@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -89,12 +90,20 @@
             align-items: center;
             gap: 10px;
             padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .card:nth-child(1) h2 { color: var(--accent1); }
-        .card:nth-child(2) h2 { color: var(--accent3); }
-        .card:nth-child(3) h2 { color: var(--accent2); }
+        .card:nth-child(1) h2 {
+            color: var(--accent1);
+        }
+
+        .card:nth-child(2) h2 {
+            color: var(--accent3);
+        }
+
+        .card:nth-child(3) h2 {
+            color: var(--accent2);
+        }
 
         .link-list {
             list-style: none;
@@ -123,66 +132,69 @@
         }
     </style>
 </head>
+
 <body>
 
-<div class="container">
-    <header>
-        <h1>PLC & 수학 매뉴얼 허브</h1>
-        <p class="subtitle">작성된 모든 HTML 문서들을 한눈에 탐색하세요.</p>
-        <!-- 나중에 구글 드라이브 PDF 링크를 여기에 넣으면 돼 -->
-        <a href="여기에_구글드라이브_링크_넣기" target="_blank" class="pdf-link">📄 PDF 매뉴얼 보기</a>
-    </header>
+    <div class="container">
+        <header>
+            <h1>PLC & 수학 매뉴얼 허브</h1>
+            <p class="subtitle">작성된 모든 HTML 문서들을 한눈에 탐색하세요.</p>
+            <!-- 나중에 구글 드라이브 PDF 링크를 여기에 넣으면 돼 -->
+            <a href="여기에_구글드라이브_링크_넣기" target="_blank" class="pdf-link">📄 PDF 매뉴얼 보기</a>
+        </header>
 
-    <div class="grid">
-        <!-- 10 PLC 폴더 -->
-        <div class="card">
-            <h2>⚙️ 10 PLC 매뉴얼</h2>
-            <ul class="link-list">
-                <li class="link-item"><a href="./PLC -MTR_매트릭스.html">PLC -MTR_매트릭스</a></li>
-                <li class="link-item"><a href="./PLC-BAND불감대영역.html">PLC-BAND불감대영역</a></li>
-                <li class="link-item"><a href="./PLC-BON(비트판정).html">PLC-BON(비트판정)</a></li>
-                <li class="link-item"><a href="./PLC-DATE&TIME.html">PLC-DATE&TIME</a></li>
-                <li class="link-item"><a href="./PLC-DSFR_워드_ 시프트.html">PLC-DSFR_워드_시프트</a></li>
-                <li class="link-item"><a href="./PLC-DSORTD_정렬.html">PLC-DSORTD_정렬</a></li>
-                <li class="link-item"><a href="./PLC-FIFW-선입선출.html">PLC-FIFW-선입선출</a></li>
-                <li class="link-item"><a href="./PLC-PWM_펄스폭.html">PLC-PWM_펄스폭</a></li>
-                <li class="link-item"><a href="./PLC-RAMPQ_경사신호.html">PLC-RAMPQ_경사신호</a></li>
-                <li class="link-item"><a href="./PLC-ROR_n비트_우_로테이션.html">PLC-ROR_n비트_우_로테이션</a></li>
-                <li class="link-item"><a href="./PLC-ROTC_로터리_테이블.html">PLC-ROTC_로터리_테이블</a></li>
-                <li class="link-item"><a href="./PLC-SCL-스케일링.html">PLC-SCL-스케일링</a></li>
-                <li class="link-item"><a href="./PLC-SERDATA_데이터검색.html">PLC-SERDATA_데이터검색</a></li>
-                <li class="link-item"><a href="./PLC-SFR_n비트_우_시프트.html">PLC-SFR_n비트_우_시프트</a></li>
-                <li class="link-item"><a href="./PLC-SUM_비트체크.html">PLC-SUM_비트체크</a></li>
-                <li class="link-item"><a href="./PLC-TTMR특수_타이머.html">PLC-TTMR특수_타이머</a></li>
-                <li class="link-item"><a href="./[서보]전자기어비.html">[서보]전자기어비</a></li>
-            </ul>
-        </div>
+        <div class="grid">
+            <!-- 10 PLC 폴더 -->
+            <div class="card">
+                <h2>⚙️ 10 PLC 매뉴얼</h2>
+                <ul class="link-list">
+                    <li class="link-item"><a href="./PLC -MTR_매트릭스.html">PLC -MTR_매트릭스</a></li>
+                    <li class="link-item"><a href="./PLC-BAND불감대영역.html">PLC-BAND불감대영역</a></li>
+                    <li class="link-item"><a href="./PLC-BON(비트판정).html">PLC-BON(비트판정)</a></li>
+                    <li class="link-item"><a href="./PLC-DATE&TIME.html">PLC-DATE&TIME</a></li>
+                    <li class="link-item"><a href="./PLC-DSFR_워드_ 시프트.html">PLC-DSFR_워드_시프트</a></li>
+                    <li class="link-item"><a href="./PLC-DSORTD_정렬.html">PLC-DSORTD_정렬</a></li>
+                    <li class="link-item"><a href="./PLC-FIFW-선입선출.html">PLC-FIFW-선입선출</a></li>
+                    <li class="link-item"><a href="./PLC-PWM_펄스폭.html">PLC-PWM_펄스폭</a></li>
+                    <li class="link-item"><a href="./PLC-RAMPQ_경사신호.html">PLC-RAMPQ_경사신호</a></li>
+                    <li class="link-item"><a href="./PLC-ROR_n비트_우_로테이션.html">PLC-ROR_n비트_우_로테이션</a></li>
+                    <li class="link-item"><a href="./PLC-ROTC_로터리_테이블.html">PLC-ROTC_로터리_테이블</a></li>
+                    <li class="link-item"><a href="./PLC-SCL-스케일링.html">PLC-SCL-스케일링</a></li>
+                    <li class="link-item"><a href="./PLC-SERDATA_데이터검색.html">PLC-SERDATA_데이터검색</a></li>
+                    <li class="link-item"><a href="./PLC-SFR_n비트_우_시프트.html">PLC-SFR_n비트_우_시프트</a></li>
+                    <li class="link-item"><a href="./PLC-SUM_비트체크.html">PLC-SUM_비트체크</a></li>
+                    <li class="link-item"><a href="./PLC-TTMR특수_타이머.html">PLC-TTMR특수_타이머</a></li>
+                    <li class="link-item"><a href="./[서보]전자기어비.html">[서보]전자기어비</a></li>
+                </ul>
+            </div>
 
-        <!-- 20 수학 폴더 -->
-        <div class="card">
-            <h2>📐 20 수학 공식 및 원리</h2>
-            <ul class="link-list">
-                <li class="link-item"><a href="../20 수학/수학_45도_삼각형_설명_2.html">수학_45도_삼각형_설명_2</a></li>
-                <li class="link-item"><a href="../20 수학/수학_XY_ 원호_그리기.html">수학_XY_원호_그리기</a></li>
-                <li class="link-item"><a href="../20 수학/수학_각도반지름_XY좌표.html">수학_각도반지름_XY좌표</a></li>
-                <li class="link-item"><a href="../20 수학/수학_각도입력_좌표_회전.html">수학_각도입력_좌표_회전</a></li>
-                <li class="link-item"><a href="../20 수학/수학_비례식_계산.html">수학_비례식_계산</a></li>
-                <li class="link-item"><a href="../20 수학/수학_센서2개로 정렬하기.html">수학_센서2개로_정렬하기</a></li>
-                <li class="link-item"><a href="../20 수학/수학_코너_삼각형_설명.html">수학_코너_삼각형_설명</a></li>
-            </ul>
-        </div>
+            <!-- 20 수학 폴더 -->
+            <div class="card">
+                <h2>📐 20 수학 공식 및 원리</h2>
+                <ul class="link-list">
+                    <li class="link-item"><a href="../20 수학/수학_45도_삼각형_설명_2.html">수학_45도_삼각형_설명_2</a></li>
+                    <li class="link-item"><a href="../20 수학/수학_XY_ 원호_그리기.html">수학_XY_원호_그리기</a></li>
+                    <li class="link-item"><a href="../20 수학/수학_각도반지름_XY좌표.html">수학_각도반지름_XY좌표</a></li>
+                    <li class="link-item"><a href="../20 수학/수학_각도입력_좌표_회전.html">수학_각도입력_좌표_회전</a></li>
+                    <li class="link-item"><a href="../20 수학/수학_비례식_계산.html">수학_비례식_계산</a></li>
+                    <li class="link-item"><a href="../20 수학/수학_센서2개로 정렬하기.html">수학_센서2개로_정렬하기</a></li>
+                    <li class="link-item"><a href="../20 수학/수학_코너_삼각형_설명.html">수학_코너_삼각형_설명</a></li>
+                </ul>
+            </div>
 
-        <!-- 메인 HTML 폴더 -->
-        <div class="card">
-            <h2>📂 기타 문서 (메인 폴더)</h2>
-            <ul class="link-list">
-                <li class="link-item"><a href="../소결로_히팅수량계산 .html">소결로_히팅수량계산</a></li>
-                <li class="link-item"><a href="../이더넷 네트워크 계층도 .html">이더넷_네트워크_계층도</a></li>
-                <li class="link-item"><a href="../파일저장.html">파일저장</a></li>
-            </ul>
+            <!-- 메인 HTML 폴더 -->
+            <div class="card">
+                <h2>📂 기타 문서 (메인 폴더)</h2>
+                <ul class="link-list">
+                    <li class="link-item"><a href="../소결로_히팅수량계산 .html">소결로_히팅수량계산</a></li>
+                    <li class="link-item"><a href="../이더넷 네트워크 계층도 .html">이더넷_네트워크_계층도</a></li>
+                    <li class="link-item"><a href="../파일저장.html">파일저장</a></li>
+                    <li class="link-item"><a href="../설명.html">설명</a></li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 
 </body>
+
 </html>
