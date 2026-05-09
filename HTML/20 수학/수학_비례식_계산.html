@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>비례식 계산기 (완벽 정렬)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Malgun Gothic', sans-serif;
+      background: #F0F3F7;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .header {
+      background: #1B3A5C;
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      width: 100%;
+      max-width: 950px;
+      text-align: center;
+    }
+    .panel {
+      background: white;
+      border-radius: 15px;
+      padding: 50px 40px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 950px;
+    }
+    .guide {
+      background: #E3F2FD;
+      color: #1565C0;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 40px;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+    /* 수평 일렬 정렬 레이아웃 */
+    .ratio-row {
+      display: flex;
+      align-items: flex-end; /* 입력창 하단 기준으로 기호 정렬 */
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 50px;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .input-group label {
+      font-size: 24px;
+      font-weight: bold;
+      color: #1B3A5C;
+    }
+    input {
+      width: 170px;
+      padding: 15px;
+      font-size: 30px;
+      font-family: 'Consolas', monospace;
+      border: 3px solid #CBD5E1;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+      background: #fff;
+    }
+    input:focus {
+      border-color: #1B3A5C;
+      outline: none;
+    }
+    .symbol {
+      font-size: 45px;
+      font-weight: bold;
+      color: #94A3B8;
+      padding-bottom: 10px; /* 입력창 높이와 밸런스 조정 */
+      line-height: 1;
+    }
+    .btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    button {
+      padding: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-calc { background: #1B3A5C; color: white; }
+    .btn-calc:hover { background: #2C5580; }
+    .btn-reset { background: #E2E8F0; color: #475569; }
+    .btn-reset:hover { background: #CBD5E1; }
+
+    /* 결과 강조 */
+    .solved {
+      background: #FFFBEB !important;
+      border-color: #D97706 !important;
+      color: #D97706 !important;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">비례식 자동 계산기 ($X1 : X2 = X3 : X4$)</div>
+
+  <div class="panel">
+    <div class="guide">
+      💡 3군데 값을 넣으면 나머지 1개는 자동으로 계산해!
+    </div>
+
+    <div class="ratio-row">
+      <div class="input-group">
+        <label>X1</label>
+        <input type="number" id="x1" step="any">
+      </div>
+      
+      <div class="symbol">:</div>
+
+      <div class="input-group">
+        <label>X2</label>
+        <input type="number" id="x2" step="any">
+      </div>
+
+      <div class="symbol">=</div>
+
+      <div class="input-group">
+        <label>X3</label>
+        <input type="number" id="x3" step="any">
+      </div>
+
+      <div class="symbol">:</div>
+
+      <div class="input-group">
+        <label>X4</label>
+        <input type="number" id="x4" step="any">
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="btn-reset" onclick="resetAll()">초기화</button>
+      <button class="btn-calc" onclick="calculate()">계산하기</button>
+    </div>
+  </div>
+
+  <script>
+    function calculate() {
+      const ids = ['x1', 'x2', 'x3', 'x4'];
+      const vals = {};
+      let emptyId = null;
+      let emptyCount = 0;
+
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('solved');
+        if (el.value === "") {
+          emptyId = id;
+          emptyCount++;
+        } else {
+          vals[id] = parseFloat(el.value);
+        }
+      });
+
+      if (emptyCount !== 1) {
+        alert("3군데만 값을 입력해줘!");
+        return;
+      }
+
+      let result = 0;
+      // 외항의 곱 = 내항의 곱 (X1*X4 = X2*X3)
+      if (emptyId === 'x1') result = (vals.x2 * vals.x3) / vals.x4;
+      else if (emptyId === 'x2') result = (vals.x1 * vals.x4) / vals.x3;
+      else if (emptyId === 'x3') result = (vals.x1 * vals.x4) / vals.x2;
+      else if (emptyId === 'x4') result = (vals.x2 * vals.x3) / vals.x1;
+
+      if (!isFinite(result)) {
+        alert("0으로 나눌 수 없거나 계산이 불가능해.");
+        return;
+      }
+
+      const target = document.getElementById(emptyId);
+      target.value = Number.isInteger(result) ? result : result.toFixed(4);
+      target.classList.add('solved');
+    }
+
+    function resetAll() {
+      ['x1', 'x2', 'x3', 'x4'].forEach(id => {
+        const el = document.getElementById(id);
+        el.value = "";
+        el.classList.remove('solved');
+      });
+    }
+  </script>
+</body>
+</html>

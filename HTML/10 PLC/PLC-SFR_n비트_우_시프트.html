@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC SFR 명령어 비트 시프트 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        html,
+        body {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #e2e8f0;
+        }
+
+        .thick-border {
+            border: 3px solid #000000;
+        }
+
+        .main-container {
+            border: 5px solid #000000;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 4px solid #000000;
+        }
+
+        .cmd-box {
+            background: #f1f5f9;
+            border: 3px solid #000000;
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .param-label {
+            font-size: 0.8rem;
+            background: #000000;
+            color: #ffffff;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: 800;
+            margin-top: 6px;
+            border: 1px solid #000000;
+        }
+
+        .bit-group-container {
+            display: flex;
+            gap: 0;
+            border: 3px solid #000;
+            background: #fff;
+            width: fit-content;
+            position: relative;
+        }
+
+        .nibble-group {
+            display: flex;
+            border-right: 3px solid #000;
+        }
+
+        .nibble-group:last-child {
+            border-right: none;
+        }
+
+        .bit-unit {
+            width: 52px;
+            height: 65px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border-left: 2px dashed #94a3b8;
+            z-index: 10;
+        }
+
+        .bit-unit:first-child {
+            border-left: none;
+        }
+
+        .bit-label {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: #64748b;
+        }
+
+        .bit-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+        }
+
+        .interactive .bit-unit.on {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .result-view .bit-unit.on {
+            background: #f8fafc;
+            color: #94a3b8;
+            border-bottom: 4px solid #cbd5e1;
+        }
+
+        .result-view .bit-unit.on .bit-value {
+            color: #93c5fd;
+        }
+
+        .result-view .bit-unit.shifted-zero {
+            color: #e2e8f0;
+        }
+
+        .code-block {
+            background: #1e293b;
+            border: 3px solid #000000;
+            border-left: 12px solid #3b82f6;
+        }
+
+        .var {
+            color: #ff79c6;
+            font-weight: bold;
+        }
+
+        .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .btn-shift {
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s;
+            cursor: pointer;
+        }
+
+        .btn-shift:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #000;
+        }
+
+        .sm700-box {
+            border: 4px solid #ef4444;
+            background: #fef2f2;
+            box-shadow: 4px 4px 0px #ef4444;
+            transition: all 0.3s;
+        }
+
+        .view-area {
+            width: 100%;
+            padding-top: 35px;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* 시프트 화살표 SVG 레이어 */
+        #shift-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .shift-arrow-path {
+            fill: none;
+            stroke: #2563eb;
+            stroke-width: 2;
+            stroke-dasharray: 4, 4;
+            animation: dash 15s linear infinite;
+            opacity: 0.6;
+            transition: d 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .arrow-to-carry {
+            stroke: #ef4444;
+            stroke-dasharray: 4, 2;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -1000;
+            }
+        }
+    </style>
+</head>
+
+<body class="p-4">
+
+    <div class="max-w-[1450px] mx-auto h-full bg-white rounded-3xl overflow-hidden flex flex-col main-container">
+
+        <!-- Header -->
+        <div class="glass-header p-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-black text-black">SFR(P) n비트 오른쪽 시프트</h1>
+                <p class="text-sm font-bold text-slate-600 mt-1">데이터(d)를 오른쪽으로 n비트 이동시키고, 마지막 비트를 SM700에 저장</p>
+            </div>
+
+            <div class="cmd-box rounded-xl px-10 py-6 flex items-center gap-6 font-mono text-3xl">
+                <span class="text-slate-400 font-black">SFR(</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">1</span>
+                    <span class="param-label uppercase">EN</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">D10</span>
+                    <span class="param-label">대상(d)</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black" id="label-n">6</span>
+                    <span class="param-label">비트수(n)</span>
+                </div>
+                <span class="text-slate-400 font-black">);</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex p-6 gap-6 overflow-hidden relative">
+
+            <!-- Left: Simulator Area -->
+            <div class="w-[68%] flex flex-col gap-6 justify-center">
+                <div class="thick-border bg-slate-50 rounded-2xl p-8 flex flex-col items-center flex-1 relative">
+                    <div class="w-full flex justify-between items-center mb-8">
+                        <h3 class="text-xl font-black text-black flex items-center gap-3">
+                            <div class="w-4 h-4 bg-blue-600 border-2 border-black rounded-full"></div>
+                            D10 비트 데이터 동적 추적
+                        </h3>
+                        <div class="flex items-center gap-4">
+                            <label class="font-black text-sm text-slate-700">시프트 수 (n):</label>
+                            <input type="number" id="n-input" value="6" min="0" max="15" oninput="updateLabels()"
+                                class="w-20 py-2 text-center text-xl font-black rounded-lg border-2 border-black">
+                            <button onclick="executeShift()"
+                                class="btn-shift bg-blue-600 text-white px-8 py-3 font-black rounded-lg uppercase">Shift</button>
+                            <button onclick="resetBits()"
+                                class="btn-shift bg-white text-black px-8 py-3 font-black rounded-lg">초기화</button>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 w-full flex flex-col justify-center gap-10 relative" id="simulator-viewport">
+                        <!-- Dynamic Arrows Layer -->
+                        <svg id="shift-overlay">
+                            <defs>
+                                <marker id="arrowhead-blue" markerWidth="8" markerHeight="6" refX="7" refY="3"
+                                    orient="auto">
+                                    <polygon points="0 0, 8 3, 0 6" fill="#2563eb" />
+                                </marker>
+                                <marker id="arrowhead-red" markerWidth="8" markerHeight="6" refX="7" refY="3"
+                                    orient="auto">
+                                    <polygon points="0 0, 8 3, 0 6" fill="#ef4444" />
+                                </marker>
+                            </defs>
+                            <g id="arrows-container"></g>
+                        </svg>
+
+                        <!-- Original Data -->
+                        <div class="flex flex-col items-center w-full">
+                            <div class="text-[0.6rem] font-black text-slate-400 uppercase mb-4 tracking-widest">Original
+                                Data [D10] (Click Bits)</div>
+                            <div class="view-area">
+                                <div id="grid-before" class="bit-group-container interactive"></div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center">
+                            <div class="text-3xl text-slate-200">⬇️</div>
+                        </div>
+
+                        <!-- Result Data -->
+                        <div class="flex flex-col items-center w-full">
+                            <div class="text-[0.6rem] font-black text-blue-300 uppercase mb-4 tracking-widest">Shifted
+                                Result [D10] (Expected)</div>
+                            <div class="view-area">
+                                <div id="grid-after" class="bit-group-container result-view opacity-40"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 w-full flex justify-between items-center bg-black p-5 rounded-xl">
+                        <div class="text-white">
+                            <div class="text-[0.7rem] text-slate-400 font-bold uppercase mb-1">Decimal Value</div>
+                            <div class="text-3xl font-black" id="dec-val">0</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[0.7rem] text-slate-400 font-bold uppercase mb-1">Shift Type</div>
+                            <div class="text-2xl font-black text-yellow-400 uppercase">Right Shift (0-Fill)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="w-[32%] flex flex-col gap-6">
+                <div id="sm700-card"
+                    class="sm700-box rounded-2xl p-8 flex flex-col items-center justify-center text-center">
+                    <h3 class="text-red-600 font-black text-sm uppercase tracking-widest mb-4">마지막 시프트 비트 (SM700)</h3>
+                    <div id="carry-lamp"
+                        class="w-36 h-36 rounded-2xl border-4 border-black flex items-center justify-center bg-white mb-6">
+                        <span id="carry-val" class="text-7xl font-black text-slate-200">0</span>
+                    </div>
+                    <p class="text-slate-600 font-bold text-sm leading-relaxed">오른쪽으로 밀려 나간 비트 중<br><span
+                            class="text-red-600 font-black">가장 마지막 비트</span>가 저장됩니다.</p>
+                </div>
+
+                <div class="code-block rounded-2xl p-6 flex-1 shadow-lg flex flex-col">
+                    <div
+                        class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-700 pb-2 flex justify-between">
+                        <span>GX Works3 ST Example</span>
+                        <span class="text-blue-400">SFR(P)</span>
+                    </div>
+                    <pre class="font-mono text-[1rem] leading-relaxed text-blue-100 flex-1">
+<span class="comment">// D10을 오른쪽으로 <span id="code-n">6</span>비트 시프트</span>
+<span class="var">D10</span> := <span id="code-dec">0</span>;
+
+<span class="comment">// 시프트 실행 (Rising Edge)</span>
+SFR(1, <span class="var">D10</span>, <span id="code-n2">6</span>);
+
+<span class="comment">// D10 값과 SM700 상태 확인</span></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let bits = new Array(16).fill(0);
+        // 초기 샘플: b13, b8 ON
+        bits[13] = 1; bits[8] = 1;
+        let shiftedBits = new Array(16).fill(0);
+
+        function init() {
+            renderManualGrid('grid-before', bits, true);
+            renderManualGrid('grid-after', shiftedBits, false);
+            updateLabels();
+            updateDecimal();
+            setTimeout(drawAllArrows, 100);
+        }
+
+        function renderManualGrid(targetId, bitArray, interactive) {
+            const container = document.getElementById(targetId);
+            container.innerHTML = '';
+            const n = parseInt(document.getElementById('n-input').value) || 0;
+
+            for (let group = 3; group >= 0; group--) {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'nibble-group';
+                for (let b = 3; b >= 0; b--) {
+                    const bitIdx = group * 4 + b;
+                    const bitUnit = document.createElement('div');
+                    bitUnit.className = `bit-unit bit-node-${bitIdx} ${bitArray[bitIdx] ? 'on' : ''}`;
+                    if (!interactive && bitIdx >= (16 - n)) bitUnit.classList.add('shifted-zero');
+
+                    bitUnit.innerHTML = `<span class="bit-label">b${bitIdx}</span><span class="bit-value">${bitArray[bitIdx]}</span>`;
+                    if (interactive) {
+                        bitUnit.onclick = () => {
+                            bits[bitIdx] = bits[bitIdx] ? 0 : 1;
+                            renderManualGrid('grid-before', bits, true);
+                            updateDecimal();
+                            drawAllArrows();
+                        };
+                    }
+                    groupDiv.appendChild(bitUnit);
+                }
+                container.appendChild(groupDiv);
+            }
+        }
+
+        function drawAllArrows() {
+            const n = parseInt(document.getElementById('n-input').value) || 0;
+            const container = document.getElementById('arrows-container');
+            const overlay = document.getElementById('shift-overlay');
+            const sm700 = document.getElementById('carry-lamp');
+
+            container.innerHTML = '';
+            const rectOverlay = overlay.getBoundingClientRect();
+            const sm700Rect = sm700.getBoundingClientRect();
+
+            bits.forEach((on, i) => {
+                if (!on) return;
+
+                const fromEl = document.querySelector(`#grid-before .bit-node-${i}`);
+                if (!fromEl) return;
+
+                const fromRect = fromEl.getBoundingClientRect();
+                const x1 = fromRect.left + fromRect.width / 2 - rectOverlay.left;
+                const y1 = fromRect.top + fromRect.height / 2 - rectOverlay.top;
+
+                const targetIdx = i - n;
+                let x2, y2, isOut = false;
+
+                if (targetIdx >= 0) {
+                    // 데이터 내 이동
+                    const toEl = document.querySelector(`#grid-after .bit-node-${targetIdx}`);
+                    if (toEl) {
+                        const toRect = toEl.getBoundingClientRect();
+                        x2 = toRect.left + toRect.width / 2 - rectOverlay.left;
+                        y2 = toRect.top + toRect.height / 2 - rectOverlay.top;
+                    }
+                } else {
+                    // 밖으로 밀려남 (SM700 방향)
+                    x2 = sm700Rect.left + sm700Rect.width / 2 - rectOverlay.left;
+                    y2 = sm700Rect.top + sm700Rect.height / 2 - rectOverlay.top;
+                    isOut = true;
+                }
+
+                if (x1 && x2) {
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.className.baseVal = `shift-arrow-path ${isOut ? 'arrow-to-carry' : ''}`;
+
+                    // 베지어 곡선 제어점 설정
+                    const cp1y = y1 + (y2 - y1) * 0.4;
+                    const cp2y = y1 + (y2 - y1) * 0.6;
+                    const d = `M ${x1},${y1} C ${x1},${cp1y} ${x2},${cp2y} ${x2},${y2}`;
+
+                    path.setAttribute('d', d);
+                    path.setAttribute('marker-end', `url(#arrowhead-${isOut ? 'red' : 'blue'})`);
+                    container.appendChild(path);
+                }
+            });
+        }
+
+        function updateLabels() {
+            const nInput = document.getElementById('n-input');
+            let n = parseInt(nInput.value);
+            if (isNaN(n)) n = 0; if (n > 15) n = 15; if (n < 0) n = 0;
+            nInput.value = n;
+
+            document.getElementById('label-n').innerText = n;
+            document.getElementById('code-n').innerText = n;
+            document.getElementById('code-n2').innerText = n;
+
+            if (!document.getElementById('grid-after').classList.contains('opacity-40')) {
+                executeShift();
+            }
+            drawAllArrows();
+        }
+
+        function updateDecimal() {
+            let dec = 0;
+            for (let i = 0; i < 16; i++) { if (bits[i]) dec += Math.pow(2, i); }
+            document.getElementById('dec-val').innerText = dec;
+            document.getElementById('code-dec').innerText = dec;
+        }
+
+        function executeShift() {
+            const n = parseInt(document.getElementById('n-input').value) || 0;
+            document.getElementById('grid-after').classList.remove('opacity-40');
+
+            let carry = 0;
+            if (n > 0) carry = bits[n - 1];
+
+            shiftedBits = new Array(16).fill(0);
+            for (let i = 0; i < 16 - n; i++) shiftedBits[i] = bits[i + n];
+
+            renderManualGrid('grid-after', shiftedBits, false);
+
+            const carryLamp = document.getElementById('carry-lamp');
+            const carryVal = document.getElementById('carry-val');
+            const sm700Card = document.getElementById('sm700-card');
+
+            carryVal.innerText = carry;
+            if (carry) {
+                carryLamp.style.backgroundColor = '#ef4444';
+                carryVal.style.color = '#ffffff';
+                sm700Card.style.transform = 'scale(1.02)';
+            } else {
+                carryLamp.style.backgroundColor = '#ffffff';
+                carryVal.style.color = '#cbd5e1';
+                sm700Card.style.transform = 'scale(1)';
+            }
+            drawAllArrows();
+        }
+
+        function resetBits() {
+            bits = new Array(16).fill(0);
+            shiftedBits = new Array(16).fill(0);
+            renderManualGrid('grid-before', bits, true);
+            renderManualGrid('grid-after', shiftedBits, false);
+            document.getElementById('grid-after').classList.add('opacity-40');
+            updateDecimal();
+            const carryLamp = document.getElementById('carry-lamp');
+            carryLamp.style.backgroundColor = '#ffffff';
+            document.getElementById('carry-val').innerText = "0";
+            document.getElementById('carry-val').style.color = '#cbd5e1';
+            drawAllArrows();
+        }
+
+        window.onload = init;
+        window.onresize = drawAllArrows;
+    </script>
+
+</body>
+
+</html>

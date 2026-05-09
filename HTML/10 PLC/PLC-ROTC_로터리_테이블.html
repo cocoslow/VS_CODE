@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC ROTC 명령어 로터리 테이블 제어 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        html,
+        body {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #e2e8f0;
+        }
+
+        /* 조드 스타일: 검은색 테두리 강렬한 테마 */
+        .thick-border {
+            border: 3px solid #000000;
+        }
+
+        .main-container {
+            border: 5px solid #000000;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 4px solid #000000;
+        }
+
+        .cmd-box {
+            background: #f1f5f9;
+            border: 3px solid #000000;
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .param-label {
+            font-size: 0.75rem;
+            background: #000000;
+            color: #ffffff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 800;
+            margin-top: 6px;
+            border: 1px solid #000000;
+            white-space: nowrap;
+        }
+
+        /* 테이블 애니메이션 속도 조절 (3.0s) */
+        .rotary-table {
+            transition: transform 3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center;
+        }
+
+        .lamp {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #000000;
+            border-radius: 50%;
+            background: #e2e8f0;
+        }
+
+        .lamp.on {
+            background: #22c55e;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        .lamp.on.red {
+            background: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
+        }
+
+        .result-display {
+            background-color: #ffffff;
+            border: 4px solid #000000;
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .code-block {
+            background: #1e293b;
+            border: 3px solid #000000;
+            border-left: 12px solid #3b82f6;
+        }
+
+        .var {
+            color: #ff79c6;
+            font-weight: bold;
+        }
+
+        .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        /* 가이드 뱃지 */
+        .guide-badge {
+            font-size: 0.65rem;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #000;
+        }
+
+        /* 업/다운 버튼 스타일 */
+        .ud-btn {
+            border: 2px solid #000;
+            background: #fff;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            transition: 0.1s;
+        }
+
+        .ud-btn:active {
+            background: #000;
+            color: #fff;
+        }
+
+        /* 숫자 버튼 그리드 스타일 */
+        .num-btn {
+            border: 1px solid #000;
+            background: #fff;
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 4px 0;
+            border-radius: 4px;
+            transition: 0.1s;
+        }
+
+        .num-btn.active {
+            background: #7c3aed;
+            color: #fff;
+            border-width: 2px;
+        }
+
+        .num-btn:hover:not(.active) {
+            background: #f3f4f6;
+        }
+    </style>
+</head>
+
+<body class="p-4">
+
+    <div class="max-w-7xl mx-auto h-full bg-white rounded-3xl overflow-hidden flex flex-col main-container">
+
+        <!-- Header: ROTC 명령어 카드 -->
+        <div class="glass-header p-5 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-black text-black">ROTC(P) 로터리 테이블 제어</h1>
+                <p class="text-[0.8rem] font-bold text-slate-600 mt-1">목표 위치까지 근거리(가장 빠른 방향)를 자동 판정하여 제어</p>
+            </div>
+
+            <div class="cmd-box rounded-xl px-8 py-4 flex items-center gap-4 font-mono text-xl">
+                <span class="text-slate-400 font-black">ROTC(</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">1</span>
+                    <span class="param-label uppercase">EN</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">D10</span>
+                    <span class="param-label">테이블정보(s)</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black" id="label-n1">10</span>
+                    <span class="param-label">분할수(n1)</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black" id="label-n2">2</span>
+                    <span class="param-label">저속구간(n2)</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">M10</span>
+                    <span class="param-label">출력신호(d)</span>
+                </div>
+                <span class="text-slate-400 font-black">);</span>
+            </div>
+        </div>
+
+        <!-- Main Content: 레이아웃 비율 조정 (원판 크기를 위해 왼쪽을 더 넓게 6:4) -->
+        <div class="flex-1 flex p-4 gap-6 overflow-hidden">
+
+            <!-- Left Column: 시각적 설명 (60%) -->
+            <div class="w-[60%] flex flex-col gap-4">
+                <div class="thick-border bg-slate-50 rounded-2xl p-4 flex-1 flex flex-col items-center">
+                    <div class="w-full flex justify-between items-center mb-2">
+                        <h3 class="text-lg font-black text-black">물리적 구조 이해 (확대 모드)</h3>
+                    </div>
+
+                    <!-- SVG Rotary Table (크기 2배 확대: viewBox 400x400) -->
+                    <div class="flex-1 flex items-center justify-center relative w-full h-full">
+                        <svg width="450" height="450" viewBox="0 0 400 400" class="max-w-full max-h-full">
+                            <g id="stations-layer"></g>
+                            <!-- 타겟 표시 프레임 -->
+                            <rect id="active-station-rect" x="180" y="5" width="40" height="40" fill="none"
+                                stroke="#ef4444" stroke-width="4" stroke-dasharray="4,2" />
+
+                            <!-- 회전 원판 (Radii doubled) -->
+                            <g id="table-group" class="rotary-table">
+                                <circle cx="200" cy="200" r="150" fill="#f8fafc" stroke="#000" stroke-width="4" />
+                                <g id="table-items"></g>
+                            </g>
+                            <circle cx="200" cy="200" r="10" fill="#000" />
+                        </svg>
+                    </div>
+
+                    <!-- 개념 정리 카드 -->
+                    <div class="grid grid-cols-2 gap-4 mt-4 w-full">
+                        <div class="bg-blue-50 p-3 rounded-xl border-2 border-blue-200">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="guide-badge bg-blue-600 text-white">s+1</span>
+                                <span class="font-black text-xs">창구 번호 (목적지)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="target-station" value="0" min="0" max="9" readonly
+                                    class="text-3xl font-black w-1/2 bg-transparent outline-none">
+                                <div class="flex flex-col gap-1">
+                                    <button onclick="changeStation(1)" class="ud-btn text-lg">▲</button>
+                                    <button onclick="changeStation(-1)" class="ud-btn text-lg">▼</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-purple-50 p-3 rounded-xl border-2 border-purple-200">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="guide-badge bg-purple-600 text-white">s+2</span>
+                                <span class="font-black text-xs">물품 번호 (이름표)</span>
+                            </div>
+                            <div id="item-btn-grid" class="grid grid-cols-5 gap-1.5">
+                                <!-- 0-9 버튼 동적 생성 -->
+                            </div>
+                            <input type="hidden" id="target-item" value="5">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: 로직 및 코드 (40%) -->
+            <div class="w-[40%] flex flex-col gap-4">
+                <div class="result-display rounded-2xl p-6 flex flex-col">
+                    <h3 class="text-sm font-black text-slate-500 uppercase mb-4 tracking-widest flex justify-between">
+                        제어 신호 상태 <span>D10 현재: <b id="curr-pos-val" class="text-blue-600">0</b></span>
+                    </h3>
+                    <div class="grid grid-cols-1 gap-3">
+                        <div
+                            class="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <span class="text-xs font-bold">회전 방향 판정 (근거리)</span>
+                            <span id="dir-text" class="text-base font-black text-blue-600">정지</span>
+                        </div>
+                        <div class="grid grid-cols-1 gap-3">
+                            <div class="flex items-center justify-between border-b pb-2">
+                                <span class="text-[0.75rem] font-bold">고속 정회전</span>
+                                <div id="lamp-m13" class="lamp"></div>
+                            </div>
+                            <div class="flex items-center justify-between border-b pb-2">
+                                <span class="text-[0.75rem] font-bold">정지 상태</span>
+                                <div id="lamp-m15" class="lamp on"></div>
+                            </div>
+                            <div class="flex items-center justify-between border-b pb-2">
+                                <span class="text-[0.75rem] font-bold">고속 역회전</span>
+                                <div id="lamp-m17" class="lamp"></div>
+                            </div>
+                            <div class="flex items-center justify-between border-b pb-2">
+                                <span class="text-[0.75rem] font-bold text-red-600">0점 (Home)</span>
+                                <div id="lamp-m12" class="lamp red"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Block -->
+                <div class="code-block rounded-2xl p-6 flex-1 shadow-lg overflow-hidden flex flex-col">
+                    <div
+                        class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-700 pb-2 flex justify-between">
+                        <span>GX Works3 ST Example</span>
+                        <span class="text-blue-400">ROTC Control</span>
+                    </div>
+                    <pre class="font-mono text-[1rem] leading-relaxed text-blue-100 flex-1 overflow-y-auto">
+<span class="comment">// s+1: 목적지 창구 번호</span>
+<span class="var">D11</span> := <span id="code-s1">0</span>; 
+
+<span class="comment">// s+2: 옮길 물품 번호</span>
+<span class="var">D12</span> := <span id="code-s2">5</span>; 
+
+<span class="comment">// 자동 근거리 제어 실행</span>
+ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
+                </pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const n1 = 10;
+        let currentItem = 5;
+
+        function init() {
+            const tableItems = document.getElementById('table-items');
+            const stationsLayer = document.getElementById('stations-layer');
+            const itemBtnGrid = document.getElementById('item-btn-grid');
+
+            // 창구 레이어 (ST0~ST9) - 좌표값 조정 (r=180)
+            for (let i = 0; i < n1; i++) {
+                const angle = (i * 360) / n1;
+                const rad = (angle - 90) * Math.PI / 180;
+                const x = 200 + 180 * Math.cos(rad);
+                const y = 200 + 180 * Math.sin(rad);
+                stationsLayer.innerHTML += `<text x="${x}" y="${y}" text-anchor="middle" font-size="12" font-weight="900" fill="#cbd5e1">ST${i}</text>`;
+            }
+
+            // 물품 레이어 - 좌표값 조정 (r=120)
+            for (let i = 0; i < n1; i++) {
+                const angle = (i * 360) / n1;
+                const rad = (angle - 90) * Math.PI / 180;
+                const x = 200 + 120 * Math.cos(rad);
+                const y = 200 + 120 * Math.sin(rad);
+                tableItems.innerHTML += `
+                <line x1="200" y1="200" x2="${200 + 150 * Math.cos(rad)}" y2="${200 + 150 * Math.sin(rad)}" stroke="#e2e8f0" stroke-width="2" />
+                <circle cx="${x}" cy="${y}" r="16" fill="white" stroke="#000" stroke-width="2" />
+                <text x="${x}" y="${y + 5}" text-anchor="middle" font-size="16" font-weight="900">${i}</text>
+            `;
+            }
+
+            // 물품 번호 버튼 그리드 생성 (0~9)
+            for (let i = 0; i < 10; i++) {
+                const btn = document.createElement('button');
+                btn.className = `num-btn ${i === currentItem ? 'active' : ''}`;
+                btn.innerText = i;
+                btn.onclick = () => selectItem(i);
+                btn.id = `btn-item-${i}`;
+                itemBtnGrid.appendChild(btn);
+            }
+
+            updateAll();
+        }
+
+        function changeStation(delta) {
+            const el = document.getElementById('target-station');
+            let val = parseInt(el.value) + delta;
+            if (val < 0) val = 9;
+            if (val > 9) val = 0;
+            el.value = val;
+            updateAll();
+        }
+
+        function selectItem(num) {
+            currentItem = num;
+            document.getElementById('target-item').value = num;
+            document.querySelectorAll('.num-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-item-${num}`).classList.add('active');
+            updateAll();
+        }
+
+        function updateAll() {
+            const s1 = parseInt(document.getElementById('target-station').value) || 0;
+            const s2 = currentItem;
+
+            document.getElementById('code-s1').innerText = s1;
+            document.getElementById('code-s2').innerText = s2;
+
+            // 타겟 스테이션 표시기 이동 (r=176)
+            const stAngle = (s1 * 360) / n1;
+            const stRad = (stAngle - 90) * Math.PI / 180;
+            const rect = document.getElementById('active-station-rect');
+            rect.setAttribute('x', 200 + 176 * Math.cos(stRad) - 20);
+            rect.setAttribute('y', 200 + 176 * Math.sin(stRad) - 20);
+            rect.setAttribute('transform', `rotate(${stAngle}, ${200 + 176 * Math.cos(stRad)}, ${200 + 176 * Math.sin(stRad)})`);
+
+            // 테이블 회전 로직
+            const rotationAngle = (s1 - s2) * (360 / n1);
+            document.getElementById('table-group').style.transform = `rotate(${rotationAngle}deg)`;
+
+            // 램프 및 상태 업데이트
+            document.querySelectorAll('.lamp').forEach(l => l.classList.remove('on'));
+            const dirText = document.getElementById('dir-text');
+
+            const diff = (s1 - s2 + n1) % n1;
+            if (diff === 0) {
+                document.getElementById('lamp-m15').classList.add('on');
+                document.getElementById('lamp-m12').classList.add('on');
+                dirText.innerText = "목표 도착 (정지)";
+                dirText.className = "text-base font-black text-green-600";
+            } else if (diff <= 5) {
+                document.getElementById('lamp-m13').classList.add('on');
+                dirText.innerText = "시계 회전 (CW)";
+                dirText.className = "text-base font-black text-blue-600";
+            } else {
+                document.getElementById('lamp-m17').classList.add('on');
+                dirText.innerText = "반시계 회전 (CCW)";
+                dirText.className = "text-base font-black text-red-600";
+            }
+        }
+
+        window.onload = init;
+    </script>
+
+</body>
+
+</html>

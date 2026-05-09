@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC FIFO 통합 시뮬레이터 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&display=swap');
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .zodd-card {
+            background: white;
+            border: 4px solid #000;
+            border-radius: 24px;
+            box-shadow: 8px 8px 0px #000;
+        }
+
+        .pointer-box {
+            background: #1e293b;
+            color: #3b82f6;
+            border: 3px solid #3b82f6;
+            border-radius: 12px;
+            font-family: monospace;
+        }
+
+        /* 탭 스타일 */
+        .tab-btn {
+            border-bottom: 4px solid transparent;
+            transition: 0.2s;
+            white-space: nowrap;
+            font-size: 1.1rem;
+            padding: 10px 14px;
+        }
+
+        .tab-btn.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+            font-weight: 900;
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .tab-btn span.sub-label {
+            font-size: 0.85rem;
+            opacity: 0.6;
+            display: block;
+            margin-top: -2px;
+        }
+
+        /* 명령어 버튼 액티브 상태 */
+        .op-select-btn {
+            border: 3px solid #000;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            height: 85px;
+            text-align: left;
+            padding: 0 20px;
+        }
+
+        .op-select-btn .btn-main-label {
+            font-size: 1.5rem;
+            font-weight: 900;
+            display: block;
+        }
+
+        .op-select-btn .btn-sub-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            opacity: 0.6;
+        }
+
+        .op-select-btn.active {
+            background: #2563eb !important;
+            color: white !important;
+            transform: scale(1.02);
+            z-index: 20;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .op-select-btn.active i {
+            color: white !important;
+        }
+
+        .op-select-btn.active .btn-sub-label {
+            color: rgba(255, 255, 255, 0.8) !important;
+            opacity: 1;
+        }
+
+        /* 입력 필드 */
+        .data-input {
+            width: 100%;
+            background: transparent;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.8rem;
+            outline: none;
+            border: none;
+            color: #1e293b;
+        }
+
+        /* 스피너 제거 */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        #flow-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .flow-path {
+            fill: none;
+            stroke: #2563eb;
+            stroke-width: 3;
+            stroke-dasharray: 6, 4;
+            animation: dash 20s linear infinite;
+            opacity: 0.6;
+            transition: d 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -1000;
+            }
+        }
+
+        /* 업/다운 버튼 스타일 */
+        .ud-btn {
+            background: #000;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            transition: all 0.1s;
+        }
+
+        .ud-btn:hover {
+            background: #334155;
+        }
+
+        .ud-btn:active {
+            transform: scale(0.9);
+        }
+
+        .result-display-panel {
+            background: #0f172a;
+            border: 4px solid #334155;
+            border-radius: 16px;
+            height: 80px;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-value-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #60a5fa;
+            text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+
+        .st-syntax-large {
+            background: #020617;
+            border-left: 10px solid #2563eb;
+            padding: 25px;
+            border-radius: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #38bdf8;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .st-code-box {
+            background: #000;
+            border: 1px solid #334155;
+            padding: 18px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: #ec4899;
+            line-height: 1.5;
+        }
+
+        .operand-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .operand-table th {
+            background: #334155;
+            color: #94a3b8;
+            font-size: 0.7rem;
+            text-align: left;
+            padding: 6px 10px;
+            border: 1px solid #1e293b;
+        }
+
+        .operand-table td {
+            font-size: 0.85rem;
+            padding: 10px;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+        }
+
+        .memo-textarea {
+            width: 100%;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 20px;
+            color: #f8fafc;
+            font-size: 1rem;
+            line-height: 1.7;
+            outline: none;
+            resize: none;
+            transition: all 0.2s;
+        }
+
+        .memo-textarea:focus {
+            border-color: #2563eb;
+            background: #0f172a;
+        }
+
+        .save-indicator {
+            font-size: 0.65rem;
+            color: #22c55e;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="p-4 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <div class="zodd-card p-4 flex justify-between items-center mb-4">
+        <div class="flex items-center gap-4">
+            <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg"><i data-lucide="layers" size="30"></i></div>
+            <div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter">PLC DATA TABLE MASTER</h1>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Advanced Instruction Simulation
+                    Laboratory</p>
+            </div>
+        </div>
+        <div class="pointer-box px-8 py-3 text-center border-4 border-black">
+            <span class="text-[0.65rem] font-black block opacity-70 uppercase tracking-tight">Active Elements
+                (D100)</span>
+            <span id="ptr-val" class="text-3xl font-black text-white">0</span>
+        </div>
+    </div>
+
+    <!-- 4-Column Layout -->
+    <div class="flex-1 flex gap-4 overflow-hidden">
+
+        <!-- Col 1: Command Selection (20%) -->
+        <div class="w-[20%] flex flex-col gap-4">
+            <div class="zodd-card p-6 flex flex-col h-full shadow-[6px_6px_0px_#000]">
+                <h3 class="text-xs font-black text-slate-400 uppercase mb-5 border-b-2 pb-2 flex items-center gap-2">
+                    <i data-lucide="zap" size="16"></i> COMMAND SELECT
+                </h3>
+
+                <div class="space-y-3 flex-1 overflow-y-auto pr-1 custom-scrollbar">
+                    <button onclick="selectOp('FIFW')" id="btn-FIFW"
+                        class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between">
+                        <div><span class="btn-main-label">FIFW</span><span class="btn-sub-label">(테이블 쓰기)</span></div>
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                    <button onclick="selectOp('FIFR')" id="btn-FIFR"
+                        class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between">
+                        <div><span class="btn-main-label">FIFR</span><span class="btn-sub-label">(선입 읽기)</span></div>
+                        <i data-lucide="log-out" class="text-blue-600"></i>
+                    </button>
+                    <button onclick="selectOp('FPOP')" id="btn-FPOP"
+                        class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between">
+                        <div><span class="btn-main-label">FPOP</span><span class="btn-sub-label">(후입 읽기)</span></div>
+                        <i data-lucide="arrow-down-to-dot" class="text-orange-600"></i>
+                    </button>
+                    <button onclick="selectOp('FINS')" id="btn-FINS"
+                        class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between">
+                        <div><span class="btn-main-label">FINS</span><span class="btn-sub-label">(데이터 삽입)</span></div>
+                        <i data-lucide="user-plus" class="text-emerald-600"></i>
+                    </button>
+                    <button onclick="selectOp('FDEL')" id="btn-FDEL"
+                        class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between">
+                        <div><span class="btn-main-label">FDEL</span><span class="btn-sub-label">(데이터 삭제)</span></div>
+                        <i data-lucide="user-minus" class="text-rose-600"></i>
+                    </button>
+                </div>
+                <button onclick="resetTable()"
+                    class="mt-4 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600 transition-colors">Clear
+                    All Data</button>
+            </div>
+        </div>
+
+        <!-- Col 2: Live Monitor (30%) -->
+        <div class="w-[30%] flex flex-col gap-4 relative">
+            <div class="zodd-card p-6 flex-1 flex flex-col shadow-[10px_10px_0px_#000] overflow-hidden relative">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-4">
+                        <div>
+                            <span
+                                class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">Status</span>
+                            <h2 id="status-display"
+                                class="text-3xl font-black text-slate-800 tracking-tighter uppercase">READY</h2>
+                        </div>
+                        <div id="read-result-area" class="invisible">
+                            <span class="text-[0.7rem] font-black text-blue-600 uppercase block">Result</span>
+                            <div class="result-display-panel"><span id="extracted-val"
+                                    class="result-value-text">---</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 업/다운 버튼 위치 조정 완료 (Flex 기반 우측 정렬) -->
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
+                        <div class="flex-1">
+                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">SOURCE
+                                (S)</label>
+                            <input type="number" id="input-s" value="100" class="data-input text-blue-600">
+                        </div>
+                        <div class="flex flex-col gap-1 ml-3">
+                            <button onclick="stepS(10)" class="ud-btn">▲</button>
+                            <button onclick="stepS(-10)" class="ud-btn">▼</button>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
+                        <div class="flex-1">
+                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">INDEX
+                                (N)</label>
+                            <input type="number" id="input-n" value="0" min="0" max="14"
+                                class="data-input text-orange-600">
+                        </div>
+                        <div class="flex flex-col gap-1 ml-3">
+                            <button onclick="stepN(1)" class="ud-btn">▲</button>
+                            <button onclick="stepN(-1)" class="ud-btn">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mb-6">
+                    <button onclick="undo()"
+                        class="flex-1 bg-slate-800 hover:bg-black text-white h-20 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-xl flex items-center justify-center gap-3 transition-all">
+                        <i data-lucide="rotate-ccw"></i> UNDO
+                    </button>
+                    <button onclick="runExecution()" id="exec-btn"
+                        class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-20 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-2xl flex items-center justify-center gap-3 transition-all">
+                        <i data-lucide="play" fill="white"></i> EXECUTE
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 relative" id="table-container">
+                    <svg id="flow-overlay">
+                        <g id="arrows-g"></g>
+                    </svg>
+                    <div class="grid grid-cols-[80px_1fr_60px] gap-4 mb-4 items-center" id="row-ptr">
+                        <div class="bg-black text-white p-2 rounded-lg font-mono text-center font-bold text-xs">D100
+                        </div>
+                        <div
+                            class="bg-blue-600 p-3 rounded-xl border-4 border-black flex justify-between items-center text-white">
+                            <span id="ptr-center" class="text-2xl font-black">0</span><span
+                                class="text-[0.6rem] font-black uppercase">Length</span></div>
+                        <div class="text-xs font-black text-blue-300 italic uppercase">Ptr</div>
+                    </div>
+                    <div id="table-body" class="space-y-2 pb-10"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 3: Handbook (25%) -->
+        <div class="w-[25%] flex flex-col overflow-hidden">
+            <div
+                class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] overflow-hidden">
+                <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                    <i data-lucide="book-open" class="text-pink-500"></i>
+                    <h3 class="text-xl font-black uppercase tracking-widest">Manual</h3>
+                    <div id="save-status" class="save-indicator ml-auto">SAVED!</div>
+                </div>
+
+                <div class="flex gap-1 mb-6 overflow-x-auto no-scrollbar border-b border-slate-800">
+                    <button onclick="selectOp('FIFW')" id="tab-FIFW" class="tab-btn px-3 py-2 font-black">FIFW</button>
+                    <button onclick="selectOp('FIFR')" id="tab-FIFR" class="tab-btn px-3 py-2 font-black">FIFR</button>
+                    <button onclick="selectOp('FPOP')" id="tab-FPOP" class="tab-btn px-3 py-2 font-black">FPOP</button>
+                    <button onclick="selectOp('FINS')" id="tab-FINS" class="tab-btn px-3 py-2 font-black">FINS</button>
+                    <button onclick="selectOp('FDEL')" id="tab-FDEL" class="tab-btn px-3 py-2 font-black">FDEL</button>
+                </div>
+
+                <div id="hb-content" class="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2"></div>
+
+                <div class="mt-6 p-5 bg-blue-900/40 border-2 border-blue-500/50 rounded-2xl italic">
+                    <p id="hb-tip" class="text-xs font-bold text-blue-100 leading-relaxed"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 4: Notepads (25%) -->
+        <div class="w-[25%] flex flex-col gap-4 overflow-hidden">
+            <div
+                class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] border-emerald-500">
+                <div class="mb-8 flex-1 flex flex-col">
+                    <div class="flex items-center gap-3 mb-4 text-emerald-400 border-b border-emerald-900/50 pb-2">
+                        <i data-lucide="clipboard-list" size="20"></i>
+                        <h3 class="text-lg font-black uppercase">Global Notes</h3>
+                    </div>
+                    <textarea id="global-memo" class="memo-textarea flex-1 border-emerald-900/50"
+                        placeholder="프로젝트 전체 특이사항 기록..."></textarea>
+                </div>
+                <div class="flex-1 flex flex-col pt-4 border-t border-slate-800">
+                    <div class="flex items-center gap-3 mb-4 text-blue-400">
+                        <i data-lucide="pencil-line" size="20"></i>
+                        <h3 id="memo-title" class="text-lg font-black uppercase">FIFW Memo</h3>
+                    </div>
+                    <textarea id="op-memo" class="memo-textarea flex-1 border-blue-900/50"
+                        placeholder="명령어 개별 메모 기록..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tableData = [10, 20, 30, 40, 50];
+        let history = [];
+        const maxSize = 15;
+        let currentOp = 'FIFW';
+        let memoData = { FIFW: '', FIFR: '', FPOP: '', FINS: '', FDEL: '', global: '' };
+
+        const manual = {
+            FIFW: {
+                title: "FIFW (Write Last)", syntax: "FIFW(EN, s, d);",
+                desc: "데이터 테이블의 가장 마지막 빈 공간에 새로운 데이터를 추가합니다.",
+                operands: [{ label: "(s)", content: "쓰기 데이터 (D10)" }, { label: "(d)", content: "테이블 선두 디바이스 (D100)" }],
+                flow: "입력값(s) ➔ D(101 + Pointer)", ptr: "D100 값이 +1 증가합니다.",
+                st: "// s: 데이터, d: 테이블 선두\nFIFW(SM400, D10, D100);", tip: "제품 입고 시 줄의 맨 뒤에 등록하는 표준 방식입니다."
+            },
+            FIFR: {
+                title: "FIFR (Read First)", syntax: "FIFR(EN, s, d);",
+                desc: "가장 오래된 데이터(D101)를 추출하고 테이블을 당깁니다.",
+                operands: [{ label: "(s)", content: "테이블 선두 (D100)" }, { label: "(d)", content: "선입 데이터 저장 (D200)" }],
+                flow: "D101 추출 ➔ [D102→D101, D103→D102...]", ptr: "D100 값이 -1 감소합니다.",
+                st: "// s: 테이블 선두, d: 결과\nFIFR(SM400, D100, D200);", tip: "먼저 들어온 부품을 먼저 투입(FIFO)할 때 필수입니다."
+            },
+            FPOP: {
+                title: "FPOP (Read Last)", syntax: "FPOP(EN, s, d);",
+                desc: "가장 나중에 들어온 데이터를 꺼냅니다.",
+                operands: [{ label: "(s)", content: "테이블 선두 (D100)" }, { label: "(d)", content: "후입 데이터 저장 (D200)" }],
+                flow: "마지막 데이터 추출 ➔ 삭제 (나머지 이동 없음)", ptr: "D100 값이 -1 감소합니다.",
+                st: "// s: 테이블 선두, d: 결과\nFPOP(SM400, D100, D200);", tip: "스택 방식. 방금 넣은 데이터를 다시 뺄 때 유리합니다."
+            },
+            FINS: {
+                title: "FINS (Data Insert)", syntax: "FINS(EN, s, n, d);",
+                desc: "지정한 위치(n)에 데이터를 삽입합니다. 뒷 데이터는 밀려납니다.",
+                operands: [{ label: "(s)", content: "삽입 데이터" }, { label: "(n)", content: "삽입 위치 (0~n)" }, { label: "(d)", content: "테이블 선두" }],
+                flow: "n번 위치 ➔ 데이터 삽입 ➔ [기존 데이터] 한 칸씩 후퇴", ptr: "D100 값이 +1 증가합니다.",
+                st: "FINS(SM400, D10, D20, D100);", tip: "테이블 중간에 긴급 데이터를 끼워 넣을 때 사용합니다."
+            },
+            FDEL: {
+                title: "FDEL (Data Delete)", syntax: "FDEL(EN, n, d);",
+                desc: "지정한 위치(n)를 삭제하고 빈자리를 메우기 위해 당깁니다.",
+                operands: [{ label: "(n)", content: "삭제 위치 (0~n)" }, { label: "(d)", content: "테이블 선두" }],
+                flow: "n번 데이터 삭제 ➔ [뒷 데이터들] 한 칸씩 전진", ptr: "D100 값이 -1 감소합니다.",
+                st: "FDEL(SM400, D20, D100);", tip: "중간의 불량 정보를 제거하고 테이블을 다시 압축합니다."
+            }
+        };
+
+        function renderTable() {
+            const body = document.getElementById('table-body'); body.innerHTML = '';
+            document.getElementById('ptr-val').innerText = tableData.length;
+            document.getElementById('ptr-center').innerText = tableData.length;
+            const n = parseInt(document.getElementById('input-n').value);
+            for (let i = 0; i < maxSize; i++) {
+                const val = tableData[i] !== undefined ? tableData[i] : null;
+                const row = document.createElement('div'); row.id = `row-${i}`;
+                let borderClass = 'border-black';
+                if ((currentOp === 'FINS' || currentOp === 'FDEL') && i === n) borderClass = 'border-orange-500 ring-4 ring-orange-200 ring-inset';
+                row.className = `grid grid-cols-[80px_1fr_60px] gap-4 items-center transition-all duration-300`;
+                row.innerHTML = `<div class="text-[0.65rem] font-mono text-slate-400 font-black text-center">D${101 + i}</div>
+                    <div class="h-12 rounded-xl border-[3px] flex items-center px-4 relative transition-all ${val !== null ? 'bg-white ' + borderClass + ' shadow-[3px_3px_0px_#000]' : 'bg-slate-50 border-slate-200 border-dashed'}">
+                        <input type="number" value="${val !== null ? val : ''}" class="data-input" onchange="updateData(${i}, this.value)" ${val === null && i > tableData.length ? 'disabled' : ''}>
+                    </div>
+                    <div class="text-right font-mono text-[0.6rem] font-black text-slate-300 italic uppercase">#${i}</div>`;
+                body.appendChild(row);
+            }
+            drawFlow();
+        }
+
+        function selectOp(op) {
+            currentOp = op;
+            document.querySelectorAll('.op-select-btn').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.getElementById(`btn-${op}`); if (activeBtn) activeBtn.classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            const activeTab = document.getElementById(`tab-${op}`); if (activeTab) activeTab.classList.add('active');
+            document.getElementById('status-display').innerText = `READY: ${op}`;
+            updateHandbook(op); renderTable();
+        }
+
+        function updateHandbook(name) {
+            const content = document.getElementById('hb-content');
+            const data = manual[name];
+            let operandHtml = `<table class="operand-table"><thead><tr><th>Operand</th><th>Description</th></tr></thead><tbody>`;
+            data.operands.forEach(o => { operandHtml += `<tr><td><span class="op-tag">${o.label}</span></td><td>${o.content}</td></tr>`; });
+            operandHtml += `</tbody></table>`;
+            content.innerHTML = `<div class="bg-slate-800/80 p-6 rounded-3xl border-2 border-slate-700">
+                    <h4 class="text-2xl font-black text-blue-400 mb-2">${data.title}</h4>
+                    <div class="st-syntax-large">${data.syntax}</div>
+                    <p class="text-sm font-bold text-slate-300 leading-relaxed">${data.desc}</p>
+                    <div class="mt-6">${operandHtml}</div>
+                </div>
+                <div class="space-y-6">
+                    <div><span class="text-[0.7rem] font-black text-slate-500 uppercase block mb-2 tracking-widest flex items-center gap-2"><i data-lucide="move" size="14"></i> 데이터 물리 이동</span>
+                        <div class="bg-black/50 p-4 rounded-xl border border-slate-700 text-xs text-orange-300 font-mono">${data.flow}</div>
+                    </div>
+                    <div><span class="text-[0.7rem] font-black text-slate-500 uppercase block mb-2 tracking-widest flex items-center gap-2"><i data-lucide="code" size="14"></i> ST Example Code</span>
+                        <div class="st-code-box">${data.st}</div>
+                    </div>
+                </div>`;
+            document.getElementById('hb-tip').innerText = data.tip;
+            document.getElementById('memo-title').innerText = `${name} Memo`;
+            document.getElementById('op-memo').value = memoData[name] || '';
+            lucide.createIcons();
+        }
+
+        function drawFlow() {
+            const g = document.getElementById('arrows-g'); g.innerHTML = '';
+            const overlay = document.getElementById('flow-overlay'); const rectOverlay = overlay.getBoundingClientRect();
+            if (currentOp === 'FIFW') drawArrow('row-ptr', `row-${tableData.length}`, g, rectOverlay);
+            else if (currentOp === 'FIFR') drawArrow('row-0', 'read-result-area', g, rectOverlay);
+            else if (currentOp === 'FPOP' && tableData.length > 0) drawArrow(`row-${tableData.length - 1}`, 'read-result-area', g, rectOverlay);
+        }
+
+        function drawArrow(fromId, toId, g, offset) {
+            const f = document.getElementById(fromId); const t = document.getElementById(toId);
+            if (!f || !t) return;
+            const r1 = f.getBoundingClientRect(); const r2 = t.getBoundingClientRect();
+            const x1 = r1.left + r1.width / 2 - offset.left; const y1 = r1.top + r1.height / 2 - offset.top;
+            const x2 = r2.left + r2.width / 2 - offset.left; const y2 = r2.top + r2.height / 2 - offset.top;
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            path.setAttribute('class', 'flow-path'); const cp = (y1 + y2) / 2;
+            path.setAttribute('d', `M ${x1},${y1} C ${x1 + 60},${cp} ${x2 + 60},${cp} ${x2},${y2}`);
+            path.setAttribute('marker-end', 'url(#arrowhead)'); g.appendChild(path);
+        }
+
+        function runExecution() {
+            saveHistory();
+            const s = parseInt(document.getElementById('input-s').value); const n = parseInt(document.getElementById('input-n').value);
+            let extracted = null;
+            const btn = document.getElementById('exec-btn'); btn.classList.add('bg-emerald-600'); setTimeout(() => btn.classList.remove('bg-emerald-600'), 300);
+            const resultArea = document.getElementById('read-result-area'); const resultVal = document.getElementById('extracted-val');
+            switch (currentOp) {
+                case 'FIFW': if (tableData.length < maxSize) { tableData.push(s); resultArea.classList.add('invisible'); } break;
+                case 'FIFR': if (tableData.length > 0) { extracted = tableData.shift(); resultArea.classList.remove('invisible'); resultVal.innerText = extracted; } break;
+                case 'FPOP': if (tableData.length > 0) { extracted = tableData.pop(); resultArea.classList.remove('invisible'); resultVal.innerText = extracted; } break;
+                case 'FINS': if (tableData.length < maxSize) { tableData.splice(Math.min(n, tableData.length), 0, s); resultArea.classList.add('invisible'); } break;
+                case 'FDEL': if (tableData.length > 0) { tableData.splice(Math.min(n, tableData.length - 1), 1); resultArea.classList.add('invisible'); } break;
+            }
+            renderTable();
+        }
+
+        function saveHistory() { history.push(JSON.parse(JSON.stringify(tableData))); if (history.length > 20) history.shift(); }
+        function undo() { if (history.length > 0) { tableData = history.pop(); document.getElementById('status-display').innerText = "UNDO: SUCCESS"; document.getElementById('read-result-area').classList.add('invisible'); renderTable(); } }
+        function updateData(idx, val) { saveHistory(); const num = parseInt(val); if (!isNaN(num)) { if (idx < tableData.length) tableData[idx] = num; else tableData.push(num); } else tableData.splice(idx, 1); renderTable(); }
+        function stepS(d) { document.getElementById('input-s').value = parseInt(document.getElementById('input-s').value) + d; renderTable(); }
+        function stepN(d) { let el = document.getElementById('input-n'); let val = parseInt(el.value) + d; el.value = Math.max(0, Math.min(14, val)); renderTable(); }
+        function resetTable() { saveHistory(); tableData = []; document.getElementById('read-result-area').classList.add('invisible'); renderTable(); }
+        function initMemos() {
+            const saved = localStorage.getItem('zodd_fifo_memos_v4');
+            if (saved) memoData = JSON.parse(saved);
+            document.getElementById('global-memo').value = memoData.global || '';
+            document.getElementById('op-memo').addEventListener('input', (e) => { memoData[currentOp] = e.target.value; saveToLocal(); });
+            document.getElementById('global-memo').addEventListener('input', (e) => { memoData.global = e.target.value; saveToLocal(); });
+        }
+        function saveToLocal() {
+            localStorage.setItem('zodd_fifo_memos_v4', JSON.stringify(memoData));
+            const ind = document.getElementById('save-status'); ind.classList.add('show'); setTimeout(() => ind.classList.remove('show'), 1000);
+        }
+
+        window.onload = () => {
+            document.body.innerHTML += '<svg style="width:0;height:0;position:absolute;"><defs><marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#2563eb" /></marker></defs></svg>';
+            lucide.createIcons(); initMemos(); selectOp('FIFW'); renderTable();
+        };
+    </script>
+</body>
+
+</html>

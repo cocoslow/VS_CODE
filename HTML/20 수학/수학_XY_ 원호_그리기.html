@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>엔드밀 호가공 — 사분면 보정</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+    :root {
+      --bg: #0E1117;
+      --bg2: #161B24;
+      --bg3: #1E2635;
+      --border: #2A3348;
+      --border2: #354060;
+      --acc1: #3B82F6;
+      --acc2: #F59E0B;
+      --acc3: #10B981;
+      --acc4: #EF4444;
+      --acc5: #8B5CF6;
+      --acc6: #F97316;
+      --acc7: #FF4081;
+      --txt: #E8EDF5;
+      --txt2: #8A9BBE;
+      --txt3: #4A5A7A;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--txt);
+      font-family: 'Noto Sans KR', sans-serif;
+      overflow: hidden
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .app {
+      display: grid;
+      grid-template-rows: 52px 1fr 42px;
+      height: 100vh
+    }
+
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      gap: 10px
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .logo-icon {
+      width: 30px;
+      height: 30px;
+      background: var(--acc1);
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 14px
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .reset-btn {
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono';
+      cursor: pointer;
+      background: rgba(249, 115, 22, .12);
+      color: var(--acc6);
+      border: 1px solid rgba(249, 115, 22, .35);
+      transition: all .15s;
+    }
+
+    .reset-btn:hover {
+      background: rgba(249, 115, 22, .25)
+    }
+
+    .mid {
+      display: grid;
+      grid-template-columns: 340px 1fr 390px;
+      min-height: 0
+    }
+
+    .panel {
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
+      overflow: hidden
+    }
+
+    .panel.right {
+      border-right: none;
+      border-left: 1px solid var(--border)
+    }
+
+    .sec-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--txt3);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      margin-bottom: 2px
+    }
+
+    .srow {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+      gap: 0
+    }
+
+    .srow label {
+      font-size: 12px;
+      color: var(--txt2);
+      width: 85px;
+      flex: none
+    }
+
+    input[type=range] {
+      flex: 1;
+      height: 4px;
+      accent-color: var(--acc1);
+      cursor: pointer
+    }
+
+    .num-box {
+      display: flex;
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--bg3);
+      height: 28px;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      flex: none;
+      margin-left: 10px
+    }
+
+    .num-btn {
+      width: 26px;
+      height: 100%;
+      border: none;
+      background: var(--bg2);
+      color: var(--txt);
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      transition: background 0.1s;
+      user-select: none
+    }
+
+    .num-btn:hover {
+      background: var(--border);
+    }
+
+    .num-val {
+      width: 52px;
+      height: 100%;
+      border-left: 1px solid var(--border2);
+      border-right: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono';
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--acc1);
+      background: var(--bg3);
+    }
+
+    .card {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 10px 12px
+    }
+
+    .krow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px
+    }
+
+    .kval {
+      font-family: 'JetBrains Mono';
+      font-size: 14px;
+      font-weight: 700
+    }
+
+    .ang-card {
+      background: linear-gradient(135deg, rgba(239, 68, 68, .12), rgba(239, 68, 68, .04));
+      border: 1px solid rgba(239, 68, 68, .3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ang-big {
+      font-family: 'JetBrains Mono';
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--acc4)
+    }
+
+    .canvas {
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      position: relative
+    }
+
+    .canvas svg {
+      flex: 1;
+      width: 100%;
+      min-height: 0
+    }
+
+    .quad-bar {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      background: rgba(22, 27, 36, 0.85);
+      padding: 6px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+    }
+
+    .q-btn {
+      padding: 8px 16px;
+      border-radius: 5px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--txt2);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .q-btn:hover {
+      background: var(--border);
+    }
+
+    .q-btn.on {
+      background: var(--acc1);
+      color: #fff;
+      border-color: var(--acc1);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    }
+
+    .cbox {
+      background: #080C12;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: 'JetBrains Mono';
+      font-size: 12.5px;
+      line-height: 1.7;
+      flex: none;
+      height: 160px;
+      overflow: auto
+    }
+
+    .cmt {
+      color: #4A6741
+    }
+
+    .hi {
+      color: #FFD060;
+      font-weight: 700
+    }
+
+    .ok {
+      color: #4EC9B0
+    }
+
+    .kw {
+      color: #C586C0
+    }
+
+    .fbox {
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 12px;
+      line-height: 1.7;
+      flex: 1;
+      overflow: auto
+    }
+
+    .fm-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--acc4);
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      border-left: 4px solid var(--acc4);
+      padding-left: 8px
+    }
+
+    .fm-row {
+      margin-bottom: 12px
+    }
+
+    .fm-lbl {
+      color: var(--txt2);
+      font-size: 10.5px;
+      margin-bottom: 4px;
+      display: block
+    }
+
+    .fm-exp {
+      font-family: 'JetBrains Mono';
+      font-size: 11px;
+      color: var(--acc1);
+      background: rgba(0, 0, 0, 0.3);
+      padding: 6px 10px;
+      border-radius: 6px;
+      word-break: break-all;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+      line-height: 1.5
+    }
+
+    .fm-res {
+      color: var(--hi);
+      font-weight: 800;
+      margin-top: 4px;
+      display: block;
+      text-align: right;
+      font-size: 13.5px;
+      letter-spacing: 0.5px
+    }
+
+    .fm-var {
+      color: var(--txt3);
+      font-size: 9px;
+      font-weight: 400;
+      margin-left: 2px
+    }
+
+    .statusbar {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      height: 42px
+    }
+
+    .si {
+      flex: 1;
+      text-align: center
+    }
+
+    .sl {
+      font-size: 9px;
+      color: var(--txt3);
+      font-weight: 700;
+      text-transform: uppercase
+    }
+
+    .sv {
+      font-family: 'JetBrains Mono';
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .sd {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+      margin: 7px 0
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <header>
+      <div class="logo">
+        <div class="logo-icon">⚙</div>
+        <div>
+          <div class="logo-text">엔드밀 호가공 — 사분면 보정</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="reset-btn" onclick="resetAll()">↺ &nbsp;DEFAULT</button>
+      </div>
+    </header>
+
+    <div class="mid">
+
+      <div class="panel">
+        <div class="sec-title">센서 측정 → 각도 계산</div>
+        <div class="card">
+          <div class="krow"><span class="kkey" style="color:var(--acc5)">S1 감지 X1</span><span class="kval" id="v-x1"
+              style="color:var(--acc5)">—</span></div>
+          <div class="krow"><span class="kkey" style="color:var(--acc5)">S2 감지 X2</span><span class="kval" id="v-x2"
+              style="color:var(--acc5)">—</span></div>
+          <div style="height:1px;background:var(--border);margin:4px 0"></div>
+          <div class="krow"><span class="kkey">dx = X2−X1</span><span class="kval" id="v-dx"
+              style="color:var(--acc4)">—</span></div>
+          <div class="krow"><span class="kkey">dy = Ys2−Ys1</span><span class="kval" id="v-dy-val"
+              style="color:var(--acc1)">—</span></div>
+        </div>
+        <div class="ang-card">
+          <div>
+            <div style="font-size:10px;color:var(--txt3);font-weight:700;margin-bottom:1px">계산 회전각 θ</div>
+            <div class="ang-big" id="v-ang">—</div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec-title">파라미터 (단위: mm)</div>
+        <div class="srow"><label>마스터 폭(W)</label><input type="range" id="sl-mw" min="50" max="400" value="200" step="1">
+          <div class="num-box"><button class="num-btn" onclick="adjVal('sl-mw',-1)">-</button>
+            <div class="num-val" id="v-mw">200</div><button class="num-btn" onclick="adjVal('sl-mw',1)">+</button>
+          </div>
+        </div>
+        <div class="srow"><label>마스터 높이(H)</label><input type="range" id="sl-mh" min="50" max="400" value="200"
+            step="1">
+          <div class="num-box"><button class="num-btn" onclick="adjVal('sl-mh',-1)">-</button>
+            <div class="num-val" id="v-mh">200</div><button class="num-btn" onclick="adjVal('sl-mh',1)">+</button>
+          </div>
+        </div>
+        <div class="srow"><label>원호 R값</label><input type="range" id="sl-r" min="5" max="100" value="30" step="1">
+          <div class="num-box"><button class="num-btn" onclick="adjVal('sl-r',-1)">-</button>
+            <div class="num-val" id="v-r">30</div><button class="num-btn" onclick="adjVal('sl-r',1)">+</button>
+          </div>
+        </div>
+        <div class="srow"><label>제품 틸트(°)</label><input type="range" id="sl-tilt" min="-30" max="30" value="5"
+            step="0.5">
+          <div class="num-box"><button class="num-btn" onclick="adjVal('sl-tilt',-0.5)">-</button>
+            <div class="num-val" id="v-tilt">5.0</div><button class="num-btn" onclick="adjVal('sl-tilt',0.5)">+</button>
+          </div>
+        </div>
+        <div class="srow"><label>X 오프셋 (Ox)</label><input type="range" id="sl-ox" min="-100" max="100" value="0"
+            step="1">
+          <div class="num-box"><button class="num-btn" onclick="adjVal('sl-ox',-1)">-</button>
+            <div class="num-val" id="v-ox">0</div><button class="num-btn" onclick="adjVal('sl-ox',1)">+</button>
+          </div>
+        </div>
+        <div class="srow"><label>Y 오프셋 (Oy)</label><input type="range" id="sl-oy" min="-100" max="100" value="0"
+            step="1">
+          <div class="num-box"><button class="num-btn" onclick="adjVal('sl-oy',-1)">-</button>
+            <div class="num-val" id="v-oy">0</div><button class="num-btn" onclick="adjVal('sl-oy',1)">+</button>
+          </div>
+        </div>
+        <div class="srow"><label>S1 (Y위치)</label><input type="range" id="sl-ys1" min="10" max="100" value="20" step="1">
+          <div class="num-box"><button class="num-btn" onclick="adjVal('sl-ys1',-1)">-</button>
+            <div class="num-val" id="v-ys1">20</div><button class="num-btn" onclick="adjVal('sl-ys1',1)">+</button>
+          </div>
+        </div>
+        <div class="srow"><label>S2 (Y위치)</label><input type="range" id="sl-ys2" min="100" max="300" value="120"
+            step="1">
+          <div class="num-box"><button class="num-btn" onclick="adjVal('sl-ys2',-1)">-</button>
+            <div class="num-val" id="v-ys2">120</div><button class="num-btn" onclick="adjVal('sl-ys2',1)">+</button>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="sec-title">선택 코너 보정 좌표</div>
+        <div class="card" style="padding:12px; background:rgba(59,130,246,0.08); border-color:var(--acc1)">
+          <div style="font-weight:700; color:var(--acc1); font-size:13px; margin-bottom:8px" id="selCornerName">LT (좌상단)
+          </div>
+          <div class="pt-row"><span class="pt-label" style="color:var(--acc1);font-size:11.5px">시작점</span><span
+              class="pt-val mono" id="sel-s" style="font-size:12.5px">—</span></div>
+          <div class="pt-row"><span class="pt-label" style="color:var(--acc2);font-size:11.5px">중간점</span><span
+              class="pt-val mono" id="sel-m" style="font-size:12.5px">—</span></div>
+          <div class="pt-row"><span class="pt-label" style="color:var(--acc3);font-size:11.5px">끝점</span><span
+              class="pt-val mono" id="sel-e" style="font-size:12.5px">—</span></div>
+          <div class="pt-row" style="margin-top:4px; padding-top:4px; border-top:1px dashed var(--border2)"><span
+              class="pt-label" style="color:var(--acc7);font-size:11.5px">원 중심</span><span class="pt-val mono"
+              id="sel-c" style="font-size:12.5px">—</span></div>
+        </div>
+      </div>
+
+      <div class="canvas">
+        <div class="quad-bar">
+          <button class="q-btn" id="qbtn-1" onclick="setC(1)">1사분 (RT)</button>
+          <button class="q-btn on" id="qbtn-2" onclick="setC(0)">2사분 (LT)</button>
+          <button class="q-btn" id="qbtn-3" onclick="setC(3)">3사분 (LB)</button>
+          <button class="q-btn" id="qbtn-4" onclick="setC(2)">4사분 (RB)</button>
+        </div>
+
+        <!-- viewBox 하단 여유 공간 대폭 확대 (440 -> 520) -->
+        <svg id="mainSvg" viewBox="-20 -40 440 520" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2.5" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="glow2">
+              <feGaussianBlur stdDeviation="3.5" result="b" />
+              <feMerge>
+                <feMergeNode in="b" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+              <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="rgba(0,0,0,.6)" />
+            </filter>
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6"
+              orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--txt3)" />
+            </marker>
+            <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#3B82F6" />
+              <stop offset="50%" stop-color="#F59E0B" />
+              <stop offset="100%" stop-color="#10B981" />
+            </linearGradient>
+            <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(59,130,246,.15)" stroke-width="1" />
+            </pattern>
+          </defs>
+
+          <g stroke="rgba(42,51,72,.3)" stroke-width="0.5" id="grid"></g>
+
+          <text x="-15" y="-25" font-size="7" fill="var(--txt3)" font-weight="400" font-family="JetBrains Mono">Sensor:
+            S1, S2</text>
+
+          <g id="masterSet">
+            <rect id="masterFill" x="70" y="30" width="320" height="320" fill="url(#hatch)" rx="2" />
+            <rect id="masterRect" x="70" y="30" width="320" height="320" fill="none" stroke="rgba(59,130,246,.3)"
+              stroke-width="1" stroke-dasharray="8 4" rx="2" />
+            <text id="masterTxt" x="72" y="24" font-size="9" fill="rgba(59,130,246,.4)" font-weight="700"
+              font-family="JetBrains Mono">MASTER REFERENCE</text>
+          </g>
+
+          <g id="sensorSet">
+            <line id="s1line" x1="-20" y1="0" x2="420" y2="0" stroke="rgba(139,92,246,.2)" stroke-width="0.8"
+              stroke-dasharray="4 3" />
+            <line id="s2line" x1="-20" y1="0" x2="420" y2="0" stroke="rgba(139,92,246,.2)" stroke-width="0.8"
+              stroke-dasharray="4 3" />
+            <g id="s1sym">
+              <circle cx="0" cy="0" r="10" fill="rgba(139,92,246,0.8)" /><text x="0" y="3.5" font-size="7" fill="#fff"
+                text-anchor="middle" font-weight="700">S1</text>
+            </g>
+            <g id="s2sym">
+              <circle cx="0" cy="0" r="10" fill="rgba(139,92,246,0.5)" /><text x="0" y="3.5" font-size="7" fill="#fff"
+                text-anchor="middle" font-weight="700">S2</text>
+            </g>
+            <circle id="ps1" cx="0" cy="0" r="5" fill="var(--acc5)" filter="url(#glow)" />
+            <circle id="ps2" cx="0" cy="0" r="5" fill="rgba(139,92,246,.7)" filter="url(#glow)" />
+            <text id="ls1" font-size="7.5" fill="var(--acc5)" font-weight="900" stroke="var(--bg)" stroke-width="2.5"
+              paint-order="stroke" text-anchor="end">X1</text>
+            <text id="ls2" font-size="7.5" fill="rgba(139,92,246,1)" font-weight="900" stroke="var(--bg)"
+              stroke-width="2.5" paint-order="stroke" text-anchor="end">X2</text>
+
+            <line id="dyDimLine" x1="410" y1="0" x2="410" y2="0" stroke="var(--txt3)" stroke-width="1"
+              marker-start="url(#arrow)" marker-end="url(#arrow)" />
+            <text id="dyDimTxt" x="380" y="0" font-size="8" fill="var(--txt3)" text-anchor="middle"
+              transform="rotate(-90)">dy = Ys2 - Ys1</text>
+          </g>
+
+          <line id="dxLine" x1="0" y1="0" x2="0" y2="0" stroke="var(--acc4)" stroke-width="1.5" /><text id="dxTxt" x="0"
+            y="0" font-size="7.5" fill="var(--acc4)" text-anchor="middle">dx = X2 - X1</text>
+
+          <g id="prodGroup" style="cursor:move" filter="url(#shadow)">
+            <rect id="prodRect" x="70" y="30" width="320" height="320" rx="2" fill="rgba(16,185,129,.1)"
+              stroke="rgba(16,185,129,.8)" stroke-width="2" />
+            <g id="prodCenter">
+              <line x1="-10" y1="0" x2="10" y2="0" stroke="rgba(16,185,129,0.5)" stroke-width="1" />
+              <line x1="0" y1="-10" x2="0" y2="10" stroke="rgba(16,185,129,0.5)" stroke-width="1" />
+              <text x="5" y="-5" font-size="10" fill="rgba(16,185,129,0.7)" font-weight="700">셀</text>
+            </g>
+          </g>
+
+          <g id="resultGraphics" pointer-events="none">
+            <path id="arcCorr" fill="none" stroke="url(#arcGrad)" stroke-width="3.5" stroke-linecap="round"
+              filter="url(#glow2)" />
+            <path id="angArc" fill="none" stroke="rgba(239,68,68,.55)" stroke-width="1.2" /><text id="angTxt"
+              font-size="8" fill="var(--acc4)" font-weight="700">θ</text>
+            <line id="rc1" stroke="rgba(139,92,246,.2)" stroke-dasharray="3 2" />
+            <line id="rc2" stroke="rgba(139,92,246,.2)" stroke-dasharray="3 2" />
+            <line id="rc3" stroke="rgba(139,92,246,.2)" stroke-dasharray="3 2" />
+            <g id="ptGroup"></g>
+            <g id="lblGroup">
+              <circle id="pt-c" r="3.5" fill="var(--acc7)" filter="url(#glow)" />
+              <text id="lbl-c" font-size="7.5" fill="var(--acc7)" font-family="JetBrains Mono" stroke="var(--bg)"
+                stroke-width="2.5" paint-order="stroke">중심</text>
+            </g>
+          </g>
+        </svg>
+      </div>
+
+      <div class="panel right">
+        <div class="sec-title">실시간 보정 공식 대입</div>
+        <div class="fbox" id="formulaBox"></div>
+        <div class="sec-title" style="margin-top:10px">GX Works3 ST 코드</div>
+        <div class="cbox" id="stCode">...</div>
+      </div>
+    </div>
+
+    <div class="statusbar">
+      <div class="si">
+        <div class="sl">틸트각</div>
+        <div class="sv" id="b-tilt" style="color:var(--acc4)">—</div>
+      </div>
+      <div class="sd"></div>
+      <div class="si">
+        <div class="sl">오프셋 X,Y</div>
+        <div class="sv" id="b-off">—</div>
+      </div>
+      <div class="sd"></div>
+      <div class="si">
+        <div class="sl">시작점</div>
+        <div class="sv" id="b-start" style="color:var(--acc1)">—</div>
+      </div>
+      <div class="sd"></div>
+      <div class="si">
+        <div class="sl">중간점</div>
+        <div class="sv" id="b-mid" style="color:var(--acc2)">—</div>
+      </div>
+      <div class="sd"></div>
+      <div class="si">
+        <div class="sl">끝점</div>
+        <div class="sv" id="b-end" style="color:var(--acc3)">—</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const el = id => document.getElementById(id);
+    function sv(id, v) { el(id).value = v; update(); }
+    function adjVal(id, d) {
+      const e = el(id);
+      e.value = (parseFloat(e.value) + d).toFixed(1);
+      update();
+    }
+
+    (function init() {
+      const g = el('grid');
+      for (let i = 0; i <= 400; i += 20) {
+        const lh = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        lh.setAttribute('x1', -20); lh.setAttribute('x2', 420); lh.setAttribute('y1', i); lh.setAttribute('y2', i); g.appendChild(lh);
+        const lv = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        lv.setAttribute('y1', -40); lv.setAttribute('y2', 480); lv.setAttribute('x1', i); lv.setAttribute('x2', i); g.appendChild(lh);
+      }
+      const pg = el('ptGroup'), lg = el('lblGroup');
+      const cols = ['#3B82F6', '#F59E0B', '#10B981'];
+      for (let p = 0; p < 3; p++) {
+        const circ = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circ.id = `pt-${p}`; circ.setAttribute('r', 4); circ.setAttribute('fill', cols[p]); pg.appendChild(circ);
+        const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        txt.id = `lbl-${p}`; txt.setAttribute('font-size', '7.5'); txt.setAttribute('fill', cols[p]);
+        txt.setAttribute('font-family', 'JetBrains Mono'); txt.setAttribute('stroke', '#0E1117');
+        txt.setAttribute('stroke-width', '2.5'); txt.setAttribute('paint-order', 'stroke'); lg.appendChild(txt);
+      }
+    })();
+
+    let curC = 0;
+    function setC(n) {
+      curC = n;
+      for (let i = 1; i <= 4; i++) el('qbtn-' + i).classList.remove('on');
+      const qNum = { 0: 2, 1: 1, 2: 4, 3: 3 }[n];
+      el('qbtn-' + qNum).classList.add('on');
+      update();
+    }
+
+    function resetAll() {
+      el('sl-mw').value = 200; el('sl-mh').value = 200; el('sl-tilt').value = 5; el('sl-r').value = 30;
+      el('sl-ox').value = 0; el('sl-oy').value = 0; el('sl-ys1').value = 20; el('sl-ys2').value = 120;
+      setC(0);
+    }
+
+    const SC = 1.6, MX = 70, MY = 30;
+
+    function update() {
+      const mw = parseFloat(el('sl-mw').value), mh = parseFloat(el('sl-mh').value);
+      const tilt = parseFloat(el('sl-tilt').value), R_mm = parseFloat(el('sl-r').value);
+      const ox_mm = parseFloat(el('sl-ox').value), oy_mm = parseFloat(el('sl-oy').value);
+      const ys1 = parseFloat(el('sl-ys1').value), ys2 = parseFloat(el('sl-ys2').value);
+
+      el('v-mw').textContent = mw; el('v-mh').textContent = mh; el('v-r').textContent = R_mm;
+      el('v-tilt').textContent = tilt.toFixed(1); el('v-ox').textContent = ox_mm; el('v-oy').textContent = oy_mm;
+      el('v-ys1').textContent = ys1; el('v-ys2').textContent = ys2;
+
+      const rad = tilt * Math.PI / 180, cosT = Math.cos(rad), sinT = Math.sin(rad);
+      const PX = MX + ox_mm * SC, PY = MY + oy_mm * SC;
+      const W_px = mw * SC, H_px = mh * SC;
+
+      el('masterRect').setAttribute('width', W_px); el('masterRect').setAttribute('height', H_px);
+      el('masterFill').setAttribute('width', W_px); el('masterFill').setAttribute('height', H_px);
+      el('masterTxt').textContent = `MASTER REFERENCE (${mw}x${mh}mm)`;
+
+      el('prodRect').setAttribute('width', W_px); el('prodRect').setAttribute('height', H_px);
+      el('prodGroup').setAttribute('transform', `translate(${ox_mm * SC},${oy_mm * SC}) rotate(${tilt} ${MX} ${MY})`);
+      el('prodCenter').setAttribute('transform', `translate(${W_px / 2 + MX}, ${H_px / 2 + MY})`);
+
+      const botSvg = { x: PX - sinT * H_px, y: PY + cosT * H_px };
+      const s1y_px = MY + ys1 * SC, s2y_px = MY + ys2 * SC;
+      const x1_px = PX + (s1y_px - PY) / (botSvg.y - PY) * (botSvg.x - PX);
+      const x2_px = PX + (s2y_px - PY) / (botSvg.y - PY) * (botSvg.x - PX);
+      const x1_mm = (x1_px - MX) / SC - ox_mm, x2_mm = (x2_px - MX) / SC - ox_mm;
+      const dx_mm = x2_mm - x1_mm, dy_mm = ys2 - ys1;
+      const theta_calc = Math.atan2(dx_mm, dy_mm) * 180 / Math.PI;
+
+      el('s1line').setAttribute('y1', s1y_px); el('s1line').setAttribute('y2', s1y_px);
+      el('s2line').setAttribute('y1', s2y_px); el('s2line').setAttribute('y2', s2y_px);
+      el('s1sym').setAttribute('transform', `translate(12, ${s1y_px})`);
+      el('s2sym').setAttribute('transform', `translate(12, ${s2y_px})`);
+
+      el('ps1').setAttribute('cx', x1_px); el('ps1').setAttribute('cy', s1y_px);
+      el('ps2').setAttribute('cx', x2_px); el('ps2').setAttribute('cy', s2y_px);
+
+      el('ls1').setAttribute('x', x1_px - 25); el('ls1').setAttribute('y', s1y_px - 4); el('ls1').textContent = `(${x1_mm.toFixed(2)},${ys1})`;
+      el('ls2').setAttribute('x', x2_px - 25); el('ls2').setAttribute('y', s2y_px - 4); el('ls2').textContent = `(${x2_mm.toFixed(2)},${ys2})`;
+
+      el('dyDimLine').setAttribute('y1', s1y_px); el('dyDimLine').setAttribute('y2', s2y_px);
+      el('dyDimTxt').setAttribute('x', -(s1y_px + s2y_px) / 2); el('dyDimTxt').setAttribute('y', 425);
+
+      const dxY = Math.max(s1y_px, s2y_px) + 15;
+      el('dxLine').setAttribute('x1', Math.min(x1_px, x2_px)); el('dxLine').setAttribute('x2', Math.max(x1_px, x2_px));
+      el('dxLine').setAttribute('y1', dxY); el('dxLine').setAttribute('y2', dxY);
+      el('dxTxt').setAttribute('x', (x1_px + x2_px) / 2); el('dxTxt').setAttribute('y', dxY + 10); el('dxTxt').textContent = `dx = X2 - X1: ${dx_mm.toFixed(2)}`;
+
+      el('v-x1').textContent = x1_mm.toFixed(3); el('v-x2').textContent = x2_mm.toFixed(3);
+      el('v-dx').textContent = dx_mm.toFixed(3); el('v-dy-val').textContent = dy_mm.toFixed(1); el('v-ang').textContent = theta_calc.toFixed(2) + '°';
+
+      function locToMach(lx, ly) {
+        return { x: +(cosT * lx - sinT * ly + ox_mm).toFixed(3), y: +(sinT * lx + cosT * ly + oy_mm).toFixed(3) };
+      }
+      function locToSvg(lx, ly) {
+        const px = lx * SC, py = ly * SC;
+        return { x: PX + cosT * px - sinT * py, y: PY + sinT * px + cosT * py };
+      }
+
+      const k = 1 - 1 / Math.SQRT2;
+      const labels = ['시작', '중간', '끝'];
+      const cornerNames = ['LT (좌상단)', 'RT (우상단)', 'RB (우하단)', 'LB (좌하단)'];
+
+      const offs = [
+        [[-40, -10], [-55, -25], [10, -35]],  // LT
+        [[10, -35], [55, -25], [40, -10]],   // RT
+        [[40, 10], [55, 25], [-65, 30]],     // RB (4사분면): 끝점(Bottom) 레이블을 왼쪽으로 보내서 공간 확보
+        [[10, 35], [-55, 25], [-40, 10]]     // LB
+      ];
+
+      let cc, sc, ec, mc;
+      if (curC === 0) { cc = { x: R_mm, y: R_mm }; sc = { x: 0, y: R_mm }; ec = { x: R_mm, y: 0 }; mc = { x: R_mm * k, y: R_mm * k }; }
+      else if (curC === 1) { cc = { x: mw - R_mm, y: R_mm }; sc = { x: mw - R_mm, y: 0 }; ec = { x: mw, y: R_mm }; mc = { x: mw - R_mm * k, y: R_mm * k }; }
+      else if (curC === 2) { cc = { x: mw - R_mm, y: mh - R_mm }; sc = { x: mw, y: mh - R_mm }; ec = { x: mw - R_mm, y: mh }; mc = { x: mw - R_mm * k, y: mh - R_mm * k }; }
+      else { cc = { x: R_mm, y: mh - R_mm }; sc = { x: R_mm, y: mh }; ec = { x: 0, y: mh - R_mm }; mc = { x: R_mm * k, y: mh - R_mm * k }; }
+
+      const R_svgpx = R_mm * SC;
+      const sV = locToSvg(sc.x, sc.y), mV = locToSvg(mc.x, mc.y), eV = locToSvg(ec.x, ec.y), cV = locToSvg(cc.x, cc.y);
+      const sM = locToMach(sc.x, sc.y), mM = locToMach(mc.x, mc.y), eM = locToMach(ec.x, ec.y), cM = locToMach(cc.x, cc.y);
+
+      el('arcCorr').setAttribute('d', `M ${sV.x} ${sV.y} A ${R_svgpx} ${R_svgpx} ${tilt} 0 1 ${eV.x} ${eV.y}`);
+      el('rc1').setAttribute('x1', cV.x); el('rc1').setAttribute('y1', cV.y); el('rc1').setAttribute('x2', sV.x); el('rc1').setAttribute('y2', sV.y);
+      el('rc2').setAttribute('x1', cV.x); el('rc2').setAttribute('y1', cV.y); el('rc2').setAttribute('x2', mV.x); el('rc2').setAttribute('y2', mV.y);
+      el('rc3').setAttribute('x1', cV.x); el('rc3').setAttribute('y1', cV.y); el('rc3').setAttribute('x2', eV.x); el('rc3').setAttribute('y2', eV.y);
+
+      el('pt-c').setAttribute('cx', cV.x); el('pt-c').setAttribute('cy', cV.y);
+
+      let cox = 8, coy = 15;
+      if (curC === 0) { cox = 12; coy = 20; }
+      else if (curC === 1) { cox = -85; coy = 20; }
+      else if (curC === 2) { cox = -85; coy = -15; }
+      else if (curC === 3) { cox = 12; coy = -15; }
+      el('lbl-c').setAttribute('x', cV.x + cox); el('lbl-c').setAttribute('y', cV.y + coy); el('lbl-c').textContent = `중심(${cM.x},${cM.y})`;
+
+      const pts = [sV, mV, eV], mpts = [sM, mM, eM], locs = [sc, mc, ec];
+      for (let p = 0; p < 3; p++) {
+        el(`pt-${p}`).setAttribute('cx', pts[p].x); el(`pt-${p}`).setAttribute('cy', pts[p].y);
+        el(`lbl-${p}`).setAttribute('x', pts[p].x + offs[curC][p][0]); el(`lbl-${p}`).setAttribute('y', pts[p].y + offs[curC][p][1]);
+        el(`lbl-${p}`).textContent = `${labels[p]}(${mpts[p].x},${mpts[p].y})`;
+
+        if (curC === 0 || curC === 3) {
+          el(`lbl-${p}`).setAttribute('text-anchor', p === 0 || p === 1 ? 'end' : 'start');
+        } else {
+          el(`lbl-${p}`).setAttribute('text-anchor', p === 2 || p === 1 ? 'start' : 'end');
+        }
+      }
+
+      // 사분면별 예외 처리: RB 끝점은 anchor end로 변경하여 왼쪽으로 길어지게 함
+      if (curC === 2) el('lbl-2').setAttribute('text-anchor', 'end');
+
+      el('selCornerName').textContent = cornerNames[curC];
+      el('sel-s').textContent = `(${sM.x}, ${sM.y})`; el('sel-m').textContent = `(${mM.x}, ${mM.y})`; el('sel-e').textContent = `(${eM.x}, ${eM.y})`; el('sel-c').textContent = `(${cM.x}, ${cM.y})`;
+
+      const aR = 35;
+      el('angArc').setAttribute('d', `M ${PX + aR} ${PY} A ${aR} ${aR} 0 0 1 ${PX + aR * cosT} ${PY + aR * sinT}`);
+      el('angTxt').setAttribute('x', PX + aR * Math.cos(rad / 2) + 4); el('angTxt').setAttribute('y', PY + aR * Math.sin(rad / 2) + 4); el('angTxt').textContent = theta_calc.toFixed(1) + '°';
+
+      el('b-tilt').textContent = tilt.toFixed(1) + '°'; el('b-off').textContent = `${ox_mm},${oy_mm}`;
+      el('b-start').textContent = `${sM.x},${sM.y}`; el('b-mid').textContent = `${mM.x},${mM.y}`; el('b-end').textContent = `${eM.x},${eM.y}`;
+
+      const cT = cosT.toFixed(4), sT = sinT.toFixed(4);
+      el('formulaBox').innerHTML = `
+    <div class="fm-title">① 보정 각도 (θ) 계산</div>
+    <div class="fm-row">
+      <span class="fm-lbl">ATAN(dx / dy)</span>
+      <div class="fm-exp">ATAN(${dx_mm.toFixed(3)}<span class="fm-var">(dx)</span> / ${dy_mm.toFixed(1)}<span class="fm-var">(dy)</span>)</div>
+      <span class="fm-res">= ${theta_calc.toFixed(2)}°</span>
+    </div>
+
+    <div class="fm-title">② 회전 변환 계수 산출</div>
+    <div class="fm-row">
+      <span class="fm-lbl">삼각함수 값 (현재 각도 ${theta_calc.toFixed(2)}° 기준)</span>
+      <div class="fm-exp">
+        <span style="color:var(--acc7)">cos(${theta_calc.toFixed(2)}°) = ${cT}</span><br>
+        <span style="color:var(--acc2)">sin(${theta_calc.toFixed(2)}°) = ${sT}</span>
+      </div>
+      <span class="fm-lbl" style="margin-top:8px">좌표 보정 공식:</span>
+      <div class="fm-exp" style="font-size:11px">
+        X_mach = <span style="color:var(--acc7)">cosθ</span> × Lx - <span style="color:var(--acc2)">sinθ</span> × Ly + Ox<br>
+        Y_mach = <span style="color:var(--acc2)">sinθ</span> × Lx + <span style="color:var(--acc7)">cosθ</span> × Ly + Oy
+      </div>
+    </div>
+
+    <div class="fm-title">③ ${cornerNames[curC]} 좌표 산출</div>
+    <div class="fm-row">
+      <span class="fm-lbl">중중심점 (Lx: ${cc.x}<span class="fm-var">(원호R)</span>, Ly: ${cc.y}<span class="fm-var">(원호R)</span>)</span>
+      <div class="fm-exp"><span style="color:var(--acc7)">${cT}</span> × ${cc.x} - <span style="color:var(--acc2)">${sT}</span> × ${cc.y} + ${ox_mm}</div>
+      <span class="fm-res">X_center = ${cM.x}</span>
+      <div class="fm-exp"><span style="color:var(--acc2)">${sT}</span> × ${cc.x} + <span style="color:var(--acc7)">${cT}</span> × ${cc.y} + ${oy_mm}</div>
+      <span class="fm-res">Y_center = ${cM.y}</span>
+    </div>
+
+    <div class="fm-row">
+      <span class="fm-lbl">시작점 (Lx: ${locs[0].x}, Ly: ${locs[0].y})</span>
+      <div class="fm-exp"><span style="color:var(--acc7)">${cT}</span> × ${locs[0].x} - <span style="color:var(--acc2)">${sT}</span> × ${locs[0].y} + ${ox_mm}</div>
+      <span class="fm-res">X_mach = ${sM.x}</span>
+      <div class="fm-exp"><span style="color:var(--acc2)">${sT}</span> × ${locs[0].x} + <span style="color:var(--acc7)">${cT}</span> × ${locs[0].y} + ${oy_mm}</div>
+      <span class="fm-res">Y_mach = ${sM.y}</span>
+    </div>
+
+    <div class="fm-row">
+      <span class="fm-lbl">중간점 (Lx: ${locs[1].x.toFixed(2)}, Ly: ${locs[1].y.toFixed(2)})</span>
+      <div class="fm-exp" style="color:var(--txt3); margin-bottom:4px">└ 공식: 원호R × (1 - cos 45°) = ${R_mm} × 0.2929</div>
+      <div class="fm-exp"><span style="color:var(--acc7)">${cT}</span> × ${locs[1].x.toFixed(2)} - <span style="color:var(--acc2)">${sT}</span> × ${locs[1].y.toFixed(2)} + ${ox_mm}</div>
+      <span class="fm-res">X_mach = ${mM.x}</span>
+      <div class="fm-exp"><span style="color:var(--acc2)">${sT}</span> × ${locs[1].x.toFixed(2)} + <span style="color:var(--acc7)">${cT}</span> × ${locs[1].y.toFixed(2)} + ${oy_mm}</div>
+      <span class="fm-res">Y_mach = ${mM.y}</span>
+    </div>
+
+    <div class="fm-row">
+      <span class="fm-lbl">끝점 (Lx: ${locs[2].x}, Ly: ${locs[2].y})</span>
+      <div class="fm-exp"><span style="color:var(--acc7)">${cT}</span> × ${locs[2].x} - <span style="color:var(--acc2)">${sT}</span> × ${locs[2].y} + ${ox_mm}</div>
+      <span class="fm-res">X_mach = ${eM.x}</span>
+      <div class="fm-exp"><span style="color:var(--acc2)">${sT}</span> × ${locs[2].x} + <span style="color:var(--acc7)">${cT}</span> × ${locs[2].y} + ${oy_mm}</div>
+      <span class="fm-res">Y_mach = ${eM.y}</span>
+    </div>
+  `;
+
+      el('stCode').innerHTML = `<span class="cmt">// ① 각도 보정</span>
+<span class="vr">dx</span> := <span class="nm">${dx_mm.toFixed(3)}</span>; <span class="vr">dy</span> := <span class="nm">${dy_mm.toFixed(1)}</span>;
+<span class="vr">rRad</span> := <span class="fn">ATAN</span>(<span class="vr">dx</span>/<span class="vr">dy</span>);
+<span class="cmt">// θ = <span class="hi">${theta_calc.toFixed(3)}°</span></span>
+
+<span class="cmt">// ② 선택 코너 (${cornerNames[curC]})</span>
+<span class="cmt">// 시작: (${sM.x}, ${sM.y})</span>
+<span class="cmt">// 중간: (${mM.x}, ${mM.y})</span>
+<span class="cmt">// 끝:   (${eM.x}, ${eM.y})</span>
+<span class="cmt">// 중심: (${cM.x}, ${cM.y})</span>`;
+    }
+
+    let drag = false, dragSX = 0, dragSY = 0, dragOx = 0, dragOy = 0;
+    function toSvgPt(e) {
+      const r = el('mainSvg').getBoundingClientRect();
+      const c = e.touches ? e.touches[0] : e;
+      return { x: (c.clientX - r.left) / r.width * 440 - 20, y: (c.clientY - r.top) / r.height * 520 - 40 };
+    }
+    el('prodGroup').addEventListener('mousedown', e => {
+      drag = true; const p = toSvgPt(e); dragSX = p.x; dragSY = p.y;
+      dragOx = parseFloat(el('sl-ox').value); dragOy = parseFloat(el('sl-oy').value);
+    });
+    window.addEventListener('mousemove', e => {
+      if (!drag) return; const p = toSvgPt(e);
+      el('sl-ox').value = dragOx + (p.x - dragSX) / SC; el('sl-oy').value = dragOy + (p.y - dragSY) / SC; update();
+    });
+    window.addEventListener('mouseup', () => drag = false);
+
+    ['sl-mw', 'sl-mh', 'sl-tilt', 'sl-r', 'sl-ox', 'sl-oy', 'sl-ys1', 'sl-ys2'].forEach(id => el(id).addEventListener('input', update));
+    update();
+    setC(0);
+  </script>
+</body>
+
+</html>

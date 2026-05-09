@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>서보 파라미터 & 속도 계산기</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+      background: #F0F3F7;
+      color: #333;
+      padding: 20px;
+      line-height: 1.5;
+    }
+
+    .header {
+      background: #1B3A5C;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #DDE3EA;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+
+    .panel-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #1B3A5C;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #EEF1F5;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 5px;
+    }
+
+    input[type="number"], input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      font-family: 'Consolas', monospace;
+      border: 1px solid #CCC;
+      border-radius: 4px;
+      font-weight: bold;
+      color: #1B3A5C;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 15px;
+      margin-top: 5px;
+    }
+
+    .radio-group label {
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .slider-row input[type="range"] {
+      flex: 1;
+    }
+
+    .slider-row input[type="number"] {
+      width: 80px;
+    }
+
+    .updown-wrapper {
+      display: flex;
+      border: 1px solid #CCC;
+      border-radius: 4px;
+      overflow: hidden;
+      height: 40px;
+    }
+
+    .updown-wrapper input[type="number"] {
+      border: none;
+      border-radius: 0;
+      width: 50px;
+      text-align: center;
+      padding: 0;
+      -moz-appearance: textfield;
+    }
+
+    .updown-wrapper input[type="number"]::-webkit-inner-spin-button,
+    .updown-wrapper input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    .updown-btn {
+      width: 30px;
+      background: #F8FAFC;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      color: #1B3A5C;
+      cursor: pointer;
+    }
+
+    .updown-btn:first-child {
+      border-right: 1px solid #CCC;
+    }
+
+    .updown-btn:last-child {
+      border-left: 1px solid #CCC;
+    }
+
+    .updown-btn:hover {
+      background: #E3F0FA;
+    }
+
+    /* 결과 패널 스타일 */
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+
+    .result-card {
+      background: #F8FAFC;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      padding: 15px 20px;
+      border-left: 6px solid #1B3A5C;
+    }
+
+    .result-label {
+      font-size: 16px;
+      font-weight: bold;
+      color: #64748B;
+      margin-bottom: 8px;
+    }
+
+    .result-value {
+      font-family: 'Consolas', monospace;
+      font-size: 28px;
+      font-weight: bold;
+      color: #0F172A;
+      word-break: break-all;
+    }
+
+    .unit-text {
+      font-size: 18px;
+      color: #1B3A5C;
+      font-weight: bold;
+    }
+
+    .speed-block {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .speed-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 1px dashed #CBD5E1;
+      padding-bottom: 4px;
+    }
+
+    .speed-line:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .speed-type {
+      font-size: 14px;
+      font-weight: bold;
+      color: #D97706;
+      background: #FEF3C7;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    서보 파라미터 & 기계 속도 계산기
+  </div>
+
+  <div class="container">
+    <div class="panel">
+      <div class="panel-title">기구부 및 모터 제원 입력</div>
+
+      <div class="input-group">
+        <label>기준 단위 (Unit)</label>
+        <div class="radio-group">
+          <label><input type="radio" name="unit" value="mm" checked onchange="onUnitChange(this)"> mm (직선)</label>
+          <label><input type="radio" name="unit" value="deg" onchange="onUnitChange(this)"> deg (회전)</label>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>1회전당 펄스 수 (엔코더 해상도)</label>
+        <input type="text" id="in-pulse" value="4,194,304" oninput="formatInt(this); calc()">
+      </div>
+
+      <div class="input-group">
+        <label>부하 1회전당 기계 이동량 (Lead / 원판 둘레)</label>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <input type="text" id="in-move" value="10,000.0" oninput="formatFloat(this); calc()">
+          <span id="in-move-unit" style="font-weight:bold; color:#1B3A5C; font-size:16px;">μm</span>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label style="display:flex; align-items:center; gap:5px; cursor:pointer;">
+          <input type="checkbox" id="chk-reducer" onchange="toggleReducer(); calc()" style="width:16px; height:16px;">
+          감속기 적용 (Reduction Ratio)
+        </label>
+        <div id="reducer-box"
+          style="display:none; align-items:center; gap:8px; margin-top:8px; background:#F8FAFC; padding:12px; border-radius:6px; border:1px dashed #CBD5E1; flex-wrap:wrap;">
+          <span style="font-weight:bold; color:#1B3A5C; white-space:nowrap;">비율</span>
+          <input type="number" id="in-reducer" value="5" min="1" step="any"
+            style="width:80px; text-align:center; font-family:'Consolas', monospace; font-size:16px; font-weight:bold; color:#1B3A5C; border:1px solid #CCC; border-radius:4px; padding:5px;"
+            oninput="calc()">
+          <span style="color:#64748B; font-size:14px; font-weight:bold; white-space:nowrap;">: 1 &nbsp; (모터 회전 : 부하
+            회전)</span>
+        </div>
+      </div>
+
+      <div style="border-bottom: 1px solid #E2E8F0; margin: 20px 0;"></div>
+
+      <div class="input-group">
+        <label>모터 최고 회전수 (RPM)</label>
+        <input type="text" id="in-rpm" value="3,000" oninput="formatInt(this); calc()">
+      </div>
+
+      <div class="input-group">
+        <label>JOG 스피드 리미트 비율 (%)</label>
+        <div class="slider-row">
+          <input type="range" id="sl-jog" min="1" max="100" value="10" oninput="sync('jog', this.value)">
+          <div class="updown-wrapper">
+            <button class="updown-btn" onclick="stepVal('jog', -1)">-</button>
+            <input type="number" id="in-jog" value="10" min="1" max="100" oninput="sync('jog', this.value)">
+            <button class="updown-btn" onclick="stepVal('jog', 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="border-bottom: 1px solid #E2E8F0; margin: 20px 0;"></div>
+
+      <div class="input-group">
+        <label>OPR 원점 복귀 속도 비율 (%)</label>
+        <div class="slider-row">
+          <input type="range" id="sl-home" min="1" max="100" value="5" oninput="sync('home', this.value)">
+          <div class="updown-wrapper">
+            <button class="updown-btn" onclick="stepVal('home', -1)">-</button>
+            <input type="number" id="in-home" value="5" min="1" max="100" oninput="sync('home', this.value)">
+            <button class="updown-btn" onclick="stepVal('home', 1)">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group">
+        <label>Creep 속도 비율 (%)</label>
+        <div class="slider-row">
+          <input type="range" id="sl-creep" min="1" max="100" value="1" oninput="sync('creep', this.value)">
+          <div class="updown-wrapper">
+            <button class="updown-btn" onclick="stepVal('creep', -1)">-</button>
+            <input type="number" id="in-creep" value="1" min="1" max="100" oninput="sync('creep', this.value)">
+            <button class="updown-btn" onclick="stepVal('creep', 1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">파라미터 입력 결과 (복사해서 사용하세요)</div>
+
+      <div class="result-grid">
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:15px;">
+          <div class="result-card" style="display:flex; flex-direction:column; justify-content:center;">
+            <div class="result-label">[Pr.2] 1회전당 펄스 수 (분자)</div>
+            <div class="result-value" id="out-pulse">4194304</div>
+          </div>
+
+          <div class="result-card" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div class="result-label" id="lbl-pr3">[Pr.3] 1회전당 이동량 (분모)</div>
+              <div class="result-value">
+                <span id="out-move">10000.0</span> <span class="unit-text" id="out-move-unit">μm</span>
+              </div>
+            </div>
+            <div
+              style="margin-top:12px; padding-top:12px; border-top:1px dashed #CBD5E1; display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:14px; font-weight:bold; color:#64748B;">1펄스당 명령 단위 (최소 이동량)</span>
+              <div style="font-family:'Consolas', monospace; font-size:16px; font-weight:bold; color:#0284C7;">
+                <span id="out-per-pulse">0.002384</span> <span id="out-per-pulse-unit"
+                  style="font-size:14px; color:#1B3A5C;">μm/pulse</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-bottom: 2px dashed #CBD5E1; margin: 10px 0;"></div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:15px;">
+          <div class="result-card">
+            <div class="result-label">[Pr.8] 최대 속도 제한값</div>
+            <div class="speed-block">
+              <div class="speed-line">
+                <span class="speed-type">분당 속도</span>
+                <div class="result-value"><span id="out-max-min">30000.00</span> <span
+                    class="unit-text min-unit">mm/min</span></div>
+              </div>
+              <div class="speed-line">
+                <span class="speed-type">초당 속도</span>
+                <div class="result-value" style="color:#0284C7;"><span id="out-max-sec">500.00</span> <span
+                    class="unit-text sec-unit">mm/s</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-card">
+            <div class="result-label">JOG 스피드 리미트</div>
+            <div class="speed-block">
+              <div class="speed-line">
+                <span class="speed-type">분당 속도</span>
+                <div class="result-value"><span id="out-jog-min">3000.00</span> <span
+                    class="unit-text min-unit">mm/min</span></div>
+              </div>
+              <div class="speed-line">
+                <span class="speed-type">초당 속도</span>
+                <div class="result-value" style="color:#0284C7;"><span id="out-jog-sec">50.00</span> <span
+                    class="unit-text sec-unit">mm/s</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="border-bottom: 2px dashed #CBD5E1; margin: 10px 0;"></div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:15px;">
+          <div class="result-card">
+            <div class="result-label">OPR 원점 복귀 속도</div>
+            <div class="speed-block">
+              <div class="speed-line">
+                <span class="speed-type">분당 속도</span>
+                <div class="result-value"><span id="out-home-min">1500.00</span> <span
+                    class="unit-text min-unit">mm/min</span></div>
+              </div>
+              <div class="speed-line">
+                <span class="speed-type">초당 속도</span>
+                <div class="result-value" style="color:#0284C7;"><span id="out-home-sec">25.00</span> <span
+                    class="unit-text sec-unit">mm/s</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="result-card">
+            <div class="result-label">Creep 속도</div>
+            <div class="speed-block">
+              <div class="speed-line">
+                <span class="speed-type">분당 속도</span>
+                <div class="result-value"><span id="out-creep-min">300.00</span> <span
+                    class="unit-text min-unit">mm/min</span></div>
+              </div>
+              <div class="speed-line">
+                <span class="speed-type">초당 속도</span>
+                <div class="result-value" style="color:#0284C7;"><span id="out-creep-sec">5.00</span> <span
+                    class="unit-text sec-unit">mm/s</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 감속기 설정 UI 토글
+    function toggleReducer() {
+      const isChecked = document.getElementById('chk-reducer').checked;
+      document.getElementById('reducer-box').style.display = isChecked ? 'flex' : 'none';
+    }
+
+    // 소수점 포함 실수 입력창 콤마 자동 생성기
+    function formatFloat(el) {
+      let val = el.value.replace(/[^0-9.]/g, ''); // 숫자와 소수점만 남김
+      if (val === '') return;
+
+      let parts = val.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+      el.value = parts.length > 1 ? parts[0] + '.' + parts.slice(1).join('') : parts[0];
+    }
+
+    // 정수 입력창 전용 천단위 콤마 자동 생성기
+    function formatInt(el) {
+      let val = el.value.replace(/[^0-9]/g, '');
+      if (val !== '') {
+        el.value = parseInt(val, 10).toLocaleString('en-US');
+      }
+    }
+
+    // 업다운 버튼 처리기
+    function stepVal(type, amount) {
+      let el = document.getElementById('sl-' + type);
+      let next = parseInt(el.value, 10) + amount;
+      if (next < 1) next = 1;
+      if (next > 100) next = 100;
+      sync(type, next);
+    }
+
+    // 슬라이더와 숫자 입력창 동기화
+    function sync(type, val) {
+      document.getElementById('sl-' + type).value = val;
+      document.getElementById('in-' + type).value = val;
+      calc();
+    }
+
+    // 단위 변경 시 1회전당 이동량 기본값 자동 적용
+    function onUnitChange(radio) {
+      if (radio.value === 'deg') {
+        document.getElementById('in-move').value = '360.00000';
+      } else {
+        document.getElementById('in-move').value = '10,000.0';
+      }
+      calc();
+    }
+
+    // 메인 계산 로직
+    function calc() {
+      // 1. 입력값 가져오기
+      const unit = document.querySelector('input[name="unit"]:checked').value;
+      const pulse = parseFloat(document.getElementById('in-pulse').value.replace(/,/g, '')) || 0;
+      const originalMove = parseFloat(document.getElementById('in-move').value.replace(/,/g, '')) || 0;
+      const rpm = parseFloat(document.getElementById('in-rpm').value.replace(/,/g, '')) || 0;
+
+      // 감속기 설정에 따른 실제 모터 1회전당 이동량 산출
+      let inMove = originalMove;
+      if (document.getElementById('chk-reducer') && document.getElementById('chk-reducer').checked) {
+        const ratio = parseFloat(document.getElementById('in-reducer').value) || 1;
+        inMove = originalMove / ratio;
+      }
+      const jogPct = parseFloat(document.getElementById('in-jog').value.replace(/,/g, '')) || 0;
+      const homePct = parseFloat(document.getElementById('in-home').value.replace(/,/g, '')) || 0;
+      const creepPct = parseFloat(document.getElementById('in-creep').value.replace(/,/g, '')) || 0;
+
+      // 입력단위 텍스트 업데이트
+      if (document.getElementById('in-move-unit')) {
+        document.getElementById('in-move-unit').textContent = unit === 'mm' ? 'μm' : 'deg';
+      }
+
+      // 2. 텍스트/단위 설정
+      const uMin = unit === 'mm' ? 'mm/min' : 'deg/min';
+      const uSec = unit === 'mm' ? 'mm/s' : 'deg/s';
+
+      document.querySelectorAll('.min-unit').forEach(el => el.textContent = uMin);
+      document.querySelectorAll('.sec-unit').forEach(el => el.textContent = uSec);
+
+      // 숫자 콤마 포맷 함수 (소수점 자릿수 지정)
+      const fmt = (val, dec) => val.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+
+      // 3. 파라미터 계산
+      document.getElementById('out-pulse').textContent = pulse.toLocaleString('en-US');
+
+      if (unit === 'mm') {
+        document.getElementById('out-move').textContent = fmt(inMove, 1);
+        document.getElementById('out-move-unit').textContent = 'μm';
+      } else {
+        document.getElementById('out-move').textContent = fmt(inMove, 5);
+        document.getElementById('out-move-unit').textContent = 'deg';
+      }
+
+      // 1펄스당 이동량 계산
+      const movePerPulse = pulse > 0 ? (inMove / pulse) : 0;
+      const pulseDec = unit === 'mm' ? 6 : 8; // 소수점 세팅 (정밀하게)
+      document.getElementById('out-per-pulse').textContent = movePerPulse.toLocaleString('en-US', { minimumFractionDigits: pulseDec, maximumFractionDigits: pulseDec });
+      document.getElementById('out-per-pulse-unit').textContent = unit === 'mm' ? 'μm/pulse' : 'deg/pulse';
+
+      // 속도 계산용 단위 환산 (mm일 경우 입력값은 μm이므로 1000으로 나눔)
+      const realMove = unit === 'mm' ? (inMove / 1000) : inMove;
+
+      // 4. 속도 계산
+      const maxMin = realMove * rpm;
+      const maxSec = maxMin / 60;
+
+      const jogMin = maxMin * (jogPct / 100);
+      const jogSec = maxSec * (jogPct / 100);
+
+      const homeMin = maxMin * (homePct / 100);
+      const homeSec = maxSec * (homePct / 100);
+
+      const creepMin = maxMin * (creepPct / 100);
+      const creepSec = maxSec * (creepPct / 100);
+
+      // 5. 결과 출력 (deg일 경우 Pr.8 속도 제한값은 소수점 3자리)
+      const pr8Dec = unit === 'deg' ? 3 : 2;
+      document.getElementById('out-max-min').textContent = fmt(maxMin, pr8Dec);
+      document.getElementById('out-max-sec').textContent = fmt(maxSec, pr8Dec);
+
+      document.getElementById('out-jog-min').textContent = fmt(jogMin, 2);
+      document.getElementById('out-jog-sec').textContent = fmt(jogSec, 2);
+
+      document.getElementById('out-home-min').textContent = fmt(homeMin, 2);
+      document.getElementById('out-home-sec').textContent = fmt(homeSec, 2);
+
+      document.getElementById('out-creep-min').textContent = fmt(creepMin, 2);
+      document.getElementById('out-creep-sec').textContent = fmt(creepSec, 2);
+    }
+
+    // 초기 실행
+    calc();
+  </script>
+</body>
+
+</html>

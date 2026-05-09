@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>45° 삼각형 분해</title>
+  <style>
+    /* ============================================
+     전체 초기화 & 기본 설정
+     ============================================ */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: #F0F3F7;
+      /* 전체 배경색 */
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+      overflow: hidden;
+      /* 스크롤 없이 한 페이지에 고정 */
+    }
+
+    /* 전체 페이지 레이아웃: 헤더 / 중간 / 하단 바 3행 구조 */
+    .page {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      /* 헤더:자동, 중간:남은공간, 하단:자동 */
+      height: 100vh;
+      padding: 10px 14px 8px;
+      gap: 8px;
+    }
+
+    /* ============================================
+     상단 헤더
+     ============================================ */
+    .hdr {
+      background: #1B3A5C;
+      /* 헤더 배경색 (네이비) ← 색상 변경 시 여기 */
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hdr-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* 제목 글자 크기 ← */
+    .hdr-sub {
+      font-size: 22px;
+      color: #7AAAD0;
+    }
+
+    /* 부제목 글자 크기 ← */
+
+    /* ============================================
+     중간 영역: 3열 (왼쪽 | 가운데 SVG | 오른쪽)
+     ============================================ */
+    .mid {
+      display: grid;
+      grid-template-columns: 340px 1fr 300px;
+      /* 좌우 패널 너비 ← 조절 가능 */
+      gap: 8px;
+      min-height: 0;
+    }
+
+    /* 공통 패널 (흰 카드) */
+    .panel {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #DDE3EA;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* 패널 소제목 (PARAMETERS / 계산 공식 등) */
+    .ptitle {
+      font-size: 20px;
+      /* 패널 소제목 글자 크기 ← */
+      font-weight: 700;
+      color: #8899AA;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #EEF1F5;
+    }
+
+    /* ============================================
+     왼쪽 패널 — 슬라이더
+     ============================================ */
+    .srow {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      column-gap: 8px;
+      row-gap: 8px;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .srow label {
+      font-size: 16px;
+      /* 슬라이더 레이블 글자 크기 ← */
+      color: #555;
+      white-space: nowrap;
+    }
+
+    input[type=range] {
+      grid-column: 1 / 3;
+      /* 슬라이더가 두 칸을 모두 차지하도록 */
+      grid-row: 2;
+      width: 100%;
+      accent-color: #1B3A5C;
+      /* 슬라이더 색상 ← */
+      height: 3px;
+      margin-top: 2px;
+    }
+
+    .sval {
+      grid-column: 2;
+      grid-row: 1;
+      font-size: 24px;
+      /* 슬라이더 현재값 글자 크기 ← */
+      font-weight: 700;
+      color: #1B3A5C;
+      min-width: 70px;
+      text-align: right;
+      font-family: Consolas, monospace;
+    }
+
+    .p-btn {
+      flex: 1;
+      min-width: 25px;
+      padding: 4px 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1B3A5C;
+      background: #F8FAFC;
+      border: 1px solid #DDE3EA;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .p-btn:hover {
+      background: #E3F0FA;
+      border-color: #BBDEFB;
+      color: #1565C0;
+    }
+
+    .hint {
+      font-size: 20px;
+      color: #AAA;
+    }
+
+    /* 하단 힌트 글자 크기 ← */
+
+    /* ============================================
+     왼쪽 패널 — 공식 코드박스 (어두운 배경)
+     ============================================ */
+    .fbox {
+      background: #0F1117;
+      /* 코드박스 배경색 ← */
+      color: #D4D4D4;
+      /* 기본 글자 색상 (흰회색) */
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-family: Consolas, monospace;
+      font-size: 23px;
+      /* 공식 글자 크기 ← */
+      line-height: 1.85;
+      flex: 1;
+    }
+
+    /* 코드 색상 클래스 (VSCode 스타일) */
+    .c1 {
+      color: #6A9955;
+    }
+
+    /* 초록: 주석 */
+    .c2 {
+      color: #9CDCFE;
+    }
+
+    /* 하늘: 변수명 */
+    .c3 {
+      color: #CE9178;
+    }
+
+    /* 주황: 숫자/값 */
+    .c4 {
+      color: #FFD060;
+      font-weight: 700;
+    }
+
+    /* 노랑: 결과값 */
+    .c5 {
+      color: #888;
+    }
+
+    /* 회색: 기호 */
+
+    /* ============================================
+     오른쪽 패널 — 삼각비 설명 박스
+     ============================================ */
+    .tbox {
+      border-radius: 5px;
+      padding: 7px 9px;
+      font-size: 22px;
+      /* 설명 본문 글자 크기 ← */
+      line-height: 1.6;
+    }
+
+    .tbox b {
+      font-size: 23px;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    /* 설명 제목 글자 크기 ← */
+    .tbox code {
+      font-family: Consolas, monospace;
+      font-size: 22px;
+    }
+
+    /* 설명 공식 글자 크기 ← */
+
+    /* ============================================
+     가운데 — SVG 도식 패널
+     ============================================ */
+    .svg-panel {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #DDE3EA;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+    }
+
+    .svg-panel svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ============================================
+     하단 요약 바
+     ============================================ */
+    .bar {
+      background: #1B3A5C;
+      /* 하단 바 배경색 ← */
+      border-radius: 8px;
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .bitem {
+      flex: 1;
+      text-align: center;
+    }
+
+    .blbl {
+      font-size: 20px;
+      color: #7AAAD0;
+      font-weight: 700;
+    }
+
+    /* 항목 레이블 글자 크기 ← */
+    .bval {
+      font-size: 30px;
+      color: #FFD060;
+      font-weight: 700;
+      /* 결과값 글자 크기 ← */
+      font-family: Consolas, monospace;
+      margin-top: 1px;
+    }
+
+    .bdiv {
+      width: 1px;
+      background: #2C5580;
+      align-self: stretch;
+      margin: 0 4px;
+    }
+
+    /* 구분선 */
+  </style>
+</head>
+
+<body>
+  <div class="page">
+
+    <!-- ===================== 상단 헤더 ===================== -->
+    <div class="hdr">
+      <span class="hdr-title">45° 대각 이동 — 삼각형 분해</span>
+      <span class="hdr-sub">대각거리를 X / Y 로 분해하는 원리</span>
+    </div>
+
+    <!-- ===================== 중간 3열 영역 ===================== -->
+    <div class="mid">
+
+      <!-- ── 왼쪽: 슬라이더 + 공식 ── -->
+      <div style="display:flex;flex-direction:column;gap:8px;min-height:0;">
+
+        <!-- 슬라이더 패널 -->
+        <div class="panel">
+          <div class="ptitle">파라미터</div>
+
+          <!-- 대각거리 슬라이더: min/max/value 값 변경 가능 -->
+          <div class="srow">
+            <label>대각거리</label>
+            <span class="sval" id="vDist">50mm</span>
+            <input type="range" id="sl-dist" min="10" max="100" value="50" step="1">
+            <div style="grid-column: 1 / 3; display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px;">
+              <button onclick="document.getElementById('sl-dist').value=10; update();" class="p-btn">10</button>
+              <button onclick="document.getElementById('sl-dist').value=20; update();" class="p-btn">20</button>
+              <button onclick="document.getElementById('sl-dist').value=30; update();" class="p-btn">30</button>
+              <button onclick="document.getElementById('sl-dist').value=40; update();" class="p-btn">40</button>
+              <button onclick="document.getElementById('sl-dist').value=50; update();" class="p-btn">50</button>
+              <button onclick="document.getElementById('sl-dist').value=60; update();" class="p-btn">60</button>
+              <button onclick="document.getElementById('sl-dist').value=70; update();" class="p-btn">70</button>
+              <button onclick="document.getElementById('sl-dist').value=80; update();" class="p-btn">80</button>
+              <button onclick="document.getElementById('sl-dist').value=90; update();" class="p-btn">90</button>
+              <button onclick="document.getElementById('sl-dist').value=100; update();" class="p-btn">100</button>
+            </div>
+          </div>
+
+          <!-- 각도 슬라이더 -->
+          <div class="srow">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <label>각도</label>
+              <div style="display:flex; gap:4px;">
+                <button onclick="document.getElementById('sl-ang').value=0; update();" class="p-btn"
+                  style="min-width:30px">0°</button>
+                <button onclick="document.getElementById('sl-ang').value=30; update();" class="p-btn"
+                  style="min-width:30px">30°</button>
+                <button onclick="document.getElementById('sl-ang').value=45; update();" class="p-btn"
+                  style="min-width:30px">45°</button>
+                <button onclick="document.getElementById('sl-ang').value=60; update();" class="p-btn"
+                  style="min-width:30px">60°</button>
+                <button onclick="document.getElementById('sl-ang').value=90; update();" class="p-btn"
+                  style="min-width:30px">90°</button>
+              </div>
+            </div>
+            <input type="range" id="sl-ang" min="0" max="90" value="45" step="1">
+            <span class="sval" id="vAng">45°</span>
+          </div>
+
+          <div class="hint">※ 45°일 때 X = Y</div>
+        </div>
+
+        <!-- 공식 코드박스 패널 -->
+        <div class="panel" style="flex:1">
+          <div class="ptitle">삼각비 계산 공식</div>
+          <div class="fbox">
+            <!-- 슬라이더 조작 시 id 값들이 JS에 의해 자동 업데이트 됨 -->
+            <span class="c1">// X, Y 분해</span><br>
+            <span class="c2">X</span>=<span class="c2">거리</span>×cos(<span class="c3" id="fAng">45</span>°)<br>
+            <span class="c5">&nbsp;=</span><span class="c3" id="fDist">50.0</span>×<span class="c3"
+              id="fCos">0.70711</span><br>
+            <span class="c5">&nbsp;=</span><span class="c4" id="fX">35.355</span><span class="c5">mm</span><br>
+            <span class="c2">Y</span>=<span class="c2">거리</span>×sin(<span class="c3" id="fAng2">45</span>°)<br>
+            <span class="c5">&nbsp;=</span><span class="c3" id="fDist2">50.0</span>×<span class="c3"
+              id="fSin">0.70711</span><br>
+            <span class="c5">&nbsp;=</span><span class="c4" id="fY">35.355</span><span class="c5">mm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 가운데: 삼각형 SVG 도식 ── -->
+      <div class="svg-panel" style="position:relative;">
+        <!-- 유튜브 링크 플로팅 -->
+        <a href="https://www.youtube.com/results?search_query=%EC%82%BC%EA%B0%81%EB%B9%84+%EA%B8%B0%EC%B4%88" target="_blank" style="position:absolute; top:12px; left:12px; color:#d32f2f; text-decoration:none; text-transform:none; letter-spacing:0; font-size:13px; display:flex; align-items:center; gap:4px; font-weight:600; background:rgba(255,255,255,0.9); padding:4px 10px; border-radius:6px; border:1px solid #ffcdd2; box-shadow:0 2px 4px rgba(0,0,0,0.05); z-index:10;"><svg viewBox="0 0 24 24" fill="#d32f2f" style="width:18px; height:18px;"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>유튜브 참고</a>
+        <!--
+        SVG viewBox="0 0 380 300" → 가로 380, 세로 300 좌표계
+        시작점(O): x=60, y=250  (좌하단)
+        종료점(E): JS에 의해 슬라이더 값으로 계산되어 실시간 이동
+        SVG 안 글자 크기는 font-size="숫자" 속성으로 직접 변경
+      -->
+        <svg id="mainSvg" viewBox="0 0 380 300" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <!-- 화살표 마커 3종: 파랑(X축), 초록(Y축), 주황(빗변) -->
+            <marker id="ah-b" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5"
+              orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="#1565C0" stroke-width="1.8" stroke-linecap="round" />
+            </marker>
+            <marker id="ah-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5"
+              orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="#1A5C1A" stroke-width="1.8" stroke-linecap="round" />
+            </marker>
+            <marker id="ah-o" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5"
+              orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="#CF4500" stroke-width="1.8" stroke-linecap="round" />
+            </marker>
+          </defs>
+
+          <!-- 배경 사각형 (연한 회색) -->
+          <rect x="30" y="10" width="310" height="255" fill="#F8FAFC" rx="6" />
+
+          <!-- 격자선 (연한 파랑회색) -->
+          <g stroke="#DDE3EA" stroke-width="0.5">
+            <line x1="30" y1="50" x2="340" y2="50" />
+            <line x1="30" y1="90" x2="340" y2="90" />
+            <line x1="30" y1="130" x2="340" y2="130" />
+            <line x1="30" y1="170" x2="340" y2="170" />
+            <line x1="30" y1="210" x2="340" y2="210" />
+            <line x1="30" y1="250" x2="340" y2="250" />
+            <line x1="70" y1="10" x2="70" y2="265" />
+            <line x1="110" y1="10" x2="110" y2="265" />
+            <line x1="150" y1="10" x2="150" y2="265" />
+            <line x1="190" y1="10" x2="190" y2="265" />
+            <line x1="230" y1="10" x2="230" y2="265" />
+            <line x1="270" y1="10" x2="270" y2="265" />
+            <line x1="310" y1="10" x2="310" y2="265" />
+          </g>
+
+          <!-- 0, 30, 45, 60, 90도 기준 보조선 -->
+          <g stroke="#E2E8F0" stroke-width="0.8" stroke-dasharray="4 4">
+            <!-- 0도 선: 끝점 X=340 -->
+            <line x1="60" y1="250" x2="340" y2="250" />
+            <text x="340" y="244" font-size="11" fill="#CBD5E1" font-weight="600" stroke="none"
+              text-anchor="end">0°</text>
+
+            <!-- 30도 선: 끝점 X=340 -->
+            <line x1="60" y1="250" x2="340" y2="88.35" />
+            <text x="340" y="80" font-size="11" fill="#CBD5E1" font-weight="600" stroke="none"
+              text-anchor="end">30°</text>
+
+            <!-- 45도 선: 끝점 Y=50 -->
+            <line x1="60" y1="250" x2="260" y2="50" />
+            <text x="254" y="46" font-size="11" fill="#CBD5E1" font-weight="600" text-anchor="end"
+              stroke="none">45°</text>
+
+            <!-- 60도 선: 끝점 Y=50 -->
+            <line x1="60" y1="250" x2="175.47" y2="50" />
+            <text x="169" y="46" font-size="11" fill="#CBD5E1" font-weight="600" text-anchor="end"
+              stroke="none">60°</text>
+
+            <!-- 90도 선: 끝점 Y=50 -->
+            <line x1="60" y1="250" x2="60" y2="50" />
+            <text x="66" y="46" font-size="11" fill="#CBD5E1" font-weight="600" stroke="none"
+              text-anchor="start">90°</text>
+          </g>
+
+          <!-- 빗변 길이 반경 (0~90도 원호) -->
+          <path id="distArc" fill="none" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 4" />
+
+          <!-- 삼각형 내부 채우기 (연한 노랑) — JS가 꼭짓점 좌표 실시간 업데이트 -->
+          <polygon id="triPoly" points="60,250 260,250 260,90" fill="#FFD06022" />
+
+          <!-- 보조 점선 (삼각형 완성을 위한 가이드라인) -->
+          <line id="dh1" x1="60" y1="90" x2="260" y2="90" stroke="#CCC" stroke-width="0.8" stroke-dasharray="5 3" />
+          <line id="dh2" x1="60" y1="90" x2="60" y2="250" stroke="#CCC" stroke-width="0.8" stroke-dasharray="5 3" />
+
+          <!-- 빗변: 대각선 이동 경로 (주황) ← 색상 변경: stroke="#색상코드" -->
+          <line id="hyp" x1="60" y1="250" x2="260" y2="90" stroke="#CF4500" stroke-width="2.5" stroke-linecap="round"
+            marker-end="url(#ah-o)" />
+
+          <!-- X축 가로변 (파랑) ← 색상 변경: stroke="#색상코드" -->
+          <line id="xLine" x1="60" y1="250" x2="260" y2="250" stroke="#1565C0" stroke-width="2.2" stroke-linecap="round"
+            marker-end="url(#ah-b)" />
+
+          <!-- Y축 세로변 (초록) ← 색상 변경: stroke="#색상코드" -->
+          <line id="yLine" x1="260" y1="250" x2="260" y2="90" stroke="#1A5C1A" stroke-width="2.2" stroke-linecap="round"
+            marker-end="url(#ah-g)" />
+
+          <!-- 직각 기호 (ㄱ 모양) -->
+          <rect id="rtAngle" x="244" y="234" width="16" height="16" fill="none" stroke="#888" stroke-width="1" />
+
+          <!-- 시작점 (Xv, Yh 교차점) -->
+          <circle id="ptO" cx="60" cy="250" r="5" fill="#1B3A5C" />
+          <text x="50" y="246" font-size="12" fill="#1B3A5C" font-weight="700" text-anchor="end">시작점</text>
+          <!-- 글자크기 ← -->
+          <text x="50" y="260" font-size="12" fill="#888" text-anchor="end">(Xv,Yh)</text> <!-- 글자크기 ← -->
+
+          <!-- 종료점 (JS가 슬라이더에 따라 위치 업데이트) -->
+          <circle id="ptE" cx="260" cy="90" r="5" fill="#CF4500" />
+          <text id="lblEnd" x="265" y="85" font-size="12" fill="#CF4500" font-weight="700">종료점</text> <!-- 글자크기 ← -->
+
+          <!-- 각도 호 + 레이블 (JS가 각도에 따라 모양 업데이트) -->
+          <path id="angArc" d="M 90 250 A 30 30 0 0 0 81.2 228.8" fill="none" stroke="#CF4500" stroke-width="1.4" />
+          <text id="angLabel" x="94" y="242" font-size="12" fill="#CF4500" font-weight="700">45°</text> <!-- 글자크기 ← -->
+
+          <!-- X이동량 레이블 (JS가 위치와 값 업데이트) -->
+          <text id="xLabel" x="160" y="265" font-size="12" fill="#1565C0" font-weight="700"
+            text-anchor="middle">X이동량</text> <!-- 글자크기 ← -->
+          <text id="xVal" x="160" y="285" font-size="12" fill="#1565C0" text-anchor="middle">35.355 mm</text>
+          <!-- 글자크기 ← -->
+
+          <!-- Y이동량 레이블 (JS가 위치와 값 업데이트) -->
+          <text id="yLabel" x="268" y="168" font-size="12" fill="#1A5C1A" font-weight="700">Y이동량</text> <!-- 글자크기 ← -->
+          <text id="yVal" x="268" y="190" font-size="12" fill="#1A5C1A">35.355 mm</text> <!-- 글자크기 ← -->
+
+          <!-- 빗변 레이블 (JS가 각도에 따라 회전 및 위치 업데이트) -->
+          <text id="hypLabel" x="130" y="162" font-size="12" fill="#CF4500" font-weight="700"
+            transform="rotate(-38,130,162)">대각거리 (빗변)</text> <!-- 글자크기 ← -->
+          <text id="hypVal" x="145" y="176" font-size="12" fill="#CF4500" transform="rotate(-38,145,176)">50 mm</text>
+          <!-- 글자크기 ← -->
+        </svg>
+      </div>
+
+      <!-- ── 오른쪽: 삼각비 설명 ── -->
+      <div style="display:flex;flex-direction:column;gap:8px;min-height:0;">
+        <div class="panel" style="flex:1">
+          <div class="ptitle">삼각비 원리</div>
+
+          <!-- cos 설명 박스 (파란 배경) ← background 값으로 배경색 변경 -->
+          <div class="tbox" style="background:#E3F0FA">
+            <b style="color:#1565C0">cos(θ) — 가로 비율</b>
+            <span style="color:#333">빗변 대비 가로(X) 길이</span><br>
+            <code style="color:#1565C0">X = 빗변 × cos(θ)</code>
+          </div>
+
+          <!-- sin 설명 박스 (초록 배경) -->
+          <div class="tbox" style="background:#E8F5E9;margin-top:4px">
+            <b style="color:#1A5C1A">sin(θ) — 세로 비율</b>
+            <span style="color:#333">빗변 대비 세로(Y) 길이</span><br>
+            <code style="color:#1A5C1A">Y = 빗변 × sin(θ)</code>
+          </div>
+
+          <!-- tan 설명 박스 (보라 배경) -->
+          <div class="tbox" style="background:#F3E5F5;margin-top:4px">
+            <b style="color:#6A1B9A">tan(θ) — 기울기</b>
+            <span style="color:#333">가로(X) 대비 세로(Y) 비율</span><br>
+            <code style="color:#6A1B9A">tan(θ) = Y / X</code>
+          </div>
+
+          <!-- 피타고라스 정리 (주황 배경) -->
+          <div class="tbox" style="background:#FFF3E0;margin-top:4px">
+            <b style="color:#E65100">피타고라스 정리</b>
+            <span style="color:#333">직각삼각형 세 변의 길이 공식</span><br>
+            <code style="color:#E65100">빗변² = X² + Y²</code>
+          </div>
+
+          <!-- 주요 각도 특징 (회색 배경, 남은 공간 채우기) -->
+          <div class="tbox" style="background:#F8FAFC;margin-top:4px;flex:1;border:1px solid #DDE3EA">
+            <b style="color:#475569">📐 각도별 X, Y 비율 특징</b>
+            <span style="color:#475569; display:block; margin-top:4px; font-size:18px; line-height:1.7;">
+              • <b>30°</b> : 가로(X)가 세로(Y)보다 긺<br>
+              • <b>45°</b> : 가로(X)와 세로(Y)가 똑같음<br>
+              • <b>60°</b> : 세로(Y)가 가로(X)보다 긺
+            </span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end .mid -->
+
+    <!-- ===================== 하단 요약 바 ===================== -->
+    <div class="bar">
+      <!-- 각 .bitem: 항목 하나 / id 붙은 .bval은 JS가 자동 업데이트 -->
+      <div class="bitem">
+        <div class="blbl">대각거리</div>
+        <div class="bval" id="iDist">50 mm</div>
+      </div>
+      <div class="bdiv"></div>
+      <div class="bitem">
+        <div class="blbl">cos(45°)=sin(45°)</div>
+        <div class="bval">0.70711</div>
+      </div>
+      <div class="bdiv"></div>
+      <div class="bitem">
+        <div class="blbl">X 이동량</div>
+        <div class="bval" id="iX">35.355 mm</div>
+      </div>
+      <div class="bdiv"></div>
+      <div class="bitem">
+        <div class="blbl">Y 이동량</div>
+        <div class="bval" id="iY">35.355 mm</div>
+      </div>
+    </div>
+
+  </div><!-- end .page -->
+
+  <!-- ===================== JavaScript =====================
+     슬라이더 값이 바뀔 때마다 SVG 도형과 공식 텍스트를 실시간으로 업데이트
+     ===================================================== -->
+  <script>
+    // 시작점 좌표 (SVG 좌표계 기준, 픽셀)
+    const O = { x: 60, y: 250 };
+
+    // 슬라이더 요소 가져오기
+    const slDist = document.getElementById('sl-dist');  // 대각거리 슬라이더
+    const slAng = document.getElementById('sl-ang');   // 각도 슬라이더
+
+    function update() {
+      // ── 슬라이더 현재값 읽기 ──
+      const dist = parseFloat(slDist.value);  // 대각거리 (mm)
+      const deg = parseFloat(slAng.value);   // 각도 (°)
+
+      // ── 삼각함수 계산 ──
+      const rad = deg * Math.PI / 180;       // 도(°) → 라디안 변환
+      const cosV = Math.cos(rad);             // cos(각도)
+      const sinV = Math.sin(rad);             // sin(각도)
+      const dx = dist * cosV;              // X 이동량 (mm)
+      const dy = dist * sinV;              // Y 이동량 (mm)
+
+      // ── SVG 픽셀 좌표 계산 (100mm일 때 화면을 벗어나지 않도록 스케일 조정) ──
+      const sc = 2.4;                         // 스케일 비율 ← 삼각형 크기 조절 시 변경
+      const EX = O.x + dx * sc;              // 종료점 X 픽셀 좌표
+      const EY = O.y - dy * sc;              // 종료점 Y 픽셀 좌표 (SVG는 위가 0이라 빼기)
+
+      // ── SVG 도형 업데이트 ──
+      document.getElementById('ptE').setAttribute('cx', EX);       // 종료점 원
+      document.getElementById('ptE').setAttribute('cy', EY);
+      document.getElementById('lblEnd').setAttribute('x', EX + 10); // 종료점 레이블 (점의 바로 우측)
+      document.getElementById('lblEnd').setAttribute('y', EY + 4);
+
+      // 대각거리 반경 원호 (0도 ~ 90도)
+      const radius = dist * sc;
+      document.getElementById('distArc').setAttribute('d', `M ${O.x + radius} ${O.y} A ${radius} ${radius} 0 0 0 ${O.x} ${O.y - radius}`);
+
+      document.getElementById('triPoly').setAttribute('points',    // 삼각형 채우기
+        `${O.x},${O.y} ${EX},${O.y} ${EX},${EY}`);
+      document.getElementById('rtAngle').setAttribute('x', EX - 16); // 직각 기호
+      document.getElementById('rtAngle').setAttribute('y', O.y - 16);
+      document.getElementById('hyp').setAttribute('x2', EX);       // 빗변
+      document.getElementById('hyp').setAttribute('y2', EY);
+      document.getElementById('xLine').setAttribute('x2', EX);     // X축 가로변
+      document.getElementById('yLine').setAttribute('x1', EX);     // Y축 세로변
+      document.getElementById('yLine').setAttribute('x2', EX);
+      document.getElementById('yLine').setAttribute('y2', EY);
+      document.getElementById('dh1').setAttribute('x2', EX);       // 보조 점선
+      document.getElementById('dh1').setAttribute('y1', EY);
+      document.getElementById('dh1').setAttribute('y2', EY);
+      document.getElementById('dh2').setAttribute('y1', EY);
+
+      // ── 각도 호 업데이트 ──
+      const arcR = 30;
+      const arcEX = O.x + arcR * cosV;
+      const arcEY = O.y - arcR * sinV;
+      document.getElementById('angArc').setAttribute('d',
+        `M ${O.x + arcR} ${O.y} A ${arcR} ${arcR} 0 0 0 ${arcEX} ${arcEY}`);
+      document.getElementById('angLabel').setAttribute('x', O.x + arcR * Math.cos(rad / 2) + 5);
+      document.getElementById('angLabel').setAttribute('y', O.y - arcR * Math.sin(rad / 2) + 3);
+      document.getElementById('angLabel').textContent = deg + '°';
+
+      // ── X이동량 레이블 업데이트 ──
+      const mx = (O.x + EX) / 2;  // X축 중간 위치
+      document.getElementById('xLabel').setAttribute('x', mx);
+      document.getElementById('xVal').setAttribute('x', mx);
+      document.getElementById('xVal').textContent = dx.toFixed(3) + ' mm';
+
+      // ── Y이동량 레이블 업데이트 ──
+      const my = (O.y + EY) / 2;  // Y축 중간 위치
+      document.getElementById('yLabel').setAttribute('x', EX + 5);
+      document.getElementById('yLabel').setAttribute('y', my - 6);
+      document.getElementById('yVal').setAttribute('x', EX + 5);
+      document.getElementById('yVal').setAttribute('y', my + 6);
+      document.getElementById('yVal').textContent = dy.toFixed(3) + ' mm';
+
+      // ── 빗변 레이블 업데이트 (각도에 맞게 회전) ──
+      const hmx = (O.x + EX) / 2;
+      const hmy = (O.y + EY) / 2;
+      document.getElementById('hypLabel').setAttribute('transform', `rotate(${-deg},${hmx},${hmy})`);
+      document.getElementById('hypLabel').setAttribute('x', hmx - 55);
+      document.getElementById('hypLabel').setAttribute('y', hmy - 26);
+      document.getElementById('hypVal').setAttribute('transform', `rotate(${-deg},${hmx},${hmy})`);
+      document.getElementById('hypVal').setAttribute('x', hmx - 20);
+      document.getElementById('hypVal').setAttribute('y', hmy - 10);
+      document.getElementById('hypVal').textContent = dist + ' mm';
+
+      // ── 왼쪽 공식 텍스트 업데이트 ──
+      document.getElementById('vDist').textContent = dist + 'mm';
+      document.getElementById('vAng').textContent = deg + '°';
+      document.getElementById('fAng').textContent = deg;
+      document.getElementById('fAng2').textContent = deg;
+      document.getElementById('fDist').textContent = dist + '.0';
+      document.getElementById('fDist2').textContent = dist + '.0';
+      document.getElementById('fCos').textContent = cosV.toFixed(5);
+      document.getElementById('fSin').textContent = sinV.toFixed(5);
+      document.getElementById('fX').textContent = dx.toFixed(3);
+      document.getElementById('fY').textContent = dy.toFixed(3);
+
+      // ── 하단 바 업데이트 ──
+      document.getElementById('iDist').textContent = dist + ' mm';
+      document.getElementById('iX').textContent = dx.toFixed(3) + ' mm';
+      document.getElementById('iY').textContent = dy.toFixed(3) + ' mm';
+    }
+
+    // 슬라이더 움직일 때마다 update() 실행
+    slDist.addEventListener('input', update);
+    slAng.addEventListener('input', update);
+
+    // 페이지 로드 시 초기값으로 한 번 실행
+    update();
+  </script>
+</body>
+
+</html>

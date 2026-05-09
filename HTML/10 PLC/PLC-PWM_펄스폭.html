@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PWM-펄스폭 변조 제어 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&display=swap');
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .zodd-card {
+            background: white;
+            border: 4px solid #000;
+            border-radius: 24px;
+            box-shadow: 8px 8px 0px #000;
+        }
+
+        .pointer-box {
+            background: #1e293b;
+            color: #3b82f6;
+            border: 3px solid #3b82f6;
+            border-radius: 12px;
+            font-family: monospace;
+        }
+
+        .op-select-btn {
+            border: 3px solid #000;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            height: 85px;
+            text-align: left;
+            padding: 0 20px;
+        }
+
+        .op-select-btn .btn-main-label {
+            font-size: 1.5rem;
+            font-weight: 900;
+            display: block;
+        }
+
+        .op-select-btn .btn-sub-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            opacity: 0.6;
+        }
+
+        .op-select-btn.active {
+            background: #2563eb !important;
+            color: white !important;
+            transform: scale(1.02);
+            z-index: 20;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .data-input {
+            width: 100%;
+            background: transparent;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.8rem;
+            outline: none;
+            border: none;
+            color: #1e293b;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .ud-btn {
+            background: #000;
+            color: #fff;
+            width: 40px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            transition: all 0.1s;
+        }
+
+        .ud-btn:hover {
+            background: #334155;
+        }
+
+        .ud-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* 파형 시뮬레이션 및 타임차트 */
+        .scope-container {
+            background: #fff;
+            border: 4px solid #000;
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            height: 260px;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .wave-path {
+            fill: #e2e8f0;
+            stroke: #475569;
+            stroke-width: 3;
+        }
+
+        .wave-path-active {
+            fill: none;
+            stroke: #2563eb;
+            stroke-width: 5;
+            filter: drop-shadow(0 0 4px rgba(37, 99, 235, 0.3));
+        }
+
+        /* 출력 램프 */
+        .output-lamp {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid #000;
+            background: #334155;
+            transition: all 0.05s;
+        }
+
+        .output-lamp.on {
+            background: #facc15;
+            box-shadow: 0 0 30px #eab308, inset 0 0 10px white;
+            border-color: #854d0e;
+        }
+
+        .st-syntax-large {
+            background: #020617;
+            border-left: 10px solid #2563eb;
+            padding: 25px;
+            border-radius: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #38bdf8;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            line-height: 1.2;
+        }
+
+        .operand-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .operand-table th {
+            background: #334155;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            text-align: left;
+            padding: 8px 12px;
+            border: 1px solid #1e293b;
+        }
+
+        .operand-table td {
+            font-size: 1rem;
+            padding: 12px;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .op-tag {
+            font-weight: 800;
+            color: #3b82f6;
+            background: #1e293b;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .memo-textarea {
+            width: 100%;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 20px;
+            color: #f8fafc;
+            font-size: 1rem;
+            line-height: 1.7;
+            outline: none;
+            resize: none;
+            transition: all 0.2s;
+        }
+
+        .memo-textarea:focus {
+            border-color: #2563eb;
+            background: #0f172a;
+        }
+
+        .save-indicator {
+            font-size: 0.65rem;
+            color: #22c55e;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .status-tag {
+            font-size: 0.7rem;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 6px;
+            border: 2px solid #000;
+        }
+
+        /* 타임차트 텍스트 레이블 */
+        .chart-text {
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 12px;
+            fill: #64748b;
+        }
+
+        .chart-label-main {
+            font-weight: 900;
+            font-size: 14px;
+            fill: #1e293b;
+        }
+
+        .dimension-line {
+            stroke: #94a3b8;
+            stroke-width: 1.5;
+            marker-start: url(#arrow-start);
+            marker-end: url(#arrow-end);
+        }
+    </style>
+</head>
+
+<body class="p-4 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <div class="zodd-card p-4 flex justify-between items-center mb-4">
+        <div class="flex items-center gap-4">
+            <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg"><i data-lucide="activity" size="30"></i></div>
+            <div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-slate-800">
+                    <span class="text-blue-600">PWM</span>-펄스폭 변조 제어
+                </h1>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest text-blue-600">Pulse Width
+                    Modulation Output Simulation</p>
+            </div>
+        </div>
+        <div class="pointer-box px-8 py-3 text-center border-4 border-black min-w-[200px]">
+            <span class="text-[0.6rem] font-black block opacity-70 uppercase tracking-tight">Duty Cycle (s1/s2)</span>
+            <span id="duty-label" class="text-2xl font-black text-white">50%</span>
+        </div>
+    </div>
+
+    <!-- 4-Column Layout -->
+    <div class="flex-1 flex gap-4 overflow-hidden">
+
+        <!-- Col 1: Logic Buttons (18%) -->
+        <div class="w-[18%] flex flex-col gap-4">
+            <div class="zodd-card p-6 flex flex-col h-full shadow-[6px_6px_0px_#000]">
+                <h3 class="text-xs font-black text-slate-400 uppercase mb-5 border-b-2 pb-2 flex items-center gap-2">
+                    <i data-lucide="zap" size="16"></i> COMMAND SELECT
+                </h3>
+                <div class="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
+                    <button class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between active">
+                        <div><span class="btn-main-label">PWM</span><span class="btn-sub-label">(펄스폭 변조)</span></div>
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                    <div class="p-5 bg-blue-50 border-2 border-dashed border-blue-200 rounded-2xl text-center">
+                        <span
+                            class="text-[0.6rem] font-black text-blue-400 uppercase tracking-widest leading-relaxed">Pulse
+                            Train<br />Generator</span>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button onclick="setFastPreset()"
+                        class="bg-indigo-500 hover:bg-indigo-600 text-white p-3 rounded-xl border-2 border-black font-black text-xs uppercase tracking-widest shadow-[3px_3px_0px_#000] active:translate-y-1 active:shadow-none transition-all">
+                        High Speed (20%)
+                    </button>
+                    <button onclick="resetTable()"
+                        class="mt-2 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600">Reset
+                        Defaults</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 2: Live Monitor (32%) -->
+        <div class="w-[32%] flex flex-col gap-4 relative">
+            <div class="zodd-card p-6 flex-1 flex flex-col shadow-[10px_10px_0px_#000] overflow-hidden relative">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">Output
+                            State</span>
+                        <div class="flex items-center gap-3">
+                            <h2 id="status-display"
+                                class="text-3xl font-black text-slate-800 tracking-tighter uppercase">RUNNING</h2>
+                            <div id="output-lamp" class="output-lamp"></div>
+                        </div>
+                    </div>
+                    <div id="error-tag" class="status-tag border-red-600 text-red-600 hidden uppercase">Error: s1 ≥ s2
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
+                        <div class="flex-1">
+                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">ON TIME
+                                (s1)</label>
+                            <input type="number" id="input-s1" value="500" min="1" max="65535"
+                                class="data-input text-blue-600" onchange="updatePWM()">
+                        </div>
+                        <div class="flex flex-col gap-1 ml-3">
+                            <button onclick="stepS1(100)" class="ud-btn">▲</button>
+                            <button onclick="stepS1(-100)" class="ud-btn">▼</button>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
+                        <div class="flex-1">
+                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">PERIOD
+                                (s2)</label>
+                            <input type="number" id="input-s2" value="1000" min="2" max="65535"
+                                class="data-input text-orange-600" onchange="updatePWM()">
+                        </div>
+                        <div class="flex flex-col gap-1 ml-3">
+                            <button onclick="stepS2(100)" class="ud-btn">▲</button>
+                            <button onclick="stepS2(-100)" class="ud-btn">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 타임차트 영역 (매뉴얼 스타일) -->
+                <div class="scope-container mb-6 relative">
+                    <svg width="100%" height="100%" viewBox="0 0 500 260">
+                        <defs>
+                            <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="0" refY="5" orient="auto">
+                                <path d="M 10 0 L 0 5 L 10 10 Z" fill="#94a3b8" />
+                            </marker>
+                            <marker id="arrow-end" markerWidth="10" markerHeight="10" refX="10" refY="5" orient="auto">
+                                <path d="M 0 0 L 10 5 L 0 10 Z" fill="#94a3b8" />
+                            </marker>
+                        </defs>
+
+                        <!-- 베이스 라인 -->
+                        <line x1="50" y1="180" x2="450" y2="180" stroke="#cbd5e1" stroke-width="2" />
+                        <line x1="50" y1="180" x2="50" y2="50" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="4" />
+
+                        <text x="15" y="85" class="chart-label-main">ON</text>
+                        <text x="15" y="185" class="chart-label-main">OFF</text>
+
+                        <!-- 파형 배경 (회색) -->
+                        <path id="wave-bg" class="wave-path" d=""></path>
+                        <!-- 파형 실시간 강조 (파란색) -->
+                        <path id="wave-active" class="wave-path-active" d=""></path>
+
+                        <!-- 치수 보조선 및 화살표 -->
+                        <g id="dimension-group">
+                            <!-- s1 ms -->
+                            <line id="s1-dim" class="dimension-line" x1="50" y1="210" x2="200" y2="210" />
+                            <text id="s1-label-pos" x="125" y="230" text-anchor="middle" class="chart-text">(s1)
+                                ms</text>
+
+                            <!-- s2 ms -->
+                            <line id="s2-dim" class="dimension-line" x1="50" y1="245" x2="350" y2="245" />
+                            <text id="s2-label-pos" x="200" y="260" text-anchor="middle" class="chart-text">(s2)
+                                ms</text>
+
+                            <!-- 수직 점선들 -->
+                            <line id="v-line-1" x1="50" y1="180" x2="50" y2="250" stroke="#cbd5e1"
+                                stroke-dasharray="2" />
+                            <line id="v-line-2" x1="200" y1="80" x2="200" y2="215" stroke="#cbd5e1"
+                                stroke-dasharray="2" />
+                            <line id="v-line-3" x1="350" y1="180" x2="350" y2="250" stroke="#cbd5e1"
+                                stroke-dasharray="2" />
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="flex gap-3">
+                    <button onclick="undo()" id="undo-btn"
+                        class="flex-1 bg-slate-800 hover:bg-black text-white h-16 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-lg flex items-center justify-center gap-3 transition-all">
+                        <i data-lucide="rotate-ccw"></i> UNDO
+                    </button>
+                    <button onclick="toggleRun()" id="exec-btn"
+                        class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-16 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-xl flex items-center justify-center gap-3 transition-all">
+                        <i data-lucide="play-circle" fill="white"></i> <span id="run-text">STOP OUTPUT</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 3: Technical Handbook (25%) -->
+        <div class="w-[25%] flex flex-col overflow-hidden">
+            <div
+                class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] overflow-hidden border-2 border-slate-700">
+                <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                    <i data-lucide="book-open" class="text-pink-500"></i>
+                    <h3 class="text-xl font-black uppercase tracking-widest">Technical Guide</h3>
+                    <div id="save-status" class="save-indicator ml-auto">SAVED!</div>
+                </div>
+
+                <div class="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2">
+                    <div class="bg-slate-800/80 p-6 rounded-3xl border-2 border-slate-700 shadow-inner">
+                        <h4 class="text-2xl font-black text-blue-400 mb-2">PWM (Pulse Modulation)</h4>
+                        <div class="st-syntax-large text-emerald-400">PWM(EN, s1, s2, d);</div>
+                        <p class="text-sm font-bold text-slate-300 leading-relaxed uppercase tracking-tighter mb-4">
+                            Generates a pulse with ON time (s1) and Period (s2) to device (d).</p>
+
+                        <div class="mt-2">
+                            <span
+                                class="text-[0.7rem] font-black text-slate-500 uppercase tracking-widest block mb-3 border-b border-slate-700 pb-1">Operand
+                                Specifications</span>
+                            <table class="operand-table">
+                                <thead>
+                                    <tr>
+                                        <th>Operand</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="op-tag">(s1)</span></td>
+                                        <td>ON 시간 (1~65535 ms)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="op-tag">(s2)</span></td>
+                                        <td>주기 시간 (1~65535 ms)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="op-tag">(d)</span></td>
+                                        <td>펄스 출력 비트 (Y0)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-black/50 border border-slate-700 rounded-2xl">
+                        <span
+                            class="text-[0.7rem] font-black text-slate-500 uppercase block mb-3 flex items-center gap-2">
+                            <i data-lucide="code" size="14"></i> ST Program Example
+                        </span>
+                        <div class="st-code-box">
+                            // 0.5초 ON, 1초 주기<br>
+                            // s1 < s2 조건을 만족해야 함<br>
+                                PWM(SM400, 500, 1000, Y0);
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-5 bg-blue-900/40 border-2 border-blue-500/50 rounded-2xl italic">
+                    <p class="text-xs font-bold text-blue-100 leading-relaxed flex items-center gap-2">
+                        <i data-lucide="award" size="16"></i>
+                        "PWM은 인버터 속도 제어나 히터 전력 제어에 주로 사용되는 핵심 명령어입니다."
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 4: Notepads (25%) -->
+        <div class="w-[25%] flex flex-col gap-4 overflow-hidden">
+            <div
+                class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] border-emerald-500">
+                <div
+                    class="memo-section-header flex justify-between items-center border-b border-emerald-900/50 pb-4 mb-4">
+                    <div class="flex items-center gap-3 text-emerald-400">
+                        <i data-lucide="clipboard-list"></i>
+                        <h3 class="text-lg font-black uppercase">Global Notes</h3>
+                    </div>
+                </div>
+                <textarea id="global-memo" class="memo-textarea flex-1 border-emerald-900/50 mb-6"
+                    placeholder="프로젝트 전체 특이사항 기록..."></textarea>
+
+                <div class="flex items-center gap-3 mb-4 text-blue-400 border-t border-slate-800 pt-6">
+                    <i data-lucide="pencil-line"></i>
+                    <h3 class="text-lg font-black uppercase">PWM Memo</h3>
+                </div>
+                <textarea id="op-memo" class="memo-textarea flex-1 border-blue-900/50"
+                    placeholder="PWM 명령어 개별 기록..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let s1 = 500;
+        let s2 = 1000;
+        let isRunning = true;
+        let history = [];
+        let memoData = { PWM: '', global: '' };
+
+        function updatePWM() {
+            saveHistory();
+            s1 = parseInt(document.getElementById('input-s1').value) || 0;
+            s2 = parseInt(document.getElementById('input-s2').value) || 0;
+
+            const err = document.getElementById('error-tag');
+            if (s1 >= s2 || s1 <= 0 || s2 <= 0) {
+                err.classList.remove('hidden');
+                document.getElementById('duty-label').innerText = "ERROR";
+            } else {
+                err.classList.add('hidden');
+                const duty = ((s1 / s2) * 100).toFixed(1);
+                document.getElementById('duty-label').innerText = duty + "%";
+            }
+            drawTimeChart();
+        }
+
+        function drawTimeChart() {
+            const chartWidth = 400; // 50 ~ 450 영역
+            const startX = 50;
+            const yHigh = 80;
+            const yLow = 180;
+
+            // s2를 기준으로 비율 계산 (두 사이클 보여주기)
+            const ratio = chartWidth / (s2 * 1.5);
+            const wOn = s1 * ratio;
+            const wOff = (s2 - s1) * ratio;
+
+            // 1. 배경 파형 (전체 가이드)
+            let pathD = `M ${startX},${yLow}`;
+            let curX = startX;
+            for (let i = 0; i < 2; i++) {
+                pathD += ` L ${curX},${yHigh} L ${curX + wOn},${yHigh} L ${curX + wOn},${yLow} L ${curX + wOn + wOff},${yLow}`;
+                curX += (wOn + wOff);
+            }
+            document.getElementById('wave-bg').setAttribute('d', pathD);
+
+            // 2. 치수선 업데이트
+            const s1Dim = document.getElementById('s1-dim');
+            s1Dim.setAttribute('x1', startX);
+            s1Dim.setAttribute('x2', startX + wOn);
+            document.getElementById('s1-label-pos').setAttribute('x', startX + (wOn / 2));
+            document.getElementById('s1-label-pos').textContent = `${s1} ms`;
+
+            const s2Dim = document.getElementById('s2-dim');
+            s2Dim.setAttribute('x1', startX);
+            s2Dim.setAttribute('x2', startX + wOn + wOff);
+            document.getElementById('s2-label-pos').setAttribute('x', startX + (wOn + wOff) / 2);
+            document.getElementById('s2-label-pos').textContent = `${s2} ms`;
+
+            // 수직 점선 위치 업데이트
+            document.getElementById('v-line-2').setAttribute('x1', startX + wOn);
+            document.getElementById('v-line-2').setAttribute('x2', startX + wOn);
+            document.getElementById('v-line-3').setAttribute('x1', startX + wOn + wOff);
+            document.getElementById('v-line-3').setAttribute('x2', startX + wOn + wOff);
+        }
+
+        // 실제 출력 d(램프 및 실시간 파형) 시뮬레이션
+        function animateOutput() {
+            if (!isRunning || s1 >= s2) {
+                document.getElementById('output-lamp').classList.remove('on');
+                document.getElementById('wave-active').setAttribute('d', '');
+                requestAnimationFrame(animateOutput);
+                return;
+            }
+
+            const now = Date.now();
+            const cyclePos = now % s2;
+            const lamp = document.getElementById('output-lamp');
+
+            // 램프 상태
+            if (cyclePos < s1) {
+                lamp.classList.add('on');
+            } else {
+                lamp.classList.remove('on');
+            }
+
+            // 실시간 파란색 추적 파형
+            const chartWidth = 400;
+            const ratio = chartWidth / (s2 * 1.5);
+            const wOn = s1 * ratio;
+            const wOff = (s2 - s1) * ratio;
+            const startX = 50;
+            const yHigh = 80;
+            const yLow = 180;
+
+            let activeD = `M ${startX},${yLow}`;
+            const currentTotalX = (now % (s2 * 1.5)) * ratio;
+
+            // 현재 시점까지 파란색 선 긋기
+            let drawX = 0;
+            let tempX = startX;
+            while (drawX < (now % (s2 * 1.5))) {
+                const stepNow = (now + drawX) % s2;
+                // 간략화를 위해 현재 시점의 진행도만 표시
+                const progressX = (now % (s2 * 1.5)) * ratio;
+
+                // 실제로는 현재 위치에 수직바 하나가 지나가는게 더 깔끔함
+                activeD = `M ${startX + progressX},${yHigh - 10} L ${startX + progressX},${yLow + 10}`;
+                break;
+            }
+            document.getElementById('wave-active').setAttribute('d', activeD);
+
+            requestAnimationFrame(animateOutput);
+        }
+
+        function toggleRun() {
+            isRunning = !isRunning;
+            document.getElementById('run-text').innerText = isRunning ? "STOP OUTPUT" : "START OUTPUT";
+            document.getElementById('status-display').innerText = isRunning ? "RUNNING" : "STOPPED";
+            document.getElementById('status-display').className = isRunning ? "text-3xl font-black text-slate-800 tracking-tighter uppercase" : "text-3xl font-black text-red-500 tracking-tighter uppercase";
+        }
+
+        function stepS1(v) {
+            const el = document.getElementById('input-s1');
+            el.value = Math.max(1, parseInt(el.value) + v);
+            updatePWM();
+        }
+        function stepS2(v) {
+            const el = document.getElementById('input-s2');
+            el.value = Math.max(2, parseInt(el.value) + v);
+            updatePWM();
+        }
+
+        function setFastPreset() {
+            document.getElementById('input-s1').value = 200;
+            document.getElementById('input-s2').value = 1000;
+            updatePWM();
+        }
+
+        function saveHistory() { history.push({ s1, s2 }); if (history.length > 20) history.shift(); }
+        function undo() {
+            if (history.length > 0) {
+                const prev = history.pop();
+                document.getElementById('input-s1').value = prev.s1;
+                document.getElementById('input-s2').value = prev.s2;
+                updatePWM();
+            }
+        }
+
+        function resetTable() {
+            document.getElementById('input-s1').value = 500;
+            document.getElementById('input-s2').value = 1000;
+            updatePWM();
+        }
+
+        function initMemos() {
+            const saved = localStorage.getItem('zodd_pwm_memos_v2');
+            if (saved) {
+                memoData = JSON.parse(saved);
+                document.getElementById('global-memo').value = memoData.global || '';
+                document.getElementById('op-memo').value = memoData.PWM || '';
+            }
+            document.getElementById('global-memo').oninput = (e) => { memoData.global = e.target.value; saveToLocal(); };
+            document.getElementById('op-memo').oninput = (e) => { memoData.PWM = e.target.value; saveToLocal(); };
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('zodd_pwm_memos_v2', JSON.stringify(memoData));
+            const ind = document.getElementById('save-status'); ind.classList.add('show'); setTimeout(() => ind.classList.remove('show'), 1000);
+        }
+
+        window.onload = () => {
+            lucide.createIcons();
+            initMemos();
+            updatePWM();
+            animateOutput();
+        };
+    </script>
+</body>
+
+</html>

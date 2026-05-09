@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>공정 배출 계산기 (Logic 포함)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Malgun Gothic', sans-serif;
+      background: #F0F3F7;
+      color: #333;
+      padding: 30px;
+    }
+    .header {
+      background: #1B3A5C;
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 30px;
+      align-items: start;
+    }
+    .panel {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid #DDE3EA;
+      padding: 30px;
+      box-shadow: 0 10px 15px rgba(0,0,0,0.05);
+    }
+    .panel-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #1B3A5C;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 3px solid #EEF1F5;
+    }
+    .input-group {
+      margin-bottom: 20px;
+    }
+    .input-group label {
+      display: block;
+      font-size: 18px;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 8px;
+    }
+    input[type="number"] {
+      width: 100%;
+      padding: 15px;
+      font-size: 22px;
+      font-family: 'Consolas', monospace;
+      border: 2px solid #CBD5E1;
+      border-radius: 8px;
+      font-weight: bold;
+      color: #1B3A5C;
+    }
+    
+    .result-item {
+      margin-bottom: 25px;
+      background: #F8FAFC;
+      border-radius: 10px;
+      padding: 20px;
+      border-left: 8px solid #1B3A5C;
+    }
+    .result-label {
+      font-size: 20px;
+      font-weight: bold;
+      color: #64748B;
+      margin-bottom: 8px;
+      display: block;
+    }
+    .formula-tag {
+      display: block;
+      font-size: 14px;
+      color: #1565C0;
+      background: #E3F2FD;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      font-family: 'Consolas', monospace;
+      font-weight: bold;
+    }
+    .result-value-main {
+      font-family: 'Consolas', monospace;
+      font-size: 42px;
+      font-weight: bold;
+      color: #0F172A;
+      display: block;
+      line-height: 1.2;
+    }
+    .result-value-sub {
+      font-family: 'Consolas', monospace;
+      font-size: 24px;
+      font-weight: bold;
+      color: #0284C7;
+      margin-top: 8px;
+      display: block;
+    }
+    .unit {
+      font-size: 20px;
+      color: #475569;
+      margin-left: 5px;
+    }
+    .status-badge {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .status-ok { background: #DCFCE7; color: #166534; }
+    .status-warn { background: #FEE2E2; color: #991B1B; }
+
+    @media (max-width: 1000px) {
+      .container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">공정 배출 계산기 (Logic 포함)</div>
+
+  <div class="container">
+    <div class="panel">
+      <div class="panel-title">공정 조건 입력</div>
+      <div class="input-group">
+        <label>적재 시간 (A)</label>
+        <input type="number" id="in-load" value="120" oninput="calc()">
+      </div>
+      <div class="input-group">
+        <label>장입 이동 시간 (B)</label>
+        <input type="number" id="in-entry" value="5" oninput="calc()">
+      </div>
+      <div class="input-group">
+        <label>히팅 시간 (C, 시간단위)</label>
+        <input type="number" id="in-heat-hr" value="72" step="0.1" oninput="calc()">
+      </div>
+      <div class="input-group">
+        <label>총 히팅 장소 (N)</label>
+        <input type="number" id="in-slots" value="40" oninput="calc()">
+      </div>
+      <div class="input-group">
+        <label>장출 이동 시간 (D)</label>
+        <input type="number" id="in-exit" value="5" oninput="calc()">
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">계산 결과 및 수식</div>
+      
+      <div class="result-item">
+        <span class="result-label">첫 제품 배출 시점 (Lead Time)</span>
+        <span class="formula-tag">공식: A + B + (C × 60) + D</span>
+        <span class="result-value-main" id="res-lead-min">4450.0<span class="unit">분</span></span>
+        <span class="result-value-sub" id="res-lead-hr">74시간 10분</span>
+      </div>
+
+      <div class="result-item">
+        <span class="result-label">연속 배출 간격 (Cycle Time)</span>
+        <span class="formula-tag">공식: Max(A, (C × 60) / N)</span>
+        <span class="result-value-main" id="res-cycle">120.0<span class="unit">분</span></span>
+      </div>
+
+      <div class="result-item">
+        <span class="result-label">필요 히팅 포트 수</span>
+        <span class="formula-tag">공식: 올림((C × 60) / A)</span>
+        <span class="result-value-main" id="res-req-slots">36<span class="unit">곳</span></span>
+        <div id="res-status" class="status-badge status-ok">여유 포트: 4곳</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function calc() {
+      const A = parseFloat(document.getElementById('in-load').value) || 0;
+      const B = parseFloat(document.getElementById('in-entry').value) || 0;
+      const Ch = parseFloat(document.getElementById('in-heat-hr').value) || 0;
+      const N = parseFloat(document.getElementById('in-slots').value) || 0;
+      const D = parseFloat(document.getElementById('in-exit').value) || 0;
+
+      const C = Ch * 60; // 히팅 시간(분)
+
+      // 1. 리드타임
+      const leadMin = A + B + C + D;
+      const hr = Math.floor(leadMin / 60);
+      const min = Math.round(leadMin % 60);
+      document.getElementById('res-lead-min').innerHTML = leadMin.toFixed(1) + '<span class="unit">분</span>';
+      document.getElementById('res-lead-hr').textContent = hr + '시간 ' + min + '분';
+
+      // 2. 필요 포트 수
+      const reqSlots = A > 0 ? Math.ceil(C / A) : 0;
+      document.getElementById('res-req-slots').innerHTML = reqSlots + '<span class="unit">곳</span>';
+
+      // 3. 사이클 타임 및 상태
+      let cycleTime = A;
+      const statusEl = document.getElementById('res-status');
+      if (reqSlots <= N) {
+        statusEl.textContent = '여유 포트: ' + (N - reqSlots) + '곳';
+        statusEl.className = 'status-badge status-ok';
+        cycleTime = A;
+      } else {
+        statusEl.textContent = '포트 부족! (' + (reqSlots - N) + '곳 더 필요)';
+        statusEl.className = 'status-badge status-warn';
+        cycleTime = C / N; // 포트 부족 시 배출 지연 발생
+      }
+      document.getElementById('res-cycle').innerHTML = cycleTime.toFixed(1) + '<span class="unit">분</span>';
+    }
+    calc();
+  </script>
+</body>
+</html>

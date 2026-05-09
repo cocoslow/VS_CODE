@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC BAND 실무 예제 시뮬레이터</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --deadzone: #ef4444;
+            --bg: #f1f5f9;
+            --panel: #ffffff;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', sans-serif;
+            background-color: var(--bg);
+            padding: 20px;
+            color: #334155;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--panel);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+            color: #1e293b;
+        }
+
+        /* 예제 선택 버튼 섹션 */
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .ex-btn {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .ex-btn:hover {
+            background: #e2e8f0;
+            border-color: var(--primary);
+        }
+
+        .ex-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 시나리오 설명 */
+        #scenario-desc {
+            background: #f0f9ff;
+            padding: 15px;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* 컨트롤러 */
+        .control-panel {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .slider-row {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group input[type="range"] {
+            flex-grow: 1;
+            margin-bottom: 0;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .adj-btn {
+            background: #e2e8f0;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 4px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #334155;
+            transition: all 0.2s;
+        }
+
+        .adj-btn:hover {
+            background: #cbd5e1;
+            border-color: #94a3b8;
+        }
+
+        /* 비주얼라이저 & 눈금 */
+        .visualizer-container {
+            position: relative;
+            margin: 60px 0 30px;
+            padding: 0 10px;
+        }
+
+        .bar-bg {
+            height: 50px;
+            background: #e2e8f0;
+            border-radius: 25px;
+            position: relative;
+            overflow: visible;
+        }
+
+        .dead-band {
+            position: absolute;
+            height: 100%;
+            background: rgba(239, 68, 68, 0.2);
+            border-left: 2px dashed var(--deadzone);
+            border-right: 2px dashed var(--deadzone);
+            transition: all 0.3s;
+        }
+
+        .pointer {
+            position: absolute;
+            width: 3px;
+            height: 60px;
+            background: var(--primary);
+            top: -5px;
+            z-index: 5;
+        }
+
+        .band-label {
+            position: absolute;
+            top: 50%;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--deadzone);
+            white-space: nowrap;
+        }
+
+        .band-label.left {
+            left: -8px;
+            transform: translate(-100%, -50%);
+        }
+
+        .band-label.right {
+            right: -8px;
+            transform: translate(100%, -50%);
+        }
+
+        .ptr-label {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 0.95rem;
+            white-space: nowrap;
+        }
+
+        /* 눈금 스타일 */
+        .scale {
+            position: relative;
+            width: 100%;
+            height: 20px;
+            margin-top: 10px;
+        }
+
+        .tick {
+            position: absolute;
+            width: 1px;
+            height: 8px;
+            background: #94a3b8;
+            top: 0;
+        }
+
+        .tick-label {
+            position: absolute;
+            top: 12px;
+            font-size: 0.7rem;
+            transform: translateX(-50%);
+            color: #64748b;
+        }
+
+        /* 결과 출력 */
+        .result-display {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: #1e293b;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .res-item .val {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #fbbf24;
+            display: block;
+        }
+
+        .res-item .unit {
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+
+        /* 탭 버튼 스타일 */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+            background: #f8fafc;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            margin-bottom: -12px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 존 제어 전용 스타일 */
+        .logic-box {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-family: monospace;
+        }
+
+        .dead-zone-area {
+            position: absolute;
+            height: 100%;
+            background: rgba(220, 38, 38, 0.2);
+            border-left: 2px solid var(--deadzone);
+            border-right: 2px solid var(--deadzone);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--deadzone);
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('band', this)">BAND (불감대)</button>
+            <button class="tab-btn" onclick="switchTab('zone', this)">ZONE (존 제어)</button>
+        </div>
+
+        <!-- BAND 탭 내용 -->
+        <div id="tab-band" class="tab-content active">
+            <h2>BAND 명령어 실무 시뮬레이션</h2>
+
+            <p>어떤 상황에서 쓰는지 궁금하지? 아래 예제를 클릭해봐!</p>
+            <div class="example-grid">
+                <button class="ex-btn active" onclick="loadEx(1, this)">1. 센서 노이즈</button>
+                <button class="ex-btn" onclick="loadEx(2, this)">2. 조이스틱 중립</button>
+                <button class="ex-btn" onclick="loadEx(3, this)">3. 서보 헌팅방지</button>
+                <button class="ex-btn" onclick="loadEx(4, this)">4. 로드셀 영점</button>
+                <button class="ex-btn" onclick="loadEx(5, this)">5. 텐션 완충</button>
+                <button class="ex-btn" onclick="loadEx(6, this)">🎲 랜덤(심화)</button>
+            </div>
+
+            <div id="scenario-desc">
+                <strong>시나리오:</strong> <span id="desc-text">센서값이 ±3 정도 미세하게 떨릴 때, 이 노이즈를 0으로 무시합니다.</span>
+            </div>
+
+            <div class="control-panel">
+                <div class="slider-row">
+                    <label>Min (하한값): <span id="s1-txt">-3</span></label>
+                    <input type="range" id="s1" min="-100" max="100" value="-3" oninput="sync()">
+                </div>
+                <div class="slider-row">
+                    <label>Max (상한값): <span id="s2-txt">3</span></label>
+                    <input type="range" id="s2" min="-100" max="100" value="3" oninput="sync()">
+                </div>
+                <div class="slider-row">
+                    <label>In (입력값): <span id="s3-txt">2</span></label>
+                    <div class="input-group">
+                        <input type="range" id="s3" min="-100" max="100" value="2" oninput="sync()">
+                        <div class="btn-group">
+                            <button class="adj-btn" onclick="adjustValue('s3', -1)">▼</button>
+                            <button class="adj-btn" onclick="adjustValue('s3', 1)">▲</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualizer-container">
+                <div class="bar-bg">
+                    <div id="band" class="dead-band">
+                        <div id="band-min-label" class="band-label left">Min: -3</div>
+                        <div id="band-max-label" class="band-label right">Max: 3</div>
+                    </div>
+                    <div id="ptr" class="pointer">
+                        <div id="ptr-label" class="ptr-label">In: 2</div>
+                    </div>
+                </div>
+                <div class="scale" id="ruler"></div>
+            </div>
+
+            <div class="result-display">
+                <div class="res-item">
+                    <span class="unit">입력(In)</span>
+                    <span class="val" id="res-s3">2</span>
+                </div>
+                <div style="font-size: 2rem;">→</div>
+                <div class="res-item">
+                    <span class="unit">결과(d)</span>
+                    <span class="val" id="res-d">0</span>
+                </div>
+            </div>
+        </div> <!-- // BAND 탭 끝 -->
+
+        <!-- ZONE 탭 내용 -->
+        <div id="tab-zone" class="tab-content">
+            <h2>DZONE(EN, s1, s2, s3, d) 시뮬레이터</h2>
+            <div class="logic-box">
+                IF s3 < s1 THEN d=s3 <br>
+                    ELSIF s1 <= s3 <=s2 THEN d=0 <br>
+                        ELSE d = s3
+            </div>
+
+            <div class="control-panel">
+                <div class="slider-row">
+                    <label>Min(s1, 하한): <span id="z-s1-t">-30</span></label>
+                    <input type="range" id="z-s1" min="-100" max="100" value="-30" oninput="syncZone()">
+                </div>
+                <div class="slider-row">
+                    <label>Max(s2, 상한): <span id="z-s2-t">30</span></label>
+                    <input type="range" id="z-s2" min="-100" max="100" value="30" oninput="syncZone()">
+                </div>
+                <div class="slider-row">
+                    <label>In(s3, 입력): <span id="z-s3-t">50</span></label>
+                    <div class="input-group">
+                        <input type="range" id="z-s3" min="-100" max="100" value="50" oninput="syncZone()">
+                        <div class="btn-group">
+                            <button class="adj-btn" onclick="adjustZoneValue('z-s3', -1)">▼</button>
+                            <button class="adj-btn" onclick="adjustZoneValue('z-s3', 1)">▲</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="visualizer-container">
+                <div class="bar-bg">
+                    <div id="z-dz" class="dead-zone-area">
+                        <div id="z-band-min-label" class="band-label left">Min: -30</div>
+                        ZERO ZONE
+                        <div id="z-band-max-label" class="band-label right">Max: 30</div>
+                    </div>
+                    <div id="z-ptr" class="pointer">
+                        <div id="z-ptr-label" class="ptr-label">In: 50</div>
+                    </div>
+                </div>
+                <div class="scale" id="z-ruler"></div>
+            </div>
+
+            <div class="result-display">
+                <div class="res-item">
+                    <span class="unit">입력(s3)</span>
+                    <span class="val" id="z-res-s3">50</span>
+                </div>
+                <div style="font-size: 2rem;">→</div>
+                <div class="res-item">
+                    <span class="unit">결과(d)</span>
+                    <span class="val" id="z-res-d">50</span>
+                </div>
+            </div>
+        </div> <!-- // ZONE 탭 끝 -->
+    </div>
+
+    <script>
+        const examples = {
+            1: { s1: -3, s2: 3, s3: 2, desc: "<b>센서 노이즈 제거:</b> 센서가 가만히 있어도 -2~2 사이를 떨고 있습니다. 불감대를 3으로 설정하면, 실제 큰 변화가 생기기 전까지 출력(d)은 0을 유지하여 시스템이 안정됩니다." },
+            2: { s1: -15, s2: 15, s3: 5, desc: "<b>조이스틱 중립 구간:</b> 조이스틱을 놓아도 물리적 마모로 인해 5라는 값이 들어옵니다. ±15를 불감대로 잡으면 사용자가 손을 뗐을 때 장비가 움직이지 않습니다." },
+            3: { s1: -1, s2: 1, s3: 0.5, desc: "<b>서보 헌팅 방지:</b> 위치 오차가 0.5인데 모터가 미세하게 떨립니다. ±1 이내의 오차는 0으로 간주하여 서보가 정지 상태를 유지하게 합니다." },
+            4: { s1: 0, s2: 8, s3: 4, desc: "<b>로드셀 영점:</b> 빈 컨베이어의 진동으로 4g이 찍힙니다. 0~8g 구간을 불감대로 설정하면, 진짜 물건(8g 이상)이 올라올 때만 무게 측정을 시작합니다." },
+            5: { s1: -10, s2: 10, s3: 12, desc: "<b>텐션 보정:</b> 장력이 조금 변할 때마다 속도를 바꾸면 필름이 끊어질 수 있습니다. ±10 범위를 넘을 때만 보정값(d)을 계산해 부드럽게 제어합니다." },
+            6: { s1: -50, s2: 20, s3: -60, desc: "<b>랜덤/심화:</b> 불감대를 비대칭(-50 ~ 20)으로 설정할 수도 있습니다. 이 경우 하한선을 넘으면 음수 방향으로 제어값이 발생합니다." }
+        };
+
+        let currentExId = 1;
+
+        function loadEx(id, btn) {
+            document.querySelectorAll('.ex-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            currentExId = id;
+            const ex = examples[id];
+            document.getElementById('s1').value = ex.s1;
+            document.getElementById('s2').value = ex.s2;
+            document.getElementById('s3').value = ex.s3;
+            document.getElementById('desc-text').innerHTML = ex.desc;
+            sync();
+        }
+
+        function createRuler() {
+            const ruler = document.getElementById('ruler');
+            for (let i = -100; i <= 100; i += 20) {
+                const left = (i + 100) / 2;
+                ruler.innerHTML += `<div class="tick" style="left: ${left}%"></div>
+                               <div class="tick-label" style="left: ${left}%">${i}</div>`;
+            }
+        }
+
+        function adjustValue(id, delta) {
+            const input = document.getElementById(id);
+            let newVal = parseInt(input.value) + delta;
+            const min = parseInt(input.min);
+            const max = parseInt(input.max);
+
+            if (newVal < min) newVal = min;
+            if (newVal > max) newVal = max;
+
+            input.value = newVal;
+            sync();
+        }
+
+        function sync() {
+            const s1 = parseInt(document.getElementById('s1').value);
+            const s2 = parseInt(document.getElementById('s2').value);
+            const s3 = parseInt(document.getElementById('s3').value);
+
+            // 사용자가 설정한 값을 저장 (탭 변경 시 유지용)
+            examples[currentExId].s1 = s1;
+            examples[currentExId].s2 = s2;
+            examples[currentExId].s3 = s3;
+
+            document.getElementById('s1-txt').innerText = s1;
+            document.getElementById('s2-txt').innerText = s2;
+            document.getElementById('s3-txt').innerText = s3;
+            document.getElementById('res-s3').innerText = s3;
+
+            let d = 0;
+            if (s3 < s1) d = s3 - s1;
+            else if (s3 > s2) d = s3 - s2;
+            else d = 0;
+
+            document.getElementById('res-d').innerText = d;
+
+            // Visual Update
+            const toPct = (v) => (v + 100) / 2;
+            const band = document.getElementById('band');
+            band.style.left = toPct(s1) + "%";
+            band.style.width = Math.max(0, toPct(s2) - toPct(s1)) + "%";
+            document.getElementById('ptr').style.left = toPct(s3) + "%";
+
+            // Label Update
+            document.getElementById('band-min-label').innerText = `Min: ${s1}`;
+            document.getElementById('band-max-label').innerText = `Max: ${s2}`;
+            document.getElementById('ptr-label').innerText = `In: ${s3}`;
+        }
+
+        createRuler();
+        sync();
+
+        // ==========================================
+        // 탭 전환 로직
+        // ==========================================
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        // ==========================================
+        // ZONE 제어 로직
+        // ==========================================
+        function adjustZoneValue(id, delta) {
+            const input = document.getElementById(id);
+            let newVal = parseInt(input.value) + delta;
+            const min = parseInt(input.min);
+            const max = parseInt(input.max);
+
+            if (newVal < min) newVal = min;
+            if (newVal > max) newVal = max;
+
+            input.value = newVal;
+            syncZone();
+        }
+
+        function syncZone() {
+            const s1 = parseInt(document.getElementById('z-s1').value);
+            const s2 = parseInt(document.getElementById('z-s2').value);
+            const s3 = parseInt(document.getElementById('z-s3').value);
+
+            document.getElementById('z-s1-t').innerText = s1;
+            document.getElementById('z-s2-t').innerText = s2;
+            document.getElementById('z-s3-t').innerText = s3;
+            document.getElementById('z-res-s3').innerText = s3;
+
+            let d = (s3 >= s1 && s3 <= s2) ? 0 : s3;
+            document.getElementById('z-res-d').innerText = d;
+
+            const toPct = v => (v + 100) / 2;
+            const dz = document.getElementById('z-dz');
+            dz.style.left = toPct(s1) + "%";
+            dz.style.width = Math.max(0, toPct(s2) - toPct(s1)) + "%";
+            document.getElementById('z-ptr').style.left = toPct(s3) + "%";
+
+            document.getElementById('z-band-min-label').innerText = `Min: ${s1}`;
+            document.getElementById('z-band-max-label').innerText = `Max: ${s2}`;
+            document.getElementById('z-ptr-label').innerText = `In: ${s3}`;
+        }
+
+        function createZoneRuler() {
+            const ruler = document.getElementById('z-ruler');
+            for (let i = -100; i <= 100; i += 20) {
+                const left = (i + 100) / 2;
+                ruler.innerHTML += `<div class="tick" style="left: ${left}%"></div>
+                               <div class="tick-label" style="left: ${left}%">${i}</div>`;
+            }
+        }
+
+        createZoneRuler();
+        syncZone();
+    </script>
+
+</body>
+
+</html>

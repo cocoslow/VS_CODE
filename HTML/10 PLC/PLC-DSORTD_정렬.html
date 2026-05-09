@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DSORTD-32비트 데이터 정렬 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&display=swap');
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .zodd-card {
+            background: white;
+            border: 4px solid #000;
+            border-radius: 24px;
+            box-shadow: 8px 8px 0px #000;
+        }
+
+        .pointer-box {
+            background: #1e293b;
+            color: #3b82f6;
+            border: 3px solid #3b82f6;
+            border-radius: 12px;
+            font-family: monospace;
+        }
+
+        /* 탭 스타일 */
+        .tab-btn {
+            border-bottom: 4px solid transparent;
+            transition: 0.2s;
+            white-space: nowrap;
+            font-size: 1.1rem;
+            padding: 10px 14px;
+        }
+
+        .tab-btn.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+            font-weight: 900;
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        /* 명령어 버튼 액티브 상태 */
+        .op-select-btn {
+            border: 3px solid #000;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            height: 85px;
+            text-align: left;
+            padding: 0 20px;
+        }
+
+        .op-select-btn .btn-main-label {
+            font-size: 1.5rem;
+            font-weight: 900;
+            display: block;
+        }
+
+        .op-select-btn .btn-sub-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            opacity: 0.6;
+        }
+
+        .op-select-btn.active {
+            background: #2563eb !important;
+            color: white !important;
+            transform: scale(1.02);
+            z-index: 20;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .op-select-btn.active i {
+            color: white !important;
+        }
+
+        .data-input {
+            width: 100%;
+            background: transparent;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.8rem;
+            outline: none;
+            border: none;
+            color: #1e293b;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* 업/다운 버튼 */
+        .ud-btn {
+            background: #000;
+            color: #fff;
+            width: 36px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            transition: all 0.1s;
+        }
+
+        .ud-btn:hover {
+            background: #334155;
+        }
+
+        .ud-btn:active {
+            transform: scale(0.9);
+        }
+
+        /* ST 구문 초대형 폰트 */
+        .st-syntax-large {
+            background: #020617;
+            border-left: 10px solid #2563eb;
+            padding: 25px;
+            border-radius: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #38bdf8;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            line-height: 1.2;
+        }
+
+        .st-code-box {
+            background: #000;
+            border: 1px solid #334155;
+            padding: 16px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: #ec4899;
+            line-height: 1.5;
+        }
+
+        /* 오퍼랜드 표 폰트 확대 */
+        .operand-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .operand-table th {
+            background: #334155;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            text-align: left;
+            padding: 8px 12px;
+            border: 1px solid #1e293b;
+        }
+
+        .operand-table td {
+            font-size: 1rem;
+            padding: 12px;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .op-tag {
+            font-weight: 800;
+            color: #3b82f6;
+            background: #1e293b;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* 메모장 스타일 */
+        .memo-textarea {
+            width: 100%;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 20px;
+            color: #f8fafc;
+            font-size: 1rem;
+            line-height: 1.7;
+            outline: none;
+            resize: none;
+            transition: all 0.2s;
+        }
+
+        .memo-textarea:focus {
+            border-color: #2563eb;
+            background: #0f172a;
+        }
+
+        .save-indicator {
+            font-size: 0.65rem;
+            color: #22c55e;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        /* 스위치 스타일 (SM703) */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+            border: 2px solid #000;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            border: 1px solid #000;
+        }
+
+        input:checked+.slider {
+            background-color: #2563eb;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(24px);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        /* 램프 스타일 */
+        .status-lamp {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid #000;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .lamp-off {
+            background: #94a3b8;
+            box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .lamp-on {
+            background: #22c55e;
+            box-shadow: 0 0 8px #22c55e;
+        }
+
+        .lamp-on-rose {
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+        }
+    </style>
+</head>
+
+<body class="p-4 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header: 제목 수정 반영 -->
+    <div class="zodd-card p-4 flex justify-between items-center mb-4">
+        <div class="flex items-center gap-4">
+            <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg"><i data-lucide="shuffle" size="30"></i></div>
+            <div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-slate-800">
+                    <span class="text-blue-600">DSORTD</span>-32비트 데이터 정렬
+                </h1>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest text-blue-600">32-Bit Signed Data
+                    Sorting Simulation Engine</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="pointer-box px-8 py-3 text-center border-4 border-black min-w-[160px]">
+                <span class="text-[0.6rem] font-black block opacity-70 uppercase tracking-tight">Sort Done (M0)</span>
+                <span id="done-bit" class="text-2xl font-black text-white">OFF</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-Column Layout -->
+    <div class="flex-1 flex gap-4 overflow-hidden">
+
+        <!-- Col 1: Logic Buttons (18%) -->
+        <div class="w-[18%] flex flex-col gap-4">
+            <div class="zodd-card p-6 flex flex-col h-full shadow-[6px_6px_0px_#000]">
+                <h3 class="text-xs font-black text-slate-400 uppercase mb-5 border-b-2 pb-2 flex items-center gap-2">
+                    <i data-lucide="zap" size="16"></i> COMMAND SELECT
+                </h3>
+                <div class="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
+                    <button class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between active">
+                        <div><span class="btn-main-label">DSORTD</span><span class="btn-sub-label">(32비트 데이터 정렬)</span>
+                        </div>
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                    <div class="p-5 bg-blue-50 border-2 border-dashed border-blue-200 rounded-2xl text-center">
+                        <span
+                            class="text-[0.65rem] font-black text-blue-400 uppercase tracking-widest leading-relaxed">Multi-Word<br />Logic
+                            Enabled</span>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button onclick="randomizeTable()"
+                        class="bg-emerald-500 hover:bg-emerald-600 text-white p-3 rounded-xl border-2 border-black font-black text-xs uppercase tracking-widest shadow-[3px_3px_0px_#000] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="refresh-cw" size="14"></i> Random Data
+                    </button>
+                    <button onclick="resetTable()"
+                        class="mt-2 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600">Reset
+                        Memory</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 2: Live Monitor (32%) -->
+        <div class="w-[32%] flex flex-col gap-4 relative">
+            <div class="zodd-card p-6 flex-1 flex flex-col shadow-[10px_10px_0px_#000] overflow-hidden relative">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">Execution
+                            Mode</span>
+                        <h2 id="status-display" class="text-3xl font-black text-slate-800 tracking-tighter uppercase">
+                            READY</h2>
+                    </div>
+
+                    <div
+                        class="flex flex-col items-end gap-2 bg-slate-100 p-3 rounded-2xl border-2 border-black shadow-sm">
+                        <span class="text-[0.6rem] font-black text-slate-500 uppercase">SM703 (정렬 순서)</span>
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-1.5">
+                                <div id="sm703-lamp" class="status-lamp lamp-off"></div>
+                                <span id="sm703-label" class="text-[0.75rem] font-black text-blue-600 uppercase">OFF
+                                    (오름)</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="sm703-toggle" onchange="updateSortMode()">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
+                        <div class="flex-1">
+                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">COUNT
+                                (N)</label>
+                            <input type="number" id="input-n" value="6" min="2" max="10"
+                                class="data-input text-blue-600" onchange="renderTable()">
+                        </div>
+                        <div class="flex flex-col gap-1 ml-3">
+                            <button onclick="stepN(1)" class="ud-btn">▲</button>
+                            <button onclick="stepN(-1)" class="ud-btn">▼</button>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
+                        <div class="flex-1">
+                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">SPEED
+                                (S2)</label>
+                            <input type="number" id="input-s2" value="2" min="1" max="10"
+                                class="data-input text-orange-600">
+                        </div>
+                        <div class="flex flex-col gap-1 ml-3">
+                            <button onclick="stepS2(1)" class="ud-btn">▲</button>
+                            <button onclick="stepS2(-1)" class="ud-btn">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mb-6">
+                    <button onclick="undo()" id="undo-btn"
+                        class="flex-1 bg-slate-800 hover:bg-black text-white h-20 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-xl flex items-center justify-center gap-3 transition-all">
+                        <i data-lucide="rotate-ccw"></i> UNDO
+                    </button>
+                    <button onclick="runSort()" id="exec-btn"
+                        class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-20 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-2xl flex items-center justify-center gap-3 transition-all">
+                        <i data-lucide="play-circle" fill="white"></i> SORT START
+                    </button>
+                </div>
+
+                <div class="flex-1 overflow-y-auto custom-scrollbar pr-2 relative">
+                    <div
+                        class="grid grid-cols-[100px_1fr_60px] gap-4 mb-4 px-2 italic font-black text-slate-300 text-[0.7rem] uppercase tracking-widest">
+                        <div>Address (2W)</div>
+                        <div class="text-center">32-bit Signed Data</div>
+                        <div class="text-right">Index</div>
+                    </div>
+                    <div id="table-body" class="space-y-3 pb-10"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 3: Technical Handbook (25%) -->
+        <div class="w-[25%] flex flex-col overflow-hidden">
+            <div
+                class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] overflow-hidden border-2 border-slate-700">
+                <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                    <i data-lucide="book-open" class="text-pink-500"></i>
+                    <h3 class="text-xl font-black uppercase tracking-widest">Technical Guide</h3>
+                    <div id="save-status" class="save-indicator ml-auto">SAVED!</div>
+                </div>
+
+                <div class="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2">
+                    <div class="bg-slate-800/80 p-6 rounded-3xl border-2 border-slate-700 shadow-inner">
+                        <h4 class="text-2xl font-black text-blue-400 mb-2">DSORTD (32-bit Sort)</h4>
+                        <div class="st-syntax-large text-emerald-400">DSORTD(EN, s1, n, s2, d1, d2);</div>
+                        <p class="text-sm font-bold text-slate-300 leading-relaxed uppercase tracking-tighter mb-4">Sort
+                            BIN32 data from (s1) to (n) points in ASC/DESC order.</p>
+
+                        <div class="mt-2">
+                            <span
+                                class="text-[0.7rem] font-black text-slate-500 uppercase tracking-widest block mb-3 border-b border-slate-700 pb-1">Operand
+                                Specifications</span>
+                            <table class="operand-table">
+                                <thead>
+                                    <tr>
+                                        <th>Operand</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="op-tag">(s1)</span></td>
+                                        <td>테이블 선두 디바이스 (D100)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="op-tag">(n)</span></td>
+                                        <td>정렬 데이터 수 (2~10)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="op-tag">(s2)</span></td>
+                                        <td>1회 비교 데이터 수</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="op-tag">(d1)</span></td>
+                                        <td>정렬 완료 비트 (M0)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="op-tag">(d2)</span></td>
+                                        <td>시스템 전용 디바이스 (D2000)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-black/50 border border-slate-700 rounded-2xl">
+                        <span
+                            class="text-[0.7rem] font-black text-slate-500 uppercase block mb-3 flex items-center gap-2">
+                            <i data-lucide="code" size="14"></i> ST Program Example
+                        </span>
+                        <div class="st-code-box">
+                            // D100부터 n개 데이터 정렬<br>
+                            // s2=2 (1스캔당 2개씩 비교)<br>
+                            DSORTD(SM400, D100, 6, 2, M0, D2000);
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-5 bg-blue-900/40 border-2 border-blue-500/50 rounded-2xl italic">
+                    <p class="text-xs font-bold text-blue-100 leading-relaxed flex items-center gap-2">
+                        <i data-lucide="award" size="16"></i>
+                        "32비트 데이터는 항상 2워드(D100+D101)를 한 쌍으로 처리합니다."
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 4: Notepads (25%) -->
+        <div class="w-[25%] flex flex-col gap-4 overflow-hidden">
+            <div
+                class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] border-emerald-500">
+                <div
+                    class="memo-section-header flex justify-between items-center border-b border-emerald-900/50 pb-4 mb-4">
+                    <div class="flex items-center gap-3 text-emerald-400">
+                        <i data-lucide="clipboard-list"></i>
+                        <h3 class="text-lg font-black uppercase">Global Notes</h3>
+                    </div>
+                </div>
+                <textarea id="global-memo" class="memo-textarea flex-1 border-emerald-900/50 mb-6"
+                    placeholder="프로젝트 전체 특이사항 기록..."></textarea>
+
+                <div class="flex items-center gap-3 mb-4 text-blue-400 border-t border-slate-800 pt-6">
+                    <i data-lucide="pencil-line"></i>
+                    <h3 class="text-lg font-black uppercase">DSORTD Memo</h3>
+                </div>
+                <textarea id="op-memo" class="memo-textarea flex-1 border-blue-900/50"
+                    placeholder="명령어 개별 기록..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tableData = [35000, -1000, 500, -124, 9999, -5000, 200, -10, 0, 100];
+        let history = [];
+        let isSorting = false;
+        let memoData = { DSORTD: '', global: '' };
+        const startAddr = 100;
+
+        function renderTable() {
+            const body = document.getElementById('table-body');
+            const n = parseInt(document.getElementById('input-n').value);
+            body.innerHTML = '';
+
+            for (let i = 0; i < n; i++) {
+                const val = tableData[i] || 0;
+                const row = document.createElement('div');
+                row.className = `grid grid-cols-[100px_1fr_60px] gap-4 items-center transition-all duration-300`;
+
+                const addr1 = startAddr + i * 2;
+                const addr2 = addr1 + 1;
+
+                row.innerHTML = `
+                    <div class="text-[0.75rem] font-mono text-slate-500 font-black text-center leading-tight">D${addr1}<br/>D${addr2}</div>
+                    <div class="h-16 rounded-xl border-[3px] border-black flex items-center px-6 bg-white shadow-[3px_3px_0px_#000] relative overflow-hidden">
+                        <input type="number" value="${val}" class="data-input" onchange="updateData(${i}, this.value)" ${isSorting ? 'disabled' : ''}>
+                        <div class="absolute inset-0 bg-blue-500/5 pointer-events-none opacity-0 transition-opacity compare-highlight"></div>
+                    </div>
+                    <div class="text-right font-mono text-[0.6rem] font-black text-slate-300 italic uppercase">#${i}</div>`;
+                body.appendChild(row);
+            }
+        }
+
+        async function runSort() {
+            if (isSorting) return;
+            saveHistory();
+            isSorting = true;
+            document.getElementById('exec-btn').disabled = true;
+            document.getElementById('exec-btn').classList.add('opacity-50');
+            document.getElementById('done-bit').innerText = "BUSY";
+            document.getElementById('done-bit').className = "text-2xl font-black text-yellow-400 animate-pulse";
+            document.getElementById('status-display').innerText = "SORTING...";
+
+            const n = parseInt(document.getElementById('input-n').value);
+            const s2 = parseInt(document.getElementById('input-s2').value);
+            const isDesc = document.getElementById('sm703-toggle').checked;
+
+            let arr = tableData.slice(0, n);
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = 0; j < arr.length - i - 1; j++) {
+                    let condition = isDesc ? (arr[j] < arr[j + 1]) : (arr[j] > arr[j + 1]);
+                    if (condition) {
+                        let temp = arr[j];
+                        arr[j] = arr[j + 1];
+                        arr[j + 1] = temp;
+                        tableData = [...arr, ...tableData.slice(n)];
+                        renderTable();
+                        await new Promise(r => setTimeout(r, 400 / s2));
+                    }
+                }
+            }
+
+            document.getElementById('status-display').innerText = "DONE";
+            document.getElementById('done-bit').innerText = "ON (DONE)";
+            document.getElementById('done-bit').className = "text-2xl font-black text-emerald-400";
+
+            setTimeout(() => {
+                isSorting = false;
+                document.getElementById('exec-btn').disabled = false;
+                document.getElementById('exec-btn').classList.remove('opacity-50');
+                document.getElementById('done-bit').innerText = "OFF";
+                document.getElementById('done-bit').className = "text-2xl font-black text-white";
+                document.getElementById('status-display').innerText = "READY";
+            }, 2500);
+        }
+
+        function updateData(idx, val) {
+            saveHistory();
+            tableData[idx] = parseInt(val) || 0;
+        }
+
+        function randomizeTable() {
+            saveHistory();
+            const n = parseInt(document.getElementById('input-n').value);
+            for (let i = 0; i < n; i++) {
+                tableData[i] = Math.floor(Math.random() * 200000) - 100000;
+            }
+            renderTable();
+        }
+
+        function stepN(d) {
+            let el = document.getElementById('input-n');
+            let val = parseInt(el.value) + d;
+            el.value = Math.max(2, Math.min(10, val));
+            renderTable();
+        }
+
+        function stepS2(d) {
+            let el = document.getElementById('input-s2');
+            let val = parseInt(el.value) + d;
+            el.value = Math.max(1, Math.min(10, val));
+        }
+
+        function updateSortMode() {
+            const isDesc = document.getElementById('sm703-toggle').checked;
+            const label = document.getElementById('sm703-label');
+            const lamp = document.getElementById('sm703-lamp');
+
+            if (isDesc) {
+                label.innerText = 'ON (내림)';
+                label.className = 'text-[0.75rem] font-black text-rose-500 uppercase';
+                lamp.className = 'status-lamp lamp-on-rose';
+            } else {
+                label.innerText = 'OFF (오름)';
+                label.className = 'text-[0.75rem] font-black text-blue-600 uppercase';
+                lamp.className = 'status-lamp lamp-off';
+            }
+        }
+
+        function saveHistory() { history.push([...tableData]); if (history.length > 20) history.shift(); }
+        function undo() { if (history.length > 0) { tableData = history.pop(); renderTable(); } }
+        function resetTable() { tableData = [35000, -1000, 500, -124, 9999, -5000, 200, -10, 0, 100]; renderTable(); }
+
+        function initMemos() {
+            const saved = localStorage.getItem('zodd_dsortd_final_v3');
+            if (saved) {
+                memoData = JSON.parse(saved);
+                document.getElementById('global-memo').value = memoData.global || '';
+                document.getElementById('op-memo').value = memoData.DSORTD || '';
+            }
+            document.getElementById('global-memo').oninput = (e) => { memoData.global = e.target.value; saveToLocal(); };
+            document.getElementById('op-memo').oninput = (e) => { memoData.DSORTD = e.target.value; saveToLocal(); };
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('zodd_dsortd_final_v3', JSON.stringify(memoData));
+            const ind = document.getElementById('save-status'); ind.classList.add('show'); setTimeout(() => ind.classList.remove('show'), 1000);
+        }
+
+        window.onload = () => { lucide.createIcons(); initMemos(); renderTable(); updateSortMode(); };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DATE & TIME-PLC 시간 제어 마스터 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&display=swap');
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .zodd-card {
+            background: white;
+            border: 4px solid #000;
+            border-radius: 24px;
+            box-shadow: 8px 8px 0px #000;
+        }
+
+        .pointer-box {
+            background: #1e293b;
+            color: #3b82f6;
+            border: 3px solid #3b82f6;
+            border-radius: 12px;
+            font-family: monospace;
+        }
+
+        .tab-btn {
+            border-bottom: 4px solid transparent;
+            transition: 0.2s;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+        }
+
+        .tab-btn.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+            font-weight: 900;
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .op-select-btn {
+            border: 3px solid #000;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            height: 75px;
+            text-align: left;
+            padding: 0 15px;
+        }
+
+        .op-select-btn .btn-main-label {
+            font-size: 1.2rem;
+            font-weight: 900;
+            display: block;
+        }
+
+        .op-select-btn .btn-sub-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            opacity: 0.6;
+        }
+
+        .op-select-btn.active {
+            background: #2563eb !important;
+            color: white !important;
+            transform: scale(1.02);
+            z-index: 20;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .op-select-btn.active .btn-sub-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .clock-display {
+            background: #0f172a;
+            border: 4px solid #334155;
+            border-radius: 20px;
+            padding: 20px;
+            color: #60a5fa;
+            text-align: center;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .clock-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3rem;
+            font-weight: 800;
+            text-shadow: 0 0 15px rgba(96, 165, 250, 0.5);
+        }
+
+        .clock-date {
+            font-size: 1rem;
+            color: #94a3b8;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .data-input {
+            width: 100%;
+            background: transparent;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.4rem;
+            outline: none;
+            border: none;
+            color: #1e293b;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .ud-btn {
+            background: #000;
+            color: #fff;
+            width: 32px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 0.6rem;
+            transition: all 0.1s;
+        }
+
+        .ud-btn:hover {
+            background: #334155;
+        }
+
+        .st-syntax-large {
+            background: #020617;
+            border-left: 10px solid #2563eb;
+            padding: 20px;
+            border-radius: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #38bdf8;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            line-height: 1.2;
+        }
+
+        .st-code-box {
+            background: #000;
+            border: 1px solid #334155;
+            padding: 15px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #ec4899;
+            line-height: 1.5;
+        }
+
+        .lamp {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #000;
+            background: #cbd5e1;
+            transition: 0.2s;
+        }
+
+        .lamp.on {
+            background: #22c55e;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        .lamp.red {
+            background: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
+        }
+
+        .memo-textarea {
+            width: 100%;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 20px;
+            color: #f8fafc;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            outline: none;
+            resize: none;
+            transition: all 0.2s;
+        }
+
+        .memo-textarea:focus {
+            border-color: #2563eb;
+            background: #0f172a;
+        }
+
+        .save-indicator {
+            font-size: 0.65rem;
+            color: #22c55e;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .pulse-view {
+            height: 60px;
+            background: #1e293b;
+            border-radius: 10px;
+            border: 2px solid #334155;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pulse-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: #3b82f6;
+            transition: width 0.1s linear;
+        }
+    </style>
+</head>
+
+<body class="p-4 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <div class="zodd-card p-4 flex justify-between items-center mb-4">
+        <div class="flex items-center gap-4">
+            <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg"><i data-lucide="clock" size="30"></i></div>
+            <div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-slate-800">
+                    PLC <span class="text-blue-600">DATE & TIME</span> MASTER
+                </h1>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest text-blue-600">Integrated Real-Time
+                    Clock & Duration Logic Engine</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="pointer-box px-8 py-3 text-center border-4 border-black min-w-[240px]">
+                <span class="text-[0.6rem] font-black block opacity-70 uppercase tracking-tight">System Live Monitor
+                    (RTC)</span>
+                <span id="header-clock" class="text-xl font-black text-white uppercase tracking-tighter">00:00:00</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-Column Layout -->
+    <div class="flex-1 flex gap-4 overflow-hidden">
+
+        <!-- Col 1: Command Selection (18%) -->
+        <div class="w-[18%] flex flex-col gap-4">
+            <div class="zodd-card p-5 flex flex-col h-full shadow-[6px_6px_0px_#000]">
+                <h3 class="text-xs font-black text-slate-400 uppercase mb-4 border-b-2 pb-2 flex items-center gap-2">
+                    <i data-lucide="zap" size="14"></i> SELECT CMD
+                </h3>
+                <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar pr-1">
+                    <button onclick="selectOp('DATERD')" id="btn-DATERD"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between active">
+                        <div><span class="btn-main-label">DATERD</span><span class="btn-sub-label">(시계 읽기)</span></div>
+                    </button>
+                    <button onclick="selectOp('DATEWR')" id="btn-DATEWR"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div><span class="btn-main-label">DATEWR</span><span class="btn-sub-label">(시계 쓰기)</span></div>
+                    </button>
+                    <button onclick="selectOp('TIME2SEC')" id="btn-TIME2SEC"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div><span class="btn-main-label">TIME2SEC</span><span class="btn-sub-label">(시분초→초)</span>
+                        </div>
+                    </button>
+                    <button onclick="selectOp('SEC2TIME')" id="btn-SEC2TIME"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div><span class="btn-main-label">SEC2TIME</span><span class="btn-sub-label">(초→시분초)</span>
+                        </div>
+                    </button>
+                    <button onclick="selectOp('TCMP')" id="btn-TCMP"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div><span class="btn-main-label">TCMP</span><span class="btn-sub-label">(시간 비교)</span></div>
+                    </button>
+                    <button onclick="selectOp('DUTY')" id="btn-DUTY"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div><span class="btn-main-label">DUTY</span><span class="btn-sub-label">(타이밍 펄스)</span></div>
+                    </button>
+                    <button onclick="selectOp('TIMCHK')" id="btn-TIMCHK"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div><span class="btn-main-label">TIMCHK</span><span class="btn-sub-label">(시간 계측)</span></div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 2: Live Monitor (32%) -->
+        <div class="w-[32%] flex flex-col gap-4 relative">
+            <div class="zodd-card p-6 flex-1 flex flex-col shadow-[10px_10px_0px_#000] overflow-hidden relative">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">Execution
+                            Mode</span>
+                        <h2 id="status-display" class="text-3xl font-black text-slate-800 tracking-tighter uppercase">
+                            READY</h2>
+                    </div>
+                </div>
+
+                <div id="sim-content" class="flex-1 flex flex-col gap-6 overflow-y-auto custom-scrollbar pr-2">
+                    <!-- Dynamic Content will be injected here -->
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button onclick="undo()"
+                        class="flex-1 bg-slate-800 hover:bg-black text-white h-16 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-lg flex items-center justify-center gap-3 transition-all">
+                        <i data-lucide="rotate-ccw"></i> UNDO
+                    </button>
+                    <button onclick="executeAction()" id="exec-btn"
+                        class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-16 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-xl flex items-center justify-center gap-3 transition-all">
+                        <i data-lucide="play-circle" fill="white"></i> <span id="exec-text">EXECUTE</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 3: Handbook (25%) -->
+        <div class="w-[25%] flex flex-col overflow-hidden">
+            <div
+                class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] overflow-hidden border-2 border-slate-700">
+                <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                    <i data-lucide="book-open" class="text-pink-500"></i>
+                    <h3 class="text-xl font-black uppercase tracking-widest">Handbook</h3>
+                    <div id="save-status" class="save-indicator ml-auto">SAVED!</div>
+                </div>
+
+                <div id="hb-content" class="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2"></div>
+
+                <div class="mt-6 p-5 bg-blue-900/40 border-2 border-blue-500/50 rounded-2xl italic">
+                    <p class="text-xs font-bold text-blue-100 leading-relaxed flex items-center gap-2">
+                        <i data-lucide="award" size="16"></i>
+                        <span id="hb-tip">PLC 내부의 RTC 정보를 다루는 명령어입니다.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 4: Notepads (25%) -->
+        <div class="w-[25%] flex flex-col gap-4 overflow-hidden">
+            <div
+                class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] border-emerald-500">
+                <div class="mb-8 flex-1 flex flex-col">
+                    <div class="flex items-center gap-3 mb-4 text-emerald-400 border-b border-emerald-900/50 pb-2">
+                        <i data-lucide="clipboard-list"></i>
+                        <h3 class="text-lg font-black uppercase">Global Notes</h3>
+                    </div>
+                    <textarea id="global-memo" class="memo-textarea flex-1 border-emerald-900/50 mb-6"
+                        placeholder="프로젝트 전체 시간 제어 특이사항..."></textarea>
+                </div>
+                <div class="flex-1 flex flex-col pt-4 border-t border-slate-800">
+                    <div class="flex items-center gap-3 mb-4 text-blue-400">
+                        <i data-lucide="pencil-line"></i>
+                        <h3 id="memo-title" class="text-lg font-black uppercase">DATERD Memo</h3>
+                    </div>
+                    <textarea id="op-memo" class="memo-textarea flex-1 border-blue-900/50"
+                        placeholder="명령어 개별 기록..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentOp = 'DATERD';
+        // PLC 메모리 (스냅샷 저장용)
+        let rtcMemory = { year: 0, month: 0, day: 0, hour: 0, min: 0, sec: 0, dow: 0 };
+        let history = [];
+        let memoData = { DATERD: '', DATEWR: '', TIME2SEC: '', SEC2TIME: '', TCMP: '', DUTY: '', TIMCHK: '', global: '' };
+
+        // 조작용 변수들
+        let editRTC = { year: 2026, month: 5, day: 8, hour: 15, min: 30, sec: 45 };
+        let totalSeconds = 55845;
+        let tcmpTime = { hour: 17, min: 0, sec: 0 };
+        let dutySettings = { on: 10, total: 20 };
+        let dutyPhase = 0;
+        let isDutyRunning = false;
+        let timchkStart = null;
+        let timchkElapsed = 0;
+        let isTimerRunning = false;
+
+        const manual = {
+            DATERD: { title: "DATERD (Read Clock)", syntax: "DATERD(EN, d);", desc: "PLC 내장 시계에서 연, 월, 일, 시, 분, 초, 요일을 읽어 (d)에 저장합니다.", operands: "(d): 읽기 데이터 저장 선두 (D10)", st: "DATERD(SM400, D10);", tip: "실행(EN) 시점의 시스템 시계를 메모리로 캡처합니다." },
+            DATEWR: { title: "DATEWR (Write Clock)", syntax: "DATEWR(EN, s);", desc: "PLC 내장 시계에 새로운 연, 월, 일, 시, 분, 초, 요일을 설정합니다.", operands: "(s): 설정 데이터 선두 (D20)", st: "DATEWR(X0, D20);", tip: "수정한 메모리 값을 시스템 시계에 강제 적용합니다." },
+            TIME2SEC: { title: "TIME2SEC (To Seconds)", syntax: "TIME2SEC(EN, s, d);", desc: "시, 분, 초 데이터를 누적 초로 변환합니다.", operands: "(s): 시분초 선두 / (d): 결과 초", st: "TIME2SEC(SM400, D10, D100);", tip: "단일 펄스 실행 시 연산 결과를 D40에 출력합니다." },
+            SEC2TIME: { title: "SEC2TIME (To Time)", syntax: "SEC2TIME(EN, s, d);", desc: "누적 초 데이터를 시, 분, 초 단위로 역변환합니다.", operands: "(s): 입력 초 / (d): 시분초 선두", st: "SEC2TIME(SM400, D100, D10);", tip: "방대한 초 데이터를 시분초 메모리로 분할 저장합니다." },
+            TCMP: { title: "TCMP (Time Compare)", syntax: "TCMP(EN, s1, s2, s3, d);", desc: "지정된 시간과 현재 시계 데이터를 비교하여 결과를 출력합니다.", operands: "(s1~s3): 비교 시간 / (d): 결과 비트", st: "TCMP(SM400, 17, 0, 0, M10);", tip: "현재 시스템 시계와 입력된 목표 시각을 비교합니다." },
+            DUTY: { title: "DUTY (Timing Pulse)", syntax: "DUTY(EN, n1, n2, d);", desc: "정해진 시간 동안 ON/OFF를 반복하는 펄스를 생성합니다.", operands: "(n1): ON / (n2): 전체 주기 / (d): 출력", st: "DUTY(SM400, 5, 10, M20);", tip: "EXECUTE를 누르면 펄스 발생기가 가동(RUN)됩니다." },
+            TIMCHK: { title: "TIMCHK (Time Check)", syntax: "TIMCHK(EN, s, d);", desc: "지정한 신호가 발생한 후 경과된 시간을 계측합니다.", operands: "(s): 기준 데이터 / (d): 결과 저장", st: "TIMCHK(SM400, D10, D200);", tip: "공정 경과 시간을 0.1초 단위로 측정합니다." }
+        };
+
+        function selectOp(op) {
+            currentOp = op;
+            document.querySelectorAll('.op-select-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById(`btn-${op}`);
+            if (btn) btn.classList.add('active');
+
+            document.getElementById('status-display').innerText = `${op} READY`;
+            document.getElementById('memo-title').innerText = `${op} Memo`;
+            document.getElementById('op-memo').value = memoData[op] || '';
+
+            // 버튼 텍스트 설정
+            const execText = document.getElementById('exec-text');
+            if (op === 'DUTY') execText.innerText = isDutyRunning ? "STOP PULSE" : "START PULSE";
+            else if (op === 'TIMCHK') execText.innerText = isTimerRunning ? "STOP TIMER" : "START TIMER";
+            else execText.innerText = "EXECUTE";
+
+            updateHandbook();
+            renderSimulation();
+        }
+
+        function renderSimulation() {
+            const container = document.getElementById('sim-content');
+            let html = '';
+
+            switch (currentOp) {
+                case 'DATERD':
+                case 'DATEWR':
+                    html = `
+                        <div class="clock-display">
+                            <div class="clock-date">PLC Memory (D10~D12)</div>
+                            <div class="clock-time">${rtcMemory.year ? rtcMemory.year : '0000'}.${String(rtcMemory.month).padStart(2, '0')}.${String(rtcMemory.day).padStart(2, '0')}</div>
+                            <div class="clock-time text-2xl mt-2">${String(rtcMemory.hour).padStart(2, '0')}:${String(rtcMemory.min).padStart(2, '0')}:${String(rtcMemory.sec).padStart(2, '0')}</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            ${renderMemoryBox(10, 'Year', editRTC.year, 'changeEditRTC("year",')}
+                            ${renderMemoryBox(13, 'Hour', editRTC.hour, 'changeEditRTC("hour",')}
+                            ${renderMemoryBox(11, 'Month', editRTC.month, 'changeEditRTC("month",')}
+                            ${renderMemoryBox(14, 'Min', editRTC.min, 'changeEditRTC("min",')}
+                            ${renderMemoryBox(12, 'Day', editRTC.day, 'changeEditRTC("day",')}
+                            ${renderMemoryBox(15, 'Sec', editRTC.sec, 'changeEditRTC("sec",')}
+                        </div>
+                    `;
+                    break;
+                case 'TIME2SEC':
+                    const total = editRTC.hour * 3600 + editRTC.min * 60 + editRTC.sec;
+                    html = `
+                        <div class="bg-white p-6 rounded-2xl border-2 border-black space-y-4">
+                            <div class="flex justify-around items-center">
+                                ${renderInputColumn('HH', editRTC.hour, 'changeEditRTC("hour",')}
+                                <span class="text-2xl font-black">:</span>
+                                ${renderInputColumn('MM', editRTC.min, 'changeEditRTC("min",')}
+                                <span class="text-2xl font-black">:</span>
+                                ${renderInputColumn('SS', editRTC.sec, 'changeEditRTC("sec",')}
+                            </div>
+                            <div class="text-center text-3xl text-slate-300">⬇️</div>
+                            <div class="bg-blue-900 p-5 rounded-xl text-center text-white border-b-4 border-black">
+                                <span class="text-[0.6rem] block uppercase text-blue-300">Total Seconds (D40)</span>
+                                <div class="text-4xl font-black text-blue-400">${total.toLocaleString()} s</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'SEC2TIME':
+                    html = `
+                        <div class="bg-white p-6 rounded-2xl border-2 border-black space-y-4">
+                            <div class="bg-indigo-900 p-5 rounded-xl flex items-center justify-between text-white border-b-4 border-black">
+                                <div class="flex-1 text-center">
+                                    <span class="text-[0.6rem] block uppercase text-indigo-300">Input Seconds (D100)</span>
+                                    <input type="number" value="${totalSeconds}" class="bg-transparent text-3xl font-black text-white w-full text-center outline-none" onchange="totalSeconds=parseInt(this.value);renderSimulation()">
+                                </div>
+                                <div class="flex flex-col gap-1 ml-4">
+                                    <button onclick="totalSeconds+=60;renderSimulation()" class="ud-btn">▲</button>
+                                    <button onclick="totalSeconds-=60;renderSimulation()" class="ud-btn">▼</button>
+                                </div>
+                            </div>
+                            <div class="text-center text-3xl text-slate-300">⬇️</div>
+                            <div class="flex justify-around text-center bg-slate-50 p-4 rounded-xl border-2 border-dashed border-slate-300">
+                                <div><span class="text-[0.6rem] block font-bold text-slate-400">HH</span><b class="text-2xl">${Math.floor(totalSeconds / 3600)}</b></div>
+                                <div><span class="text-[0.6rem] block font-bold text-slate-400">MM</span><b class="text-2xl">${Math.floor((totalSeconds % 3600) / 60)}</b></div>
+                                <div><span class="text-[0.6rem] block font-bold text-slate-400">SS</span><b class="text-2xl">${totalSeconds % 60}</b></div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'TCMP':
+                    const now = new Date();
+                    const isMatch = now.getHours() === tcmpTime.hour && now.getMinutes() === tcmpTime.min;
+                    html = `
+                        <div class="bg-slate-50 p-5 rounded-2xl border-2 border-black space-y-6">
+                            <div class="flex justify-between items-center">
+                                <div><span class="text-xs font-bold text-slate-400 uppercase">Target Time (s1~s2)</span></div>
+                                <div class="flex items-center gap-2"><div class="lamp ${isMatch ? 'on' : ''}"></div><b class="text-xs">M0 Match</b></div>
+                            </div>
+                            <div class="flex justify-around bg-white p-4 rounded-xl border-2 border-black">
+                                ${renderInputColumn('Hour', tcmpTime.hour, 'changeTCMP("hour",')}
+                                <span class="text-2xl font-black">:</span>
+                                ${renderInputColumn('Min', tcmpTime.min, 'changeTCMP("min",')}
+                            </div>
+                            <div class="p-4 bg-black rounded-xl text-center">
+                                <span class="text-[0.6rem] text-slate-500 block uppercase mb-1">Current Real Time</span>
+                                <div class="text-2xl font-black text-yellow-400 font-mono">${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}</div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'DUTY':
+                    html = `
+                        <div class="bg-white p-5 rounded-2xl border-2 border-black space-y-4">
+                            <div class="flex justify-between items-center bg-slate-900 p-4 rounded-xl border-b-4 border-blue-600">
+                                <div class="flex items-center gap-2"><span class="text-[0.6rem] text-slate-400 uppercase font-black">Output (d)</span> <span class="text-white font-black text-xs">M20</span></div>
+                                <div class="lamp ${isDutyRunning && dutyPhase < dutySettings.on ? 'on' : ''}"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-3 border-2 border-black rounded-xl flex items-center justify-between">
+                                    <div><label class="text-[0.6rem] block font-bold text-slate-400">ON (n1)</label><input value="${dutySettings.on}" class="font-black text-xl w-10 text-center bg-transparent" onchange="dutySettings.on=parseInt(this.value);renderSimulation()"></div>
+                                    <div class="flex flex-col gap-1"><button onclick="dutySettings.on++;renderSimulation()" class="ud-btn">▲</button><button onclick="dutySettings.on--;renderSimulation()" class="ud-btn">▼</button></div>
+                                </div>
+                                <div class="p-3 border-2 border-black rounded-xl flex items-center justify-between">
+                                    <div><label class="text-[0.6rem] block font-bold text-slate-400">CYC (n2)</label><input value="${dutySettings.total}" class="font-black text-xl w-10 text-center bg-transparent" onchange="dutySettings.total=parseInt(this.value);renderSimulation()"></div>
+                                    <div class="flex flex-col gap-1"><button onclick="dutySettings.total++;renderSimulation()" class="ud-btn">▲</button><button onclick="dutySettings.total--;renderSimulation()" class="ud-btn">▼</button></div>
+                                </div>
+                            </div>
+                            <div class="pulse-view">
+                                <div class="pulse-bar" style="width: ${isDutyRunning ? (dutyPhase / dutySettings.total) * 100 : 0}%"></div>
+                                <span class="relative z-10 text-[0.6rem] font-black text-white mix-blend-difference uppercase">Cycle Progress: ${isDutyRunning ? dutyPhase : 0} / ${dutySettings.total}</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'TIMCHK':
+                    html = `
+                        <div class="bg-white p-6 rounded-2xl border-2 border-black flex flex-col items-center gap-6">
+                            <div class="text-6xl font-black font-mono text-slate-800">${(timchkElapsed / 10).toFixed(1)}<span class="text-2xl ml-1 text-slate-300">s</span></div>
+                            <div class="flex gap-4 w-full">
+                                <div class="flex-1 bg-slate-900 p-4 rounded-xl text-center border-b-4 border-emerald-500">
+                                    <span class="text-[0.6rem] text-slate-500 uppercase block font-black mb-1">Measured Value (D200)</span>
+                                    <div class="text-3xl font-black text-emerald-400">${timchkElapsed} <span class="text-xs text-slate-600 font-bold uppercase">(100ms Unit)</span></div>
+                                </div>
+                                <div class="w-20 flex items-center justify-center">
+                                    <div class="lamp ${isTimerRunning ? 'on red' : ''} !w-12 !h-12 border-4 border-black"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            container.innerHTML = html;
+        }
+
+        // 헬퍼: 수치 조절 박스
+        function renderMemoryBox(addr, label, val, func) {
+            return `
+                <div class="bg-white p-3 rounded-xl border-2 border-black flex items-center justify-between">
+                    <div class="flex flex-col">
+                        <span class="text-[0.6rem] font-bold text-slate-400 uppercase tracking-tighter">D${addr} [${label}]</span>
+                        <input type="number" value="${val}" class="text-xl font-black w-20 bg-transparent outline-none" onchange="${func} parseInt(this.value))">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <button onclick="${func} ${val + 1})" class="ud-btn">▲</button>
+                        <button onclick="${func} ${val - 1})" class="ud-btn">▼</button>
+                    </div>
+                </div>
+            `;
+        }
+        function renderInputColumn(label, val, func) {
+            return `
+                <div class="flex flex-col items-center gap-1">
+                    <label class="text-[0.6rem] font-bold text-slate-400 uppercase">${label}</label>
+                    <input type="number" value="${val}" class="text-2xl font-black w-14 text-center bg-transparent outline-none" onchange="${func} parseInt(this.value))">
+                    <div class="flex gap-1 mt-1">
+                        <button onclick="${func} ${val + 1})" class="ud-btn !w-6">▲</button>
+                        <button onclick="${func} ${val - 1})" class="ud-btn !w-6">▼</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function changeEditRTC(key, val) { editRTC[key] = val; renderSimulation(); }
+        function changeTCMP(key, val) { tcmpTime[key] = val; renderSimulation(); }
+
+        // --- 핵심: 수동 실행 로직 ---
+        function executeAction() {
+            const btn = document.getElementById('exec-btn');
+            btn.classList.add('bg-emerald-500');
+            setTimeout(() => btn.classList.remove('bg-emerald-500'), 200);
+
+            saveHistory();
+
+            switch (currentOp) {
+                case 'DATERD':
+                    // 버튼 눌렀을 때만 시스템 시간을 메모리(rtcMemory)로 읽어옴
+                    const now = new Date();
+                    rtcMemory = {
+                        year: now.getFullYear(), month: now.getMonth() + 1, day: now.getDate(),
+                        hour: now.getHours(), min: now.getMinutes(), sec: now.getSeconds()
+                    };
+                    break;
+                case 'DATEWR':
+                    // HMI 등에서 수정한 editRTC 값을 rtcMemory로 저장 (PLC 시계 쓰기 시뮬레이션)
+                    rtcMemory = { ...editRTC };
+                    break;
+                case 'DUTY':
+                    isDutyRunning = !isDutyRunning;
+                    dutyPhase = 0;
+                    document.getElementById('exec-text').innerText = isDutyRunning ? "STOP PULSE" : "START PULSE";
+                    break;
+                case 'TIMCHK':
+                    isTimerRunning = !isTimerRunning;
+                    if (isTimerRunning) {
+                        timchkStart = Date.now() - (timchkElapsed * 100);
+                    }
+                    document.getElementById('exec-text').innerText = isTimerRunning ? "STOP TIMER" : "START TIMER";
+                    break;
+                default:
+                    // TIME2SEC 등은 이미 입력값에 따라 계산되므로 시각 효과만 줌
+                    break;
+            }
+            renderSimulation();
+        }
+
+        function undo() {
+            if (history.length > 0) {
+                rtcMemory = history.pop();
+                renderSimulation();
+            }
+        }
+        function saveHistory() { history.push({ ...rtcMemory }); if (history.length > 10) history.shift(); }
+
+        function updateHandbook() {
+            const data = manual[currentOp];
+            const content = document.getElementById('hb-content');
+            content.innerHTML = `
+                <div class="bg-slate-800/80 p-6 rounded-3xl border-2 border-slate-700 shadow-inner">
+                    <h4 class="text-2xl font-black text-blue-400 mb-2">${data.title}</h4>
+                    <div class="st-syntax-large text-emerald-400">${data.syntax}</div>
+                    <p class="text-sm font-bold text-slate-300 leading-relaxed mb-4">${data.desc}</p>
+                    <div class="mt-4 p-3 bg-black/50 rounded-xl border border-slate-700 text-xs text-slate-400">
+                        <b class="text-blue-400 uppercase">Operand:</b> ${data.operands}
+                    </div>
+                </div>
+                <div class="p-5 bg-black/50 border border-slate-700 rounded-2xl">
+                    <span class="text-[0.7rem] font-black text-slate-500 uppercase block mb-3 flex items-center gap-2"><i data-lucide="code" size="14"></i> ST Example</span>
+                    <div class="st-code-box">${data.st}</div>
+                </div>
+            `;
+            document.getElementById('hb-tip').innerText = data.tip;
+            lucide.createIcons();
+        }
+
+        function initMemos() {
+            const saved = localStorage.getItem('zodd_datetime_manual_v1');
+            if (saved) memoData = JSON.parse(saved);
+            document.getElementById('global-memo').value = memoData.global || '';
+            document.getElementById('global-memo').oninput = (e) => { memoData.global = e.target.value; saveMemos(); };
+            document.getElementById('op-memo').oninput = (e) => { memoData[currentOp] = e.target.value; saveMemos(); };
+        }
+        function saveMemos() {
+            localStorage.setItem('zodd_datetime_manual_v1', JSON.stringify(memoData));
+            const ind = document.getElementById('save-status'); ind.classList.add('show'); setTimeout(() => ind.classList.remove('show'), 1000);
+        }
+
+        // 실시간 갱신 루프 (디스플레이 및 진행형 명령어용)
+        setInterval(() => {
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+            document.getElementById('header-clock').innerText = timeStr;
+
+            // DUTY 가 RUN 상태일 때만 연산
+            if (isDutyRunning && currentOp === 'DUTY') {
+                dutyPhase = (dutyPhase + 1) % (dutySettings.total || 1);
+            }
+
+            // TIMCHK 가 RUN 상태일 때만 연산 (0.1초 단위이므로 100ms 주기로 돌아야 정확하지만 성능상 1s 보정)
+            if (isTimerRunning && currentOp === 'TIMCHK') {
+                timchkElapsed = Math.floor((Date.now() - timchkStart) / 100);
+            }
+
+            renderSimulation();
+        }, 1000);
+
+        window.onload = () => {
+            lucide.createIcons();
+            initMemos();
+            selectOp('DATERD');
+        };
+    </script>
+</body>
+
+</html>

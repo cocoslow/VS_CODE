@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC DSFR 명령어 워드 시프트 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        html,
+        body {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #e2e8f0;
+        }
+
+        .thick-border {
+            border: 3px solid #000000;
+        }
+
+        .main-container {
+            border: 5px solid #000000;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 4px solid #000000;
+        }
+
+        .cmd-box {
+            background: #f1f5f9;
+            border: 3px solid #000000;
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .param-label {
+            font-size: 0.8rem;
+            background: #000000;
+            color: #ffffff;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: 800;
+            margin-top: 6px;
+            border: 1px solid #000000;
+        }
+
+        /* 워드 박스 스타일 (SFR 스타일 계승) */
+        .bit-group-container {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 4px;
+            background: #fff;
+            padding: 8px;
+            border: 3px solid #000;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .unit-box {
+            height: 52px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 1px solid #cbd5e1;
+            z-index: 10;
+            transition: all 0.2s;
+        }
+
+        .unit-label {
+            font-size: 0.55rem;
+            font-weight: 800;
+            color: #64748b;
+            margin-bottom: 1px;
+        }
+
+        .unit-value {
+            font-size: 0.85rem;
+            font-weight: 900;
+            width: 100%;
+            text-align: center;
+            background: transparent;
+            outline: none;
+            border: none;
+            color: #1e293b;
+        }
+
+        .interactive .unit-box:hover {
+            background: #f8fafc;
+            border-color: #000;
+            box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .result-view .unit-box {
+            background: #f8fafc;
+            opacity: 0.8;
+        }
+
+        .result-view .unit-box.new-zero {
+            background: #f1f5f9;
+            color: #cbd5e1;
+        }
+
+        .code-block {
+            background: #1e293b;
+            border: 3px solid #000000;
+            border-left: 12px solid #3b82f6;
+        }
+
+        .var {
+            color: #ff79c6;
+            font-weight: bold;
+        }
+
+        .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .btn-shift {
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s;
+            cursor: pointer;
+        }
+
+        .btn-shift:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #000;
+        }
+
+        /* 시프트 화살표 SVG */
+        #shift-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .shift-arrow-path {
+            fill: none;
+            stroke: #2563eb;
+            stroke-width: 1.2;
+            stroke-dasharray: 4, 4;
+            animation: dash 20s linear infinite;
+            opacity: 0.35;
+            transition: d 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .arrow-to-lost {
+            stroke: #ef4444;
+            opacity: 0.6;
+            stroke-width: 2;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -1000;
+            }
+        }
+
+        .lost-zone {
+            width: 65px;
+            height: 65px;
+            border: 4px dashed #ef4444;
+            background: #fef2f2;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ef4444;
+            font-weight: 900;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+        }
+
+        /* 업/다운 버튼 디자인 */
+        .ud-btn {
+            background: #fff;
+            border: 2px solid #000;
+            padding: 2px 8px;
+            font-weight: bold;
+            transition: 0.1s;
+            line-height: 1;
+        }
+
+        .ud-btn:hover {
+            background: #000;
+            color: #fff;
+        }
+
+        .ud-btn:active {
+            transform: scale(0.9);
+        }
+    </style>
+</head>
+
+<body class="p-4">
+
+    <div class="max-w-[1450px] mx-auto h-full bg-white rounded-3xl overflow-hidden flex flex-col main-container">
+
+        <!-- Header: DSFR(EN, n, d) 순서 반영 -->
+        <div class="glass-header p-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-black text-black uppercase tracking-tight">DSFR(P) 워드 시프트 시뮬레이터</h1>
+                <p class="text-sm font-bold text-slate-500 mt-1 uppercase">Word Data 1-Station Right Shift (Max 100)</p>
+            </div>
+
+            <div class="cmd-box rounded-xl px-10 py-6 flex items-center gap-6 font-mono text-2xl">
+                <span class="text-slate-400 font-black">DSFR(</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">1</span>
+                    <span class="param-label uppercase">EN</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <!-- 순서 변경: n이 먼저 옴 -->
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black" id="label-n">7</span>
+                    <span class="param-label">개수(n)</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">D10</span>
+                    <span class="param-label">대상(d)</span>
+                </div>
+                <span class="text-slate-400 font-black">);</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex p-6 gap-6 overflow-hidden relative">
+
+            <!-- Left: Simulator Area -->
+            <div class="w-[72%] flex flex-col gap-4 justify-center">
+                <div class="thick-border bg-slate-50 rounded-2xl p-6 flex flex-col items-center flex-1 relative">
+                    <div class="w-full flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-black text-black flex items-center gap-3">
+                            <div class="w-4 h-4 bg-blue-600 border-2 border-black rounded-full"></div>
+                            DATA BLOCK VISUALIZATION (MAX 100)
+                        </h3>
+                        <div class="flex items-center gap-4">
+                            <!-- n 조절 업/다운 버튼 -->
+                            <div class="flex items-center gap-3 bg-white px-4 py-2 border-2 border-black rounded-xl">
+                                <label class="text-[0.65rem] font-black text-slate-400 uppercase">Shift Range
+                                    (n):</label>
+                                <input type="number" id="n-input" value="7" min="2" max="100" oninput="changeN()"
+                                    class="w-16 text-center text-2xl font-black outline-none text-blue-600">
+                                <div class="flex flex-col gap-1">
+                                    <button onclick="stepN(1)" class="ud-btn text-[0.7rem]">▲</button>
+                                    <button onclick="stepN(-1)" class="ud-btn text-[0.7rem]">▼</button>
+                                </div>
+                            </div>
+                            <button onclick="executeShift()"
+                                class="btn-shift bg-blue-600 text-white px-10 py-3 font-black rounded-lg uppercase text-lg">Shift</button>
+                            <button onclick="resetData()"
+                                class="btn-shift bg-white text-black px-10 py-3 font-black rounded-lg text-lg">초기화</button>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 w-full flex flex-col justify-center gap-8 relative overflow-y-auto pr-3"
+                        id="simulator-viewport">
+                        <!-- Dynamic Path Layer -->
+                        <svg id="shift-overlay">
+                            <g id="arrows-container"></g>
+                        </svg>
+
+                        <!-- Source Data Row -->
+                        <div class="flex flex-col items-center w-full">
+                            <div
+                                class="text-[0.6rem] font-black text-slate-400 uppercase mb-3 tracking-widest border-b border-slate-200 w-full text-center pb-1">
+                                Source Data Block (D10 Start)</div>
+                            <div id="grid-before" class="bit-group-container interactive"></div>
+                        </div>
+
+                        <div class="flex justify-center text-slate-200 text-3xl font-black">⬇️</div>
+
+                        <!-- Result Data Row -->
+                        <div class="flex flex-col items-center w-full">
+                            <div
+                                class="text-[0.6rem] font-black text-blue-400 uppercase mb-3 tracking-widest border-b border-blue-100 w-full text-center pb-1">
+                                Shifted Result (Expected State)</div>
+                            <div class="flex items-start w-full justify-center">
+                                <div id="grid-after" class="bit-group-container result-view"></div>
+                                <!-- Discarded Zone -->
+                                <div class="ml-6 flex flex-col items-center">
+                                    <div id="lost-box" class="lost-zone">X</div>
+                                    <span
+                                        class="text-[0.6rem] font-black mt-2 text-red-500 uppercase tracking-tighter">Lost
+                                        (D10)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 w-full flex justify-between items-center bg-black p-5 rounded-xl shadow-lg">
+                        <div class="text-white">
+                            <div class="text-[0.7rem] text-slate-400 font-bold uppercase mb-1 tracking-wider">Device
+                                Address Range</div>
+                            <div class="text-2xl font-black" id="range-text">D10 ~ D16</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[0.7rem] text-slate-400 font-bold uppercase mb-1 tracking-wider">Words
+                                Counted</div>
+                            <div class="text-2xl font-black text-yellow-400" id="stat-n">7 Words</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Description & Code -->
+            <div class="w-[28%] flex flex-col gap-6">
+                <div class="bg-blue-900 rounded-3xl p-8 flex flex-col text-white shadow-2xl">
+                    <h3 class="text-blue-300 font-black text-sm uppercase tracking-widest mb-6">DSFR 동작 메커니즘</h3>
+                    <ul class="space-y-4 text-[0.85rem] font-bold">
+                        <li class="flex gap-3 items-start"><span class="text-blue-400">●</span><span>데이터가 낮은 주소 방향(D10
+                                쪽)으로 1워드 통째로 밀립니다.</span></li>
+                        <li class="flex gap-3 items-start"><span class="text-blue-400">●</span><span>가장 끝(D10)에 있던 데이터는
+                                밖으로 소멸됩니다.</span></li>
+                        <li class="flex gap-3 items-start"><span class="text-blue-400">●</span><span>데이터가 빠져나간 최상위 주소
+                                빈자리는 0으로 채워집니다.</span></li>
+                    </ul>
+                </div>
+
+                <div class="code-block rounded-3xl p-8 flex-1 shadow-2xl flex flex-col">
+                    <div
+                        class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-700 pb-2 flex justify-between">
+                        <span>GX Works3 ST Example</span>
+                        <span class="text-blue-400">DSFR</span>
+                    </div>
+                    <pre class="font-mono text-[1.1rem] leading-relaxed text-blue-100 flex-1 overflow-y-auto">
+<span class="comment">// DSFR(EN, n, d) 순서 적용</span>
+<span class="comment">// D10부터 <span id="code-n">7</span>개 워드 시프트</span>
+
+DSFRP(1, <span id="code-n2">7</span>, <span class="var">D10</span>);
+
+<span class="comment">// [결과 분석]</span>
+<span class="comment">// D11 ➔ D10 (이동)</span>
+<span class="comment" id="code-move-max">// D16 ➔ D15 (이동)</span>
+<span class="comment" id="code-fill">// 0   ➔ D16 (채움)</span></pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let n = 7;
+        const startAddr = 10;
+        // 100개 데이터 초기화
+        let wordData = Array.from({ length: 100 }, (_, i) => Math.floor(Math.random() * 999));
+
+        function init() {
+            renderGrid('grid-before', true);
+            renderGrid('grid-after', false);
+            updateUI();
+            setTimeout(drawAllArrows, 300);
+        }
+
+        function renderGrid(targetId, interactive) {
+            const container = document.getElementById(targetId);
+            container.innerHTML = '';
+
+            // 10개씩 줄바꿈되는 그리드 생성
+            for (let i = 0; i < n; i++) {
+                const addr = startAddr + i;
+                const div = document.createElement('div');
+                div.className = `unit-box word-node-${i} ${interactive ? 'interactive' : ''}`;
+
+                const val = wordData[i] || 0;
+                div.innerHTML = `
+                <span class="unit-label">D${addr}</span>
+                <input type="number" value="${val}" class="unit-value" ${interactive ? '' : 'disabled'} oninput="updateData(${i}, this.value)">
+            `;
+                container.appendChild(div);
+            }
+        }
+
+        function stepN(delta) {
+            const input = document.getElementById('n-input');
+            let val = parseInt(input.value) + delta;
+            if (val < 2) val = 2;
+            if (val > 100) val = 100;
+            input.value = val;
+            changeN();
+        }
+
+        function changeN() {
+            const input = document.getElementById('n-input');
+            let val = parseInt(input.value) || 2;
+            if (val > 100) val = 100;
+            n = val;
+            init();
+        }
+
+        function updateData(idx, val) {
+            wordData[idx] = parseInt(val) || 0;
+            drawAllArrows();
+        }
+
+        function drawAllArrows() {
+            const container = document.getElementById('arrows-container');
+            const overlay = document.getElementById('shift-overlay');
+            const lostBox = document.getElementById('lost-box');
+            container.innerHTML = '';
+
+            const rectOverlay = overlay.getBoundingClientRect();
+            const lostRect = lostBox.getBoundingClientRect();
+
+            // 화살표 그리기 (성능 및 시각적 조절을 위해 n이 많으면 투명도 조절)
+            for (let i = 0; i < n; i++) {
+                const fromEl = document.querySelector(`#grid-before .word-node-${i}`);
+                if (!fromEl) continue;
+
+                const fromRect = fromEl.getBoundingClientRect();
+                const x1 = fromRect.left + fromRect.width / 2 - rectOverlay.left;
+                const y1 = fromRect.top + fromRect.height / 2 - rectOverlay.top;
+
+                let x2, y2, isLost = false;
+
+                if (i > 0) {
+                    const toEl = document.querySelector(`#grid-after .word-node-${i - 1}`);
+                    if (toEl) {
+                        const toRect = toEl.getBoundingClientRect();
+                        x2 = toRect.left + toRect.width / 2 - rectOverlay.left;
+                        y2 = toRect.top + toRect.height / 2 - rectOverlay.top;
+                    }
+                } else {
+                    x2 = lostRect.left + lostRect.width / 2 - rectOverlay.left;
+                    y2 = lostRect.top + lostRect.height / 2 - rectOverlay.top;
+                    isLost = true;
+                }
+
+                if (x1 && x2) {
+                    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    path.setAttribute('class', `shift-arrow-path ${isLost ? 'arrow-to-lost' : ''}`);
+
+                    const cp1y = y1 + (y2 - y1) * 0.45;
+                    const cp2y = y1 + (y2 - y1) * 0.55;
+                    const d = `M ${x1},${y1} C ${x1},${cp1y} ${x2},${cp2y} ${x2},${y2}`;
+
+                    path.setAttribute('d', d);
+                    container.appendChild(path);
+                }
+            }
+        }
+
+        function executeShift() {
+            const lostVal = wordData[0];
+            const lostBox = document.getElementById('lost-box');
+            lostBox.innerText = lostVal;
+            lostBox.style.transform = "scale(1.1)";
+            setTimeout(() => lostBox.style.transform = "scale(1)", 200);
+
+            // 실제 데이터 이동 로직
+            for (let i = 0; i < n - 1; i++) {
+                wordData[i] = wordData[i + 1];
+            }
+            wordData[n - 1] = 0;
+
+            init();
+        }
+
+        function updateUI() {
+            document.getElementById('label-n').innerText = n;
+            document.getElementById('code-n').innerText = n;
+            document.getElementById('code-n2').innerText = n;
+            document.getElementById('stat-n').innerText = n + " Words";
+            document.getElementById('range-text').innerText = `D${startAddr} ~ D${startAddr + n - 1}`;
+            document.getElementById('code-move-max').innerText = `// D${startAddr + n - 1} ➔ D${startAddr + n - 2}`;
+            document.getElementById('code-fill').innerText = `// 0 ➔ D${startAddr + n - 1}`;
+        }
+
+        function resetData() {
+            wordData = Array.from({ length: 100 }, (_, i) => Math.floor(Math.random() * 999));
+            document.getElementById('lost-box').innerText = "X";
+            init();
+        }
+
+        window.onload = init;
+        window.onresize = drawAllArrows;
+    </script>
+
+</body>
+
+</html>

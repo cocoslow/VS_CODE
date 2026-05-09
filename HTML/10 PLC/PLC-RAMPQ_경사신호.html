@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC RAMPQ 명령어 경사 신호 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        html,
+        body {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #e2e8f0;
+        }
+
+        /* 조드 스타일: 검은색 테두리 강렬한 테마 */
+        .thick-border {
+            border: 3px solid #000000;
+        }
+
+        .main-container {
+            border: 5px solid #000000;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 4px solid #000000;
+        }
+
+        .cmd-box {
+            background: #f1f5f9;
+            border: 3px solid #000000;
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .param-label {
+            font-size: 0.75rem;
+            background: #000000;
+            color: #ffffff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 800;
+            margin-top: 6px;
+            border: 1px solid #000000;
+            white-space: nowrap;
+        }
+
+        .result-display {
+            background-color: #ffffff;
+            border: 4px solid #000000;
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .code-block {
+            background: #1e293b;
+            border: 3px solid #000000;
+            border-left: 12px solid #3b82f6;
+        }
+
+        .var {
+            color: #ff79c6;
+            font-weight: bold;
+        }
+
+        .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .btn-action {
+            border: 3px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            transition: all 0.1s;
+        }
+
+        .btn-action:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px #000;
+        }
+
+        /* 계산기 강조 뱃지 */
+        .calc-badge {
+            background: #7c3aed;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+    </style>
+</head>
+
+<body class="p-4">
+
+    <div class="max-w-7xl mx-auto h-full bg-white rounded-3xl overflow-hidden flex flex-col main-container">
+
+        <!-- Header: RAMPQ 명령어 카드 -->
+        <div class="glass-header p-5 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-black text-black uppercase">RAMPQ(P) 경사 신호</h1>
+                <p class="text-sm font-bold text-slate-600 mt-1">초기값(s1)에서 최종값(s2)까지 n번에 걸쳐 부드럽게 값을 변화시킴</p>
+            </div>
+
+            <div class="cmd-box rounded-xl px-8 py-4 flex items-center gap-4 font-mono text-xl">
+                <span class="text-slate-400 font-black">RAMPQ(</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">X0</span>
+                    <span class="param-label uppercase">EN</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">D0</span>
+                    <span class="param-label">초기(s1)</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">D2</span>
+                    <span class="param-label">최종(s2)</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">D10</span>
+                    <span class="param-label">결과(d1)</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black" id="label-n">300</span>
+                    <span class="param-label">횟수(n)</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">M0</span>
+                    <span class="param-label">완료(d2)</span>
+                </div>
+                <span class="text-slate-400 font-black">);</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex p-6 gap-6 overflow-hidden">
+
+            <!-- Left: Graph Simulator -->
+            <div class="w-3/5 flex flex-col gap-4">
+                <div class="thick-border bg-slate-50 rounded-2xl p-6 flex-1 flex flex-col">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-black text-black flex items-center gap-3">
+                            <div class="w-4 h-4 bg-blue-600 border-2 border-black rounded-full"></div>
+                            경사 신호 시각화
+                        </h3>
+                        <div class="flex gap-2">
+                            <button onclick="startRamp()"
+                                class="btn-action bg-blue-600 text-white px-6 py-2 font-black rounded-lg">START (X0
+                                ON)</button>
+                            <button onclick="resetRamp()"
+                                class="btn-action bg-white text-black px-6 py-2 font-black rounded-lg">RESET</button>
+                        </div>
+                    </div>
+
+                    <!-- SVG Graph Area -->
+                    <div class="flex-1 bg-white border-2 border-black rounded-xl relative overflow-hidden">
+                        <svg id="ramp-graph" width="100%" height="100%" viewBox="0 0 500 300"
+                            preserveAspectRatio="none">
+                            <line x1="0" y1="250" x2="500" y2="250" stroke="#e2e8f0" stroke-width="1" />
+                            <line x1="50" y1="0" x2="50" y2="300" stroke="#e2e8f0" stroke-width="1" />
+                            <path id="ramp-path" d="M 50,250 L 450,50" fill="none" stroke="#cbd5e1" stroke-width="4"
+                                stroke-dasharray="10,5" />
+                            <path id="active-path" d="M 50,250" fill="none" stroke="#2563eb" stroke-width="6" />
+                            <circle id="ramp-dot" cx="50" cy="250" r="10" fill="#ef4444" stroke="#000"
+                                stroke-width="3" />
+                            <text x="30" y="275" font-weight="900" font-size="14">D0 (Start)</text>
+                            <text x="430" y="35" font-weight="900" font-size="14">D2 (End)</text>
+                        </svg>
+                    </div>
+
+                    <!-- NEW: Time to Steps Calculator -->
+                    <div
+                        class="bg-indigo-50 border-2 border-indigo-200 rounded-xl p-4 mt-4 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span class="calc-badge">TIME CALC</span>
+                            <div class="flex flex-col">
+                                <span class="text-[0.6rem] font-black text-indigo-400 uppercase tracking-tighter">Target
+                                    Reach Time</span>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="calc-sec" value="3" oninput="calculateSteps()"
+                                        class="w-12 bg-transparent text-xl font-black text-indigo-700 focus:outline-none">
+                                    <span class="font-black text-indigo-700">초 동안 상승</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-indigo-300 font-black">X</div>
+                        <div class="flex flex-col items-center">
+                            <span class="text-[0.6rem] font-black text-indigo-400 uppercase">Scan Time</span>
+                            <span class="text-sm font-black text-indigo-700">10ms (고정)</span>
+                        </div>
+                        <div class="text-indigo-300 font-black">=</div>
+                        <div class="flex flex-col items-end">
+                            <span class="text-[0.6rem] font-black text-indigo-400 uppercase">Set n to:</span>
+                            <span id="calc-result" class="text-2xl font-black text-indigo-700">300</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-4 mt-4">
+                        <div class="bg-white p-3 rounded-lg border-2 border-black">
+                            <label class="text-[0.65rem] font-bold text-slate-400 uppercase">Start (s1)</label>
+                            <input type="number" id="input-s1" value="0"
+                                class="text-2xl font-black w-full outline-none">
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border-2 border-black">
+                            <label class="text-[0.65rem] font-bold text-slate-400 uppercase">End (s2)</label>
+                            <input type="number" id="input-s2" value="1000"
+                                class="text-2xl font-black w-full outline-none">
+                        </div>
+                        <div class="bg-white p-3 rounded-lg border-2 border-black border-indigo-500">
+                            <label class="text-[0.65rem] font-bold text-indigo-400 uppercase">Steps (n)</label>
+                            <input type="number" id="input-n" value="300" oninput="updateLabels()"
+                                class="text-2xl font-black w-full outline-none text-indigo-600">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Results -->
+            <div class="w-2/5 flex flex-col gap-4">
+                <div class="result-display rounded-2xl p-6 flex flex-col">
+                    <h3 class="text-sm font-black text-slate-500 uppercase mb-5 tracking-widest">Device Monitoring</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl border-2 border-black">
+                            <span class="font-black text-slate-700">출력값 [D10]</span>
+                            <span id="curr-val" class="text-4xl font-black text-blue-600">0</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-50 p-4 rounded-xl border-2 border-black">
+                            <span class="font-black text-slate-700">현재 스캔 [(d1)+1]</span>
+                            <span id="curr-step" class="text-2xl font-black text-slate-600">0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-4 rounded-xl border-2 border-black"
+                            id="comp-box">
+                            <span class="font-black text-slate-700">완료 비트 [M0]</span>
+                            <span id="comp-bit" class="text-2xl font-black text-slate-400">OFF</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 rounded-2xl p-6 border-2 border-blue-200 flex-1">
+                    <h3 class="text-sm font-black text-blue-800 uppercase mb-3 tracking-widest flex items-center gap-2">
+                        <span class="text-xl">🦾</span> 시간 제어 핵심 정리
+                    </h3>
+                    <p class="text-[0.8rem] font-bold text-blue-900 leading-relaxed">
+                        조드님, 이 명령어는 <span class="text-red-600">"시간"</span>이 아니라 <span class="text-red-600">"스캔
+                            횟수"</span>로 동작해요!<br><br>
+                        1. <b>10ms 스캔 기준</b>으로 계산하세요.<br>
+                        2. <b>1초</b>를 원하면 n = <b>100</b><br>
+                        3. <b>3초</b>를 원하면 n = <b>300</b><br>
+                        4. <b>10초</b>를 원하면 n = <b>1000</b><br><br>
+                        이렇게 넣으면 기계가 부드럽게 가속합니다.
+                    </p>
+                </div>
+
+                <!-- Code Block -->
+                <div class="code-block rounded-2xl p-5 shadow-lg flex flex-col">
+                    <div
+                        class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-700 pb-2 flex justify-between">
+                        <span>GX Works3 ST Example</span>
+                        <span class="text-blue-400">RAMPQ</span>
+                    </div>
+                    <pre class="font-mono text-[0.8rem] leading-relaxed text-blue-100">
+<span class="comment">// 3초 동안 0에서 1000까지 증가 (스캔 10ms 기준)</span>
+RAMPQ(<span class="var">X0</span>, 0, 1000, <span class="var">D10</span>, 300, <span class="var">M0</span>);</pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let isRunning = false;
+        let currentStep = 0;
+        let timer = null;
+
+        function calculateSteps() {
+            const sec = parseFloat(document.getElementById('calc-sec').value) || 0;
+            // PLC 스캔 타임 10ms 가정: 1초당 100스캔
+            const steps = Math.round(sec * 100);
+            document.getElementById('calc-result').innerText = steps;
+            document.getElementById('input-n').value = steps;
+            updateLabels();
+        }
+
+        function updateLabels() {
+            const n = document.getElementById('input-n').value;
+            document.getElementById('label-n').innerText = n;
+            resetRamp();
+        }
+
+        function startRamp() {
+            if (isRunning) return;
+            resetRamp();
+            isRunning = true;
+
+            const s1 = parseInt(document.getElementById('input-s1').value) || 0;
+            const s2 = parseInt(document.getElementById('input-s2').value) || 0;
+            const n = parseInt(document.getElementById('input-n').value) || 1;
+
+            const stepVal = (s2 - s1) / n;
+            const dot = document.getElementById('ramp-dot');
+            const activePath = document.getElementById('active-path');
+            const compBox = document.getElementById('comp-box');
+            const compBit = document.getElementById('comp-bit');
+
+            // 실제 PLC 스캔타임(10ms)을 흉내내어 10ms마다 갱신
+            timer = setInterval(() => {
+                currentStep++;
+                let currentVal = s1 + (stepVal * currentStep);
+
+                if (currentStep >= n) {
+                    currentVal = s2;
+                    clearInterval(timer);
+                    isRunning = false;
+                    compBox.style.backgroundColor = '#ecfdf5';
+                    compBox.style.borderColor = '#10b981';
+                    compBit.innerText = "ON (DONE)";
+                    compBit.style.color = "#059669";
+                }
+
+                document.getElementById('curr-val').innerText = Math.round(currentVal);
+                document.getElementById('curr-step').innerText = currentStep;
+
+                const x = 50 + (currentStep / n) * 400;
+                const y = 250 - ((currentVal - s1) / (s2 - s1)) * 200;
+                dot.setAttribute('cx', x);
+                dot.setAttribute('cy', y);
+
+                const d = activePath.getAttribute('d');
+                activePath.setAttribute('d', `${d} L ${x},${y}`);
+
+            }, 10);
+        }
+
+        function resetRamp() {
+            clearInterval(timer);
+            isRunning = false;
+            currentStep = 0;
+            document.getElementById('curr-val').innerText = document.getElementById('input-s1').value;
+            document.getElementById('curr-step').innerText = "0";
+            document.getElementById('comp-box').style.backgroundColor = 'transparent';
+            document.getElementById('comp-box').style.borderColor = '#000';
+            document.getElementById('comp-bit').innerText = "OFF";
+            document.getElementById('comp-bit').style.color = "#94a3b8";
+
+            const dot = document.getElementById('ramp-dot');
+            dot.setAttribute('cx', 50);
+            dot.setAttribute('cy', 250);
+            document.getElementById('active-path').setAttribute('d', 'M 50,250');
+        }
+
+        window.onload = calculateSteps;
+    </script>
+
+</body>
+
+</html>

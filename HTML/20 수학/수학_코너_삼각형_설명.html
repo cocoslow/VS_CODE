@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #F0F4F8 0%, #D9E2EC 100%);
+      --panel-bg: rgba(255, 255, 255, 0.95);
+      --panel-border: rgba(255, 255, 255, 0.6);
+      --panel-shadow: 0 10px 30px rgba(27, 58, 92, 0.08);
+      --primary: #1B3A5C;
+      --accent: #CF4500;
+      --text-main: #334155;
+      --text-muted: #64748B;
+      --font-base: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      font-family: var(--font-base);
+      padding: 30px;
+      margin: 0;
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h2 {
+      font-size: 32px;
+      color: var(--primary);
+      margin: 0 0 30px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5);
+    }
+
+    .wrap {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 24px;
+      width: 80%;
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      border-radius: 16px;
+      border: 1px solid var(--panel-border);
+      box-shadow: var(--panel-shadow);
+      padding: 24px;
+      backdrop-filter: blur(10px);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .panel:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 36px rgba(27, 58, 92, 0.12);
+    }
+
+    .panel-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #F1F5F9;
+    }
+
+    /* 오른쪽 설명 리스트 스타일 */
+    .step-item {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 28px;
+      align-items: flex-start;
+    }
+
+    .step-badge {
+      min-width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .step-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .eq-box {
+      background: #0F172A;
+      border-radius: 12px;
+      padding: 24px 28px;
+      font-family: 'Consolas', 'Fira Code', monospace;
+      font-size: 22px;
+      line-height: 2.2;
+      margin-top: 32px;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .c1 {
+      color: #6A9955;
+      font-style: italic;
+    }
+
+    .c2 {
+      color: #9CDCFE;
+    }
+
+    .c3 {
+      color: #CE9178;
+    }
+
+    .c4 {
+      color: #4ADE80;
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+    }
+
+    .c5 {
+      color: #888;
+    }
+
+    /* 하단 요약 바 */
+    .bottom-bar {
+      width: 80%;
+      margin-top: 24px;
+      background: linear-gradient(90deg, #1E293B, #0F172A);
+      border-radius: 12px;
+      padding: 16px 24px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .bottom-badge {
+      font-size: 18px;
+      color: #38BDF8;
+      font-weight: 800;
+      min-width: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .bottom-text {
+      color: #F8FAFC;
+      font-size: 20px;
+      font-weight: 500;
+    }
+
+    .bottom-divider {
+      width: 2px;
+      height: 24px;
+      background: #334155;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>삼각형이 실제 코너에 어떻게 적용되는가</h2>
+
+  <div class="wrap">
+
+    <!-- 왼쪽: 실제 코너 도면 -->
+    <div class="panel">
+      <div class="panel-title">실제 코너 도식</div>
+      <svg viewBox="0 0 300 300" width="100%" style="display:block">
+        <defs>
+          <marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#CF4500" stroke-width="1.8" stroke-linecap="round" />
+          </marker>
+          <marker id="a2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#1565C0" stroke-width="1.8" stroke-linecap="round" />
+          </marker>
+          <marker id="a3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6"
+            orient="auto-start-reverse">
+            <path d="M2 1L8 5L2 9" fill="none" stroke="#1A5C1A" stroke-width="1.8" stroke-linecap="round" />
+          </marker>
+        </defs>
+
+        <!-- 배경 그리드 (흐리게) -->
+        <g stroke="#E8EDF3" stroke-width="0.6">
+          <line x1="50" y1="20" x2="50" y2="280" />
+          <line x1="100" y1="20" x2="100" y2="280" />
+          <line x1="150" y1="20" x2="150" y2="280" />
+          <line x1="200" y1="20" x2="200" y2="280" />
+          <line x1="250" y1="20" x2="250" y2="280" />
+          <line x1="20" y1="50" x2="280" y2="50" />
+          <line x1="20" y1="100" x2="280" y2="100" />
+          <line x1="20" y1="150" x2="280" y2="150" />
+          <line x1="20" y1="200" x2="280" y2="200" />
+          <line x1="20" y1="250" x2="280" y2="250" />
+        </g>
+
+        <!-- 제품 (좌상단 코너만 보임) -->
+        <!-- 제품 몸체 (직선부 + 호) -->
+        <!-- 교차점: (100, 100), R = 100px -->
+        <!-- 호 시작: (100, 200), 호 끝: (200, 100) -->
+        <path d="M 100 250 L 100 200 A 100 100 0 0 1 200 100 L 250 100 L 250 250 Z" fill="#C5D2DC" stroke="#3A5A72"
+          stroke-width="1.8" />
+
+        <!-- ── 기준선 ── -->
+        <!-- Xv 수직 기준선 (파란 점선) -->
+        <line x1="100" y1="20" x2="100" y2="280" stroke="#1565C0" stroke-width="1.2" stroke-dasharray="6 3" />
+        <!-- Yh 수평 기준선 (초록 점선) -->
+        <line x1="20" y1="100" x2="280" y2="100" stroke="#1A5C1A" stroke-width="1.2" stroke-dasharray="6 3" />
+
+        <!-- 교차점 (검은 점) -->
+        <circle cx="100" cy="100" r="5" fill="#1B3A5C" />
+
+        <!-- 교차점 레이블 -->
+        <text font-size="13" fill="#1B3A5C" text-anchor="middle" font-weight="800">
+          <tspan x="65" y="80">(Xv, Yh)</tspan>
+          <tspan x="65" y="96">교차점</tspan>
+        </text>
+
+        <!-- 센서 ON 지점 (밑에 깔림) -->
+        <circle cx="172" cy="172" r="9" fill="#FF7A00" />
+        <circle cx="172" cy="172" r="15" fill="none" stroke="#FF7A00" stroke-width="1.2" opacity=".45" />
+
+        <!-- ── 45° 대각 이동선 (화살표가 위로 옴) ── -->
+        <line x1="100" y1="100" x2="172" y2="172" stroke="#CF4500" stroke-width="2.5" stroke-linecap="round"
+          marker-end="url(#a1)" />
+
+        <!-- 이동선 레이블 (선 아래로 이동) -->
+        <text x="115" y="145" font-size="13" fill="#CF4500" text-anchor="middle" font-weight="800"
+          transform="rotate(45,115,140)">45° 이동</text>
+
+        <!-- 센서 ON 텍스트 -->
+        <text x="188" y="162" font-size="14" fill="#CF4500" font-weight="800">센서 ON!</text>
+        <text x="188" y="178" font-size="12" fill="#888">(xm, ym)</text>
+
+        <!-- ── 직각삼각형 ── -->
+        <!-- 삼각형 채우기 -->
+        <polygon points="100,100 172,100 172,172" fill="#FFD060" opacity="0.6" />
+        <!-- 직각 마크 -->
+        <rect x="158" y="100" width="14" height="14" fill="none" stroke="#888" stroke-width="1" />
+
+        <!-- dx (가로) -->
+        <line x1="100" y1="88" x2="172" y2="88" stroke="#1565C0" stroke-width="2" stroke-linecap="round"
+          marker-start="url(#a2)" marker-end="url(#a2)" />
+        <text x="136" y="78" font-size="14" fill="#1565C0" text-anchor="middle" font-weight="800">dx (밑변)</text>
+
+        <!-- dy (세로) -->
+        <line x1="185" y1="100" x2="185" y2="172" stroke="#1A5C1A" stroke-width="2" stroke-linecap="round"
+          marker-start="url(#a3)" marker-end="url(#a3)" />
+        <text x="195" y="141" font-size="14" fill="#1A5C1A" text-anchor="start" font-weight="800">dy (높이)</text>
+
+        <!-- 각도 호 -->
+        <path d="M 130 100 A 30 30 0 0 1 121.2 121.2" fill="none" stroke="#CF4500" stroke-width="1.5" />
+        <text x="135" y="118" font-size="13" fill="#CF4500" font-weight="800">45°</text>
+
+        <!-- Xv 레이블 -->
+        <text x="86" y="36" font-size="14" fill="#1565C0" text-anchor="middle" font-weight="800">Xv</text>
+
+        <!-- Yh 레이블 -->
+        <text x="36" y="118" font-size="14" fill="#1A5C1A" text-anchor="middle" font-weight="800">Yh</text>
+
+      </svg>
+    </div>
+
+    <!-- 오른쪽: 순서 설명 -->
+    <div class="panel">
+      <div class="panel-title">삼각형 대입 원리</div>
+
+      <!-- 1 -->
+      <div class="step-item">
+        <div class="step-badge" style="background: #1565C0;">1</div>
+        <div>
+          <div class="step-title" style="color: #1565C0;">교차점 = 직각삼각형의 꼭짓점</div>
+          <div class="step-desc">Xv, Yh 기준선이 만나는 점이<br>삼각형의 직각이 아닌 꼭짓점(시작점)</div>
+        </div>
+      </div>
+
+      <!-- 2 -->
+      <div class="step-item">
+        <div class="step-badge" style="background: #CF4500;">2</div>
+        <div>
+          <div class="step-title" style="color: #CF4500;">대각선 이동 = 빗변</div>
+          <div class="step-desc">서보가 45° 방향으로 움직이는 경로가<br>삼각형의 빗변이 됨</div>
+        </div>
+      </div>
+
+      <!-- 3 -->
+      <div class="step-item">
+        <div class="step-badge" style="background: #FF7A00;">3</div>
+        <div>
+          <div class="step-title" style="color: #EA580C;">센서 ON 지점 = 빗변의 끝점</div>
+          <div class="step-desc">센서가 코너 호에 닿는 순간<br>그 좌표(xm, ym)가 삼각형의 끝점</div>
+        </div>
+      </div>
+
+      <!-- 4 -->
+      <div class="step-item">
+        <div class="step-badge" style="background: #1565C0;">4</div>
+        <div>
+          <div class="step-title" style="color: #1565C0;">dx, dy = 밑변과 높이</div>
+          <div class="step-desc">xm − Xv = dx (밑변)<br>ym − Yh = dy (높이)</div>
+        </div>
+      </div>
+
+      <!-- 5 -->
+      <div class="step-item">
+        <div class="step-badge" style="background: #A82020;">5</div>
+        <div>
+          <div class="step-title" style="color: #B91C1C;">45° ∴ dx = dy → R = dx × 3.414</div>
+          <div class="step-desc">45° 이동이라 두 변 항상 같음<br>→ 공식 단순화 가능</div>
+        </div>
+      </div>
+
+      <!-- 공식 박스 -->
+      <div class="eq-box">
+        <span class="c1">// 45° → dx = dy</span><br>
+        <span class="c2">dx</span> = <span class="c3">xm</span> − <span class="c3">Xv</span>
+        &nbsp;= <span class="c4">1.230 mm</span><br>
+        <span class="c2"> R</span> = <span class="c2">dx</span> × <span class="c3">3.414</span>
+        &nbsp;= <span class="c4">4.200 mm</span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 하단: 핵심 한 줄 요약 -->
+  <div class="bottom-bar">
+    <div class="bottom-badge">삼각형 3변</div>
+    <div class="bottom-text">빗변(대각이동) → 가로(dx) + 세로(dy)로 분해</div>
+    <div class="bottom-divider"></div>
+    <div class="bottom-badge" style="color: #FCD34D;">45° 특성</div>
+    <div class="bottom-text" style="color: #FCD34D; font-family: 'Consolas', monospace; font-size: 24px;">dx = dy → R =
+      dx × 3.414</div>
+  </div>
+
+</body>
+
+</html>

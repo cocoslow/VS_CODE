@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MTR-매트릭스 입력 제어 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;800&display=swap');
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .zodd-card {
+            background: white;
+            border: 4px solid #000;
+            border-radius: 24px;
+            box-shadow: 8px 8px 0px #000;
+        }
+
+        .pointer-box {
+            background: #1e293b;
+            color: #3b82f6;
+            border: 3px solid #3b82f6;
+            border-radius: 12px;
+            font-family: monospace;
+        }
+
+        /* 명령어 버튼 액티브 상태 */
+        .op-select-btn {
+            border: 3px solid #000;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            height: 85px;
+            text-align: left;
+            padding: 0 20px;
+        }
+
+        .op-select-btn .btn-main-label {
+            font-size: 1.5rem;
+            font-weight: 900;
+            display: block;
+        }
+
+        .op-select-btn .btn-sub-label {
+            font-size: 0.9rem;
+            font-weight: 700;
+            opacity: 0.6;
+        }
+
+        .op-select-btn.active {
+            background: #2563eb !important;
+            color: white !important;
+            transform: scale(1.02);
+            z-index: 20;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        /* 매트릭스 그리드 */
+        .mtr-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            background: #fff;
+            padding: 15px;
+            border: 4px solid #000;
+            border-radius: 20px;
+        }
+
+        .mtr-key {
+            aspect-ratio: 1;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.1s;
+            position: relative;
+            background: #f8fafc;
+        }
+
+        .mtr-key:hover {
+            background: #eff6ff;
+            border-color: #3b82f6;
+        }
+
+        .mtr-key.pressed {
+            background: #3b82f6;
+            color: white;
+            border-color: #1d4ed8;
+            transform: scale(0.95);
+            box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .mtr-key.scanning {
+            outline: 4px solid #facc15;
+            outline-offset: -2px;
+            z-index: 10;
+        }
+
+        .mtr-key.active-hit {
+            background: #ef4444 !important;
+            color: white !important;
+            border-color: #b91c1c !important;
+            box-shadow: 0 0 15px #ef4444;
+        }
+
+        /* 주소 라벨 */
+        .addr-tag {
+            font-size: 0.55rem;
+            font-weight: 800;
+            color: #94a3b8;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+        }
+
+        .bit-val {
+            font-size: 1rem;
+            font-weight: 900;
+        }
+
+        /* 출력/입력 버스 바 */
+        .bus-line {
+            background: #e2e8f0;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .bus-line.active {
+            background: #2563eb;
+            box-shadow: 0 0 10px #3b82f6;
+        }
+
+        .bus-label {
+            font-size: 0.6rem;
+            font-weight: 900;
+            position: absolute;
+            color: #64748b;
+        }
+
+        /* ST 구문 초대형 */
+        .st-syntax-large {
+            background: #020617;
+            border-left: 10px solid #2563eb;
+            padding: 25px;
+            border-radius: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #38bdf8;
+            margin-bottom: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            line-height: 1.2;
+        }
+
+        .operand-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .operand-table th {
+            background: #334155;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            text-align: left;
+            padding: 8px 12px;
+            border: 1px solid #1e293b;
+        }
+
+        .operand-table td {
+            font-size: 0.95rem;
+            padding: 12px;
+            border: 1px solid #334155;
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        .op-tag {
+            font-weight: 800;
+            color: #3b82f6;
+            background: #1e293b;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .memo-textarea {
+            width: 100%;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 20px;
+            color: #f8fafc;
+            font-size: 1rem;
+            line-height: 1.7;
+            outline: none;
+            resize: none;
+            transition: all 0.2s;
+        }
+
+        .memo-textarea:focus {
+            border-color: #2563eb;
+            background: #0f172a;
+        }
+
+        .save-indicator {
+            font-size: 0.65rem;
+            color: #22c55e;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="p-4 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <div class="zodd-card p-4 flex justify-between items-center mb-4">
+        <div class="flex items-center gap-4">
+            <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg"><i data-lucide="grid-3x3" size="30"></i></div>
+            <div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-slate-800">
+                    <span class="text-blue-600">MTR</span>-매트릭스 입력 제어
+                </h1>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest text-blue-600">Multiplexed Input
+                    Scan Simulation</p>
+            </div>
+        </div>
+        <div class="pointer-box px-8 py-3 text-center border-4 border-black min-w-[220px]">
+            <span class="text-[0.6rem] font-black block opacity-70 uppercase tracking-tight">Active Scan Line (Y)</span>
+            <span id="scan-label" class="text-2xl font-black text-white text-emerald-400">Y00</span>
+        </div>
+    </div>
+
+    <!-- 4-Column Layout -->
+    <div class="flex-1 flex gap-4 overflow-hidden">
+
+        <!-- Col 1: Controls (18%) -->
+        <div class="w-[18%] flex flex-col gap-4">
+            <div class="zodd-card p-6 flex flex-col h-full shadow-[6px_6px_0px_#000]">
+                <h3 class="text-xs font-black text-slate-400 uppercase mb-5 border-b-2 pb-2 flex items-center gap-2">
+                    <i data-lucide="zap" size="16"></i> COMMAND SELECT
+                </h3>
+                <div class="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
+                    <button class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between active">
+                        <div><span class="btn-main-label">MTR</span><span class="btn-sub-label">(매트릭스 입력)</span></div>
+                        <i data-lucide="chevron-right"></i>
+                    </button>
+                    <div class="p-5 bg-blue-50 border-2 border-dashed border-blue-200 rounded-2xl text-center">
+                        <span
+                            class="text-[0.6rem] font-black text-blue-400 uppercase tracking-widest leading-relaxed">Keypad
+                            Scan<br />System Mode</span>
+                    </div>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button onclick="toggleScan()" id="scan-btn"
+                        class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl border-2 border-black font-black text-sm uppercase tracking-widest shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="play" id="scan-icon" size="16"></i> <span id="scan-text">STOP SCAN</span>
+                    </button>
+                    <button onclick="clearKeys()"
+                        class="mt-2 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600">Release
+                        All Keys</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 2: Live Monitor (32%) -->
+        <div class="w-[32%] flex flex-col gap-4 relative">
+            <div class="zodd-card p-6 flex-1 flex flex-col shadow-[10px_10px_0px_#000] overflow-hidden relative">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">Simulation
+                            View</span>
+                        <h2 id="status-display" class="text-3xl font-black text-slate-800 tracking-tighter uppercase">
+                            SCANNING...</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[0.6rem] font-black text-slate-500 uppercase block mb-1">Detected
+                            Points</span>
+                        <span id="hit-count" class="text-2xl font-black text-blue-600">0</span>
+                    </div>
+                </div>
+
+                <!-- Matrix UI -->
+                <div class="flex gap-2 flex-1">
+                    <!-- Left: Y Labels -->
+                    <div class="flex flex-col justify-between py-5 text-[0.6rem] font-black text-slate-400">
+                        <span>Y0</span><span>Y1</span><span>Y2</span><span>Y3</span><span>Y4</span><span>Y5</span><span>Y6</span><span>Y7</span>
+                    </div>
+                    <div class="flex-1 flex flex-col gap-2">
+                        <!-- Top: X Labels -->
+                        <div class="flex justify-around px-2 text-[0.6rem] font-black text-slate-400">
+                            <span>X0</span><span>X1</span><span>X2</span><span>X3</span><span>X4</span><span>X5</span><span>X6</span><span>X7</span>
+                        </div>
+                        <!-- Grid -->
+                        <div id="mtr-grid" class="mtr-grid flex-1">
+                            <!-- JS Dynamic Keys -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-5 bg-black rounded-2xl flex justify-between items-center text-white">
+                    <div>
+                        <div class="text-[0.6rem] text-slate-400 font-bold uppercase mb-1">Target Data Start</div>
+                        <div class="text-2xl font-black text-yellow-400">M0 ~ M63</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-[0.6rem] text-slate-400 font-bold uppercase mb-1">Current Hit</div>
+                        <div class="text-lg font-black text-blue-400" id="current-hit-addr">NONE</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 3: Handbook (25%) -->
+        <div class="w-[25%] flex flex-col overflow-hidden">
+            <div
+                class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] overflow-hidden border-2 border-slate-700">
+                <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
+                    <i data-lucide="book-open" class="text-pink-500"></i>
+                    <h3 class="text-xl font-black uppercase tracking-widest">Technical Guide</h3>
+                    <div id="save-status" class="save-indicator ml-auto">SAVED!</div>
+                </div>
+
+                <div class="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2">
+                    <div class="bg-slate-800/80 p-6 rounded-3xl border-2 border-slate-700 shadow-inner">
+                        <h4 class="text-2xl font-black text-blue-400 mb-2">MTR (Matrix Input)</h4>
+                        <div class="st-syntax-large text-emerald-400">MTR(s, n, d, n2);</div>
+                        <p class="text-sm font-bold text-slate-300 leading-relaxed uppercase tracking-tighter mb-4">
+                            Reads 8*n switches into d starting from input s.</p>
+
+                        <div class="mt-2">
+                            <span
+                                class="text-[0.7rem] font-black text-slate-500 uppercase tracking-widest block mb-3 border-b border-slate-700 pb-1">Operand
+                                Specifications</span>
+                            <table class="operand-table">
+                                <thead>
+                                    <tr>
+                                        <th>Operand</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><span class="op-tag">(s)</span></td>
+                                        <td>입력 선두 번호 (X0)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="op-tag">(n)</span></td>
+                                        <td>매트릭스 열 수 (8)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="op-tag">(d)</span></td>
+                                        <td>출력 선두 번호 (Y0)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><span class="op-tag">(n2)</span></td>
+                                        <td>결과 저장 선두 (M0)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-black/50 border border-slate-700 rounded-2xl">
+                        <span
+                            class="text-[0.7rem] font-black text-slate-500 uppercase block mb-3 flex items-center gap-2">
+                            <i data-lucide="code" size="14"></i> ST Program Example
+                        </span>
+                        <div class="st-code-box">
+                            // 8x8 키패드 읽기<br>
+                            // X0~X7 입력, Y0~Y7 출력<br>
+                            // M0~M63 에 결과 저장<br>
+                            MTR(X0, 8, Y0, M0);
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 p-5 bg-blue-900/40 border-2 border-blue-500/50 rounded-2xl italic">
+                    <p class="text-xs font-bold text-blue-100 leading-relaxed flex items-center gap-2">
+                        <i data-lucide="award" size="16"></i>
+                        "MTR은 스캔 방식이므로 속도가 중요할 경우 스캔 타임을 고려해야 합니다."
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 4: Notepads (25%) -->
+        <div class="w-[25%] flex flex-col gap-4 overflow-hidden">
+            <div
+                class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] border-emerald-500">
+                <div
+                    class="memo-section-header flex justify-between items-center border-b border-emerald-900/50 pb-4 mb-4">
+                    <div class="flex items-center gap-3 text-emerald-400">
+                        <i data-lucide="clipboard-list"></i>
+                        <h3 class="text-lg font-black uppercase">Global Notes</h3>
+                    </div>
+                </div>
+                <textarea id="global-memo" class="memo-textarea flex-1 border-emerald-900/50 mb-6"
+                    placeholder="프로젝트 전체 특이사항 기록..."></textarea>
+
+                <div class="flex items-center gap-3 mb-4 text-blue-400 border-t border-slate-800 pt-6">
+                    <i data-lucide="pencil-line"></i>
+                    <h3 class="text-lg font-black uppercase">MTR Memo</h3>
+                </div>
+                <textarea id="op-memo" class="memo-textarea flex-1 border-blue-900/50"
+                    placeholder="MTR 명령어 개별 기록..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentScanY = 0;
+        let isScanning = true;
+        let scanInterval = null;
+        let pressedKeys = new Set(); // "y-x" format
+        let memoData = { MTR: '', global: '' };
+
+        function init() {
+            renderMatrix();
+            startScan();
+            initMemos();
+            lucide.createIcons();
+        }
+
+        function renderMatrix() {
+            const grid = document.getElementById('mtr-grid');
+            grid.innerHTML = '';
+            for (let y = 0; y < 8; y++) {
+                for (let x = 0; x < 8; x++) {
+                    const key = document.createElement('div');
+                    key.className = 'mtr-key';
+                    key.id = `key-${y}-${x}`;
+                    key.innerHTML = `
+                        <span class="addr-tag">M${y * 8 + x}</span>
+                        <span class="bit-val">0</span>
+                    `;
+                    key.onclick = () => toggleKey(y, x);
+                    grid.appendChild(key);
+                }
+            }
+        }
+
+        function toggleKey(y, x) {
+            const keyStr = `${y}-${x}`;
+            if (pressedKeys.has(keyStr)) pressedKeys.delete(keyStr);
+            else pressedKeys.add(keyStr);
+
+            const el = document.getElementById(`key-${y}-${x}`);
+            el.classList.toggle('pressed');
+            updateHits();
+        }
+
+        function clearKeys() {
+            pressedKeys.clear();
+            document.querySelectorAll('.mtr-key').forEach(el => {
+                el.classList.remove('pressed', 'active-hit');
+                el.querySelector('.bit-val').innerText = "0";
+            });
+            updateHits();
+        }
+
+        function startScan() {
+            if (scanInterval) clearInterval(scanInterval);
+            scanInterval = setInterval(() => {
+                // 이전 스캔 라인 제거
+                document.querySelectorAll('.mtr-key').forEach(el => {
+                    el.classList.remove('scanning', 'active-hit');
+                    if (!pressedKeys.has(el.id.replace('key-', ''))) {
+                        el.querySelector('.bit-val').innerText = "0";
+                    }
+                });
+
+                // 현재 스캔 라인 이동
+                currentScanY = (currentScanY + 1) % 8;
+                document.getElementById('scan-label').innerText = `Y0${currentScanY}`;
+
+                // 현재 행(Row)의 모든 키에 스캔 표시
+                for (let x = 0; x < 8; x++) {
+                    const el = document.getElementById(`key-${currentScanY}-${x}`);
+                    el.classList.add('scanning');
+
+                    // 만약 해당 키가 눌려있다면 (물리적 접점 형성) -> 비트 ON!
+                    if (pressedKeys.has(`${currentScanY}-${x}`)) {
+                        el.classList.add('active-hit');
+                        el.querySelector('.bit-val').innerText = "1";
+                        document.getElementById('current-hit-addr').innerText = `M${currentScanY * 8 + x} (X${x})`;
+                    }
+                }
+            }, 300); // 0.3초마다 한 줄씩 스캔
+        }
+
+        function toggleScan() {
+            isScanning = !isScanning;
+            const btn = document.getElementById('scan-btn');
+            const text = document.getElementById('scan-text');
+            const status = document.getElementById('status-display');
+
+            if (isScanning) {
+                startScan();
+                btn.className = btn.className.replace('bg-emerald-500', 'bg-blue-600');
+                text.innerText = "STOP SCAN";
+                status.innerText = "SCANNING...";
+                status.className = "text-3xl font-black text-slate-800 tracking-tighter uppercase";
+            } else {
+                clearInterval(scanInterval);
+                btn.className = btn.className.replace('bg-blue-600', 'bg-emerald-500');
+                text.innerText = "START SCAN";
+                status.innerText = "HALTED";
+                status.className = "text-3xl font-black text-red-500 tracking-tighter uppercase";
+                document.querySelectorAll('.mtr-key').forEach(el => el.classList.remove('scanning'));
+            }
+            lucide.createIcons();
+        }
+
+        function updateHits() {
+            document.getElementById('hit-count').innerText = pressedKeys.size;
+            if (pressedKeys.size === 0) document.getElementById('current-hit-addr').innerText = "NONE";
+        }
+
+        function initMemos() {
+            const saved = localStorage.getItem('zodd_mtr_memos');
+            if (saved) {
+                memoData = JSON.parse(saved);
+                document.getElementById('global-memo').value = memoData.global || '';
+                document.getElementById('op-memo').value = memoData.MTR || '';
+            }
+            document.getElementById('global-memo').oninput = (e) => { memoData.global = e.target.value; saveMemos(); };
+            document.getElementById('op-memo').oninput = (e) => { memoData.MTR = e.target.value; saveMemos(); };
+        }
+
+        function saveMemos() {
+            localStorage.setItem('zodd_mtr_memos', JSON.stringify(memoData));
+            const ind = document.getElementById('save-status'); ind.classList.add('show'); setTimeout(() => ind.classList.remove('show'), 1000);
+        }
+
+        window.onload = init;
+    </script>
+</body>
+
+</html>

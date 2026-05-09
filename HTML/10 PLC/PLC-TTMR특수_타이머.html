@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC TTMR 명령어 특수 타이머 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        html,
+        body {
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #e2e8f0;
+        }
+
+        /* 검은색 테두리 강렬한 테마 */
+        .thick-border {
+            border: 3px solid #000000;
+        }
+
+        .main-container {
+            border: 5px solid #000000;
+        }
+
+        .glass-header {
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 4px solid #000000;
+        }
+
+        .cmd-box {
+            background: #f1f5f9;
+            border: 3px solid #000000;
+            box-shadow: 6px 6px 0px #000000;
+        }
+
+        .param-label {
+            font-size: 0.8rem;
+            background: #000000;
+            color: #ffffff;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-weight: 800;
+            margin-top: 6px;
+            border: 1px solid #000000;
+        }
+
+        .press-btn {
+            transition: all 0.1s;
+            border: 4px solid #000000;
+            box-shadow: 6px 6px 0px #000000;
+            user-select: none;
+        }
+
+        .press-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 2px 2px 0px #000000;
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .press-btn.active {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        /* 승수 그룹화 스타일 */
+        .multiplier-group {
+            border: 2px solid #000000;
+            padding: 8px;
+            border-radius: 12px;
+            background: #ffffff;
+            position: relative;
+        }
+
+        .multiplier-label {
+            position: absolute;
+            top: -12px;
+            left: 12px;
+            background: #000000;
+            color: white;
+            padding: 0 8px;
+            font-size: 0.7rem;
+            font-weight: 900;
+            border-radius: 4px;
+        }
+
+        .multiplier-btn {
+            border: 2px solid #000000;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        .multiplier-btn.selected {
+            background-color: #2563eb;
+            color: white;
+            border-width: 3px;
+        }
+
+        .result-display {
+            background-color: #ffffff;
+            border: 4px solid #000000;
+            box-shadow: 8px 8px 0px #000000;
+        }
+
+        .code-block {
+            background: #1e293b;
+            border: 3px solid #000000;
+            border-left: 12px solid #3b82f6;
+        }
+
+        .var {
+            color: #ff79c6;
+            font-weight: bold;
+        }
+
+        .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .timer-ring {
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        /* 범위 강조 뱃지 */
+        .range-badge {
+            font-size: 0.65rem;
+            color: #ef4444;
+            font-weight: 900;
+            background: #fee2e2;
+            padding: 1px 4px;
+            border-radius: 3px;
+            border: 1px solid #f87171;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+
+<body class="p-4">
+
+    <div class="max-w-7xl mx-auto h-full bg-white rounded-3xl overflow-hidden flex flex-col main-container">
+
+        <!-- Header: TTMR 명령어 카드 (0..2 범위 추가) -->
+        <div class="glass-header p-6 flex justify-between items-center">
+            <div>
+                <h1 class="text-3xl font-black text-black">TTMR(P) 특수 타이머</h1>
+                <p class="text-sm font-bold text-slate-600 mt-1">입력이 ON인 시간을 측정하여 승수를 곱한 뒤 데이터로 저장</p>
+            </div>
+
+            <div class="cmd-box rounded-xl px-10 py-6 flex items-center gap-6 font-mono text-3xl">
+                <span class="text-slate-400 font-black">TTMR(</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">1</span>
+                    <span class="param-label uppercase">EN</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <div class="flex flex-col items-center">
+                        <span class="font-black text-black" id="code-s-val">0</span>
+                        <span class="range-badge">0..2</span>
+                    </div>
+                    <span class="param-label">승수(s)</span>
+                </div>
+                <span class="text-slate-400">,</span>
+                <div class="flex flex-col items-center">
+                    <span class="font-black text-black">D10</span>
+                    <span class="param-label">결과(d)</span>
+                </div>
+                <span class="text-slate-400 font-black">);</span>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="flex-1 flex p-6 gap-6 overflow-hidden">
+
+            <!-- Left: Simulator Area -->
+            <div class="w-1/2 flex flex-col gap-6">
+                <div class="thick-border bg-slate-50 rounded-2xl p-6 flex-1 flex flex-col">
+                    <div class="flex justify-between items-start mb-6">
+                        <h3 class="text-xl font-black text-black flex items-center gap-3">
+                            <div class="w-4 h-4 bg-red-600 border-2 border-black rounded-full"></div>
+                            티칭 타이머 테스트
+                        </h3>
+                        <!-- 승수 그룹화 및 범위 표기 -->
+                        <div class="multiplier-group flex gap-2">
+                            <div class="multiplier-label">승수 설정 (Range: 0..2)</div>
+                            <button onclick="setMultiplier(0)" id="m0"
+                                class="multiplier-btn selected px-3 py-1 rounded-md font-bold text-xs">x1 (s=0)</button>
+                            <button onclick="setMultiplier(1)" id="m1"
+                                class="multiplier-btn px-3 py-1 rounded-md font-bold text-xs">x10 (s=1)</button>
+                            <button onclick="setMultiplier(2)" id="m2"
+                                class="multiplier-btn px-3 py-1 rounded-md font-bold text-xs">x100 (s=2)</button>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 flex flex-col items-center justify-center gap-8">
+                        <!-- 타이머 비주얼 -->
+                        <div class="relative w-48 h-48">
+                            <svg class="w-full h-full transform -rotate-90">
+                                <circle cx="96" cy="96" r="88" stroke="#e2e8f0" stroke-width="12" fill="none"
+                                    class="thick-border" />
+                                <circle id="timer-progress" cx="96" cy="96" r="88" stroke="#ef4444" stroke-width="12"
+                                    fill="none" stroke-dasharray="553" stroke-dashoffset="553" class="timer-ring" />
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span id="live-timer" class="text-4xl font-black text-black">0.0s</span>
+                                <span id="measuring-tag"
+                                    class="text-[0.6rem] font-bold text-slate-400 uppercase">Ready</span>
+                            </div>
+                        </div>
+
+                        <!-- 입력 버튼 -->
+                        <button id="input-btn"
+                            class="press-btn w-64 py-8 bg-white rounded-2xl text-2xl font-black text-black uppercase tracking-widest">
+                            PRESS & HOLD
+                        </button>
+                    </div>
+
+                    <div class="mt-6 flex justify-between items-center bg-black p-5 rounded-xl">
+                        <div class="text-white">
+                            <div class="text-[0.65rem] text-slate-400 font-bold uppercase mb-1">Raw Count (100ms unit)
+                            </div>
+                            <div class="text-3xl font-black" id="raw-val">0</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[0.65rem] text-slate-400 font-bold uppercase mb-1">Current Multiplier</div>
+                            <div class="text-2xl font-black text-yellow-400" id="mult-label">x 1</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Result & Code Area -->
+            <div class="w-1/2 flex flex-col gap-6">
+
+                <!-- Result Panel -->
+                <div class="result-display rounded-2xl p-8 flex flex-col items-center justify-center text-center">
+                    <h3 class="text-slate-500 font-black text-sm uppercase tracking-widest mb-6">최종 측정 결과 (D10)</h3>
+                    <div class="flex items-baseline gap-2">
+                        <div class="text-9xl font-black text-blue-700 leading-none" id="final-res">0</div>
+                    </div>
+                    <p class="text-slate-400 font-bold text-sm mt-8">버튼을 누르고 있는 동안 실시간으로 계산됩니다.</p>
+
+                    <div class="mt-8 p-3 bg-red-50 border-2 border-red-200 rounded-lg flex items-center gap-3">
+                        <span class="text-red-600 font-black">⚠</span>
+                        <span class="text-[0.75rem] text-red-800 font-bold text-left">
+                            <b>D11</b>은 시스템용으로 자동 점유됩니다.<br>다른 데이터와 겹치지 않게 주의하세요!
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Code Block -->
+                <div class="code-block rounded-2xl p-6 flex-1 shadow-lg flex flex-col">
+                    <div
+                        class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-700 pb-2 flex justify-between">
+                        <span>GX Works3 ST Example</span>
+                        <span class="text-blue-400">TTMR(P)</span>
+                    </div>
+                    <pre class="font-mono text-[1.1rem] leading-relaxed text-blue-100 flex-1">
+<span class="comment">// s: 승수(0:x1, 1:x10, 2:x100)
+// d: 결과 저장(D10, D11 점유)</span>
+
+<span class="var">D0</span> := <span id="code-s">0</span>; <span class="comment">// 승수 설정 (0~2)</span>
+
+<span class="comment">// X0가 ON인 동안 시간 측정</span>
+TTMR(<span class="var">X0</span>, <span class="var">D0</span>, <span class="var">D10</span>);
+
+<span class="comment">// 결과 확인: D10 = 측정값 * 승수</span>
+                </pre>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let multiplier = 0;
+        let startTime = 0;
+        let timerInterval = null;
+        let rawCount = 0;
+
+        const btn = document.getElementById('input-btn');
+        const liveTimer = document.getElementById('live-timer');
+        const progress = document.getElementById('timer-progress');
+        const rawDisp = document.getElementById('raw-val');
+        const finalRes = document.getElementById('final-res');
+        const measuringTag = document.getElementById('measuring-tag');
+
+        function setMultiplier(val) {
+            multiplier = val;
+            document.querySelectorAll('.multiplier-btn').forEach(b => b.classList.remove('selected'));
+            document.getElementById(`m${val}`).classList.add('selected');
+            document.getElementById('mult-label').innerText = `x ${val === 0 ? 1 : (val === 1 ? 10 : 100)}`;
+            document.getElementById('code-s').innerText = val;
+            document.getElementById('code-s-val').innerText = val;
+            updateRealtimeValue();
+        }
+
+        function updateRealtimeValue() {
+            const multFactor = multiplier === 0 ? 1 : (multiplier === 1 ? 10 : 100);
+            finalRes.innerText = rawCount * multFactor;
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+            startTime = Date.now();
+            btn.classList.add('active');
+            measuringTag.innerText = "Measuring...";
+            measuringTag.classList.remove('text-slate-400');
+            measuringTag.classList.add('text-red-500');
+
+            timerInterval = setInterval(() => {
+                const elapsed = (Date.now() - startTime) / 1000;
+                rawCount = Math.floor(elapsed * 10);
+                liveTimer.innerText = elapsed.toFixed(1) + 's';
+                rawDisp.innerText = rawCount;
+                updateRealtimeValue();
+                const offset = 553 - (Math.min(elapsed, 10) / 10) * 553;
+                progress.style.strokeDashoffset = offset;
+            }, 50);
+        }
+
+        function stopTimer() {
+            if (!timerInterval) return;
+            clearInterval(timerInterval);
+            timerInterval = null;
+            btn.classList.remove('active');
+            measuringTag.innerText = "Ready";
+            measuringTag.classList.add('text-slate-400');
+            measuringTag.classList.remove('text-red-500');
+            updateRealtimeValue();
+            progress.style.strokeDashoffset = 553;
+            liveTimer.innerText = '0.0s';
+        }
+
+        btn.addEventListener('mousedown', startTimer);
+        btn.addEventListener('mouseup', stopTimer);
+        btn.addEventListener('mouseleave', stopTimer);
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); startTimer(); });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); stopTimer(); });
+
+        window.onload = () => setMultiplier(0);
+    </script>
+
+</body>
+
+</html>

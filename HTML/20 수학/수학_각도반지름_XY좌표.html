@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TAB2 — 각도+반지름 → X,Y 좌표</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      background: #F0F3F7;
+      font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+      overflow: hidden;
+    }
+
+    .app {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: 100vh;
+      padding: 8px 14px 8px;
+      gap: 6px;
+    }
+
+    .hdr {
+      background: #1B3A5C;
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hdr-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .hdr-sub {
+      font-size: 14px;
+      color: #7AAAD0;
+    }
+
+    .mid {
+      display: grid;
+      grid-template-columns: 290px 1fr 380px;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .panel {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #DDE3EA;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    .ptitle {
+      font-size: 14px;
+      font-weight: 700;
+      color: #8899AA;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #EEF1F5;
+    }
+
+    .srow {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      column-gap: 8px;
+      row-gap: 3px;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+
+    .srow label {
+      font-size: 14px;
+      color: #555;
+      white-space: nowrap;
+    }
+
+    input[type=range] {
+      grid-column: 1/3;
+      grid-row: 2;
+      width: 100%;
+      accent-color: #1B3A5C;
+      height: 3px;
+      margin-top: 2px;
+    }
+
+    .sval {
+      grid-column: 2;
+      grid-row: 1;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1B3A5C;
+      min-width: 70px;
+      text-align: right;
+      font-family: Consolas, monospace;
+    }
+
+    .p-btn {
+      flex: 1;
+      min-width: 24px;
+      padding: 3px 0;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1B3A5C;
+      background: #F8FAFC;
+      border: 1px solid #DDE3EA;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .p-btn:hover {
+      background: #E3F0FA;
+      border-color: #BBDEFB;
+      color: #1565C0;
+    }
+
+    .fbox {
+      background: #0F1117;
+      color: #D4D4D4;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-family: Consolas, monospace;
+      font-size: 14.5px;
+      line-height: 1.9;
+      flex: 1;
+    }
+
+    .c1 {
+      color: #6A9955
+    }
+
+    .c2 {
+      color: #9CDCFE
+    }
+
+    .c3 {
+      color: #CE9178
+    }
+
+    .c4 {
+      color: #FFD060;
+      font-weight: 700
+    }
+
+    .c5 {
+      color: #888
+    }
+
+    .svg-panel {
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid #DDE3EA;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+    }
+
+    .svg-panel svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 수식표 */
+    .ftable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 15.5px;
+    }
+
+    .ftable th {
+      background: #1B3A5C;
+      color: #fff;
+      padding: 10px 12px;
+      text-align: center;
+      font-size: 15px;
+    }
+
+    .ftable td {
+      padding: 16px 12px;
+      border-bottom: 2px solid #CBD5E1;
+      vertical-align: middle;
+      line-height: 1.8;
+      background: #fff;
+      transition: background 0.2s;
+    }
+
+    .ftable tr:hover td {
+      background: #F4F7FA;
+    }
+
+    .ftable td:first-child {
+      font-weight: 700;
+      font-size: 15px;
+      white-space: nowrap;
+      color: #1B3A5C;
+      border-right: 2px dashed #DDE3EA;
+      text-align: center;
+    }
+
+    .ftable code {
+      font-family: Consolas, monospace;
+      font-size: 15px;
+    }
+
+    .tag {
+      display: inline-block;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .result-box {
+      background: #1B3A5C;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-top: 6px;
+    }
+
+    .result-box .rlbl {
+      font-size: 15px;
+      color: #7AAAD0;
+      font-weight: 700;
+    }
+
+    .result-box .rval {
+      font-size: 26px;
+      color: #FFD060;
+      font-weight: 700;
+      font-family: Consolas, monospace;
+    }
+
+    .bar {
+      background: #1B3A5C;
+      border-radius: 8px;
+      padding: 7px 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    .bitem {
+      flex: 1;
+      text-align: center;
+    }
+
+    .blbl {
+      font-size: 11px;
+      color: #7AAAD0;
+      font-weight: 700;
+    }
+
+    .bval {
+      font-size: 16px;
+      color: #FFD060;
+      font-weight: 700;
+      font-family: Consolas, monospace;
+      margin-top: 1px;
+    }
+
+    .bdiv {
+      width: 1px;
+      background: #2C5580;
+      align-self: stretch;
+      margin: 0 5px;
+    }
+
+    /* 드래그 커서 */
+    #t2_dragTarget {
+      cursor: grab;
+    }
+
+    #t2_dragTarget:active {
+      cursor: grabbing;
+    }
+
+    .drag-hint {
+      font-size: 13px;
+      color: #E91E63;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- 헤더 -->
+    <div class="hdr">
+      <span class="hdr-title">각도 + 반지름 → X, Y 좌표 계산</span>
+      <span class="hdr-sub">X = Cx + R×cos(θ)&nbsp;&nbsp;|&nbsp;&nbsp;Y = Cy + R×sin(θ)&nbsp;&nbsp;|&nbsp;&nbsp;🔴 빨간점
+        드래그 가능</span>
+    </div>
+
+    <!-- 미드 -->
+    <div class="mid">
+
+      <!-- 왼쪽: 슬라이더 + 공식 코드박스 -->
+      <div style="display:flex;flex-direction:column;gap:6px;min-height:0;">
+        <div class="panel">
+          <div class="ptitle">파라미터 입력 (또는 빨간점 드래그)</div>
+
+          <div class="srow">
+            <label>중심 X (Cx)</label>
+            <span class="sval" id="t2_vCx">100mm</span>
+            <input type="range" id="t2_sl-cx" min="-100" max="100" value="100" step="1">
+            <div style="grid-column:1/3;display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;">
+              <button onclick="t2_set('cx',-100)" class="p-btn">-100</button>
+              <button onclick="t2_set('cx',-50)" class="p-btn">-50</button>
+              <button onclick="t2_set('cx',0)" class="p-btn">0</button>
+              <button onclick="t2_set('cx',50)" class="p-btn">50</button>
+              <button onclick="t2_set('cx',100)" class="p-btn">100</button>
+            </div>
+          </div>
+
+          <div class="srow">
+            <label>중심 Y (Cy)</label>
+            <span class="sval" id="t2_vCy">100mm</span>
+            <input type="range" id="t2_sl-cy" min="-100" max="100" value="100" step="1">
+            <div style="grid-column:1/3;display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;">
+              <button onclick="t2_set('cy',-100)" class="p-btn">-100</button>
+              <button onclick="t2_set('cy',-50)" class="p-btn">-50</button>
+              <button onclick="t2_set('cy',0)" class="p-btn">0</button>
+              <button onclick="t2_set('cy',50)" class="p-btn">50</button>
+              <button onclick="t2_set('cy',100)" class="p-btn">100</button>
+            </div>
+          </div>
+
+          <div class="srow">
+            <label>반지름 (R)</label>
+            <span class="sval" id="t2_vR">80mm</span>
+            <input type="range" id="t2_sl-r" min="5" max="150" value="80" step="1">
+            <div style="grid-column:1/3;display:flex;gap:3px;flex-wrap:wrap;margin-top:2px;">
+              <button onclick="t2_set('r',20)" class="p-btn">20</button>
+              <button onclick="t2_set('r',50)" class="p-btn">50</button>
+              <button onclick="t2_set('r',80)" class="p-btn">80</button>
+              <button onclick="t2_set('r',100)" class="p-btn">100</button>
+              <button onclick="t2_set('r',150)" class="p-btn">150</button>
+            </div>
+          </div>
+
+          <div class="srow">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <label>각도 (θ)</label>
+              <div style="display:flex;gap:3px;">
+                <button onclick="t2_set('ang',0)" class="p-btn" style="min-width:28px">0°</button>
+                <button onclick="t2_set('ang',30)" class="p-btn" style="min-width:28px">30°</button>
+                <button onclick="t2_set('ang',45)" class="p-btn" style="min-width:28px">45°</button>
+                <button onclick="t2_set('ang',60)" class="p-btn" style="min-width:28px">60°</button>
+                <button onclick="t2_set('ang',90)" class="p-btn" style="min-width:28px">90°</button>
+                <button onclick="t2_set('ang',180)" class="p-btn" style="min-width:34px">180°</button>
+                <button onclick="t2_set('ang',270)" class="p-btn" style="min-width:34px">270°</button>
+              </div>
+            </div>
+            <input type="range" id="t2_sl-ang" min="0" max="360" value="45" step="1">
+            <span class="sval" id="t2_vAng">45°</span>
+          </div>
+
+          <div class="drag-hint">🩷 핑크색 점을 마우스로 드래그하면 R과 θ가 자동으로 바뀝니다</div>
+        </div>
+
+        <!-- 공식 코드박스 -->
+        <div class="panel" style="flex:1">
+          <div class="ptitle">계산 공식 (실시간)</div>
+          <div class="fbox">
+            <span class="c1">// 입력: Cx, Cy, R, θ</span><br>
+            <span class="c2">X</span> = <span class="c2">Cx</span> + <span class="c2">R</span>×cos(<span class="c3"
+              id="t2_fAng">45</span>°)<br>
+            <span class="c5">&nbsp;=</span> <span class="c3" id="t2_fCx">100</span> + <span class="c3"
+              id="t2_fR">80</span>×<span class="c3" id="t2_fCos">0.70711</span><br>
+            <span class="c5">&nbsp;=</span> <span class="c4" id="t2_fX">156.569</span><span class="c5">mm</span><br><br>
+            <span class="c2">Y</span> = <span class="c2">Cy</span> + <span class="c2">R</span>×sin(<span class="c3"
+              id="t2_fAng2">45</span>°)<br>
+            <span class="c5">&nbsp;=</span> <span class="c3" id="t2_fCy">100</span> + <span class="c3"
+              id="t2_fR2">80</span>×<span class="c3" id="t2_fSin">0.70711</span><br>
+            <span class="c5">&nbsp;=</span> <span class="c4" id="t2_fY">156.569</span><span class="c5">mm</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 가운데: SVG 도식 -->
+      <div class="svg-panel">
+        <svg id="t2_svgEl" viewBox="0 0 380 340" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <marker id="ah-b2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5"
+              orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="#1565C0" stroke-width="1.8" stroke-linecap="round" />
+            </marker>
+            <marker id="ah-g2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5"
+              orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="#1A5C1A" stroke-width="1.8" stroke-linecap="round" />
+            </marker>
+            <marker id="ah-r2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5"
+              orient="auto-start-reverse">
+              <path d="M2 1L8 5L2 9" fill="none" stroke="#A82020" stroke-width="1.8" stroke-linecap="round" />
+            </marker>
+            <pattern id="t2_grid10" width="10" height="10" patternUnits="userSpaceOnUse" x="10" y="10">
+              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#DDE3EA" stroke-width="0.5" />
+            </pattern>
+          </defs>
+
+          <!-- 배경 -->
+          <rect x="10" y="10" width="360" height="320" fill="#F8FAFC" rx="6" />
+          <!-- 격자 -->
+          <rect x="10" y="10" width="360" height="320" fill="url(#t2_grid10)" rx="6" pointer-events="none" />
+
+          <!-- 외곽 눈금 라벨 -->
+          <g font-size="9" fill="#94A3B8" font-family="Consolas, monospace" pointer-events="none">
+            <text id="t2_lbl_x_m100" x="40" y="324" text-anchor="middle"></text>
+            <text id="t2_lbl_x_m50" x="115" y="324" text-anchor="middle"></text>
+            <text id="t2_lbl_x_0" x="190" y="324" text-anchor="middle"></text>
+            <text id="t2_lbl_x_p50" x="265" y="324" text-anchor="middle"></text>
+            <text id="t2_lbl_x_p100" x="340" y="324" text-anchor="middle"></text>
+            <text id="t2_lbl_y_p100" x="14" y="24" text-anchor="start"></text>
+            <text id="t2_lbl_y_p50" x="14" y="99" text-anchor="start"></text>
+            <text id="t2_lbl_y_0" x="14" y="174" text-anchor="start"></text>
+            <text id="t2_lbl_y_m50" x="14" y="249" text-anchor="start"></text>
+            <text id="t2_lbl_y_m100" x="14" y="324" text-anchor="start"></text>
+          </g>
+
+          <!-- 중심 기준선 -->
+          <line id="t2_cx_line" x1="10" y1="170" x2="370" y2="170" stroke="#1565C0" stroke-width="0.8"
+            stroke-dasharray="6 3" opacity="0.5" />
+          <line id="t2_cy_line" x1="190" y1="10" x2="190" y2="330" stroke="#1A5C1A" stroke-width="0.8"
+            stroke-dasharray="6 3" opacity="0.5" />
+
+          <!-- 외접 정사각형 -->
+          <rect id="t2_sqBounding" x="94" y="74" width="192" height="192" fill="none" stroke="#ff0000"
+            stroke-width="1.5" opacity="0.3" />
+
+          <!-- 원 -->
+          <circle id="t2_circle" cx="190" cy="170" r="96" fill="none" stroke="#CBD5E1" stroke-width="1.2"
+            stroke-dasharray="5 3" />
+
+          <!-- dx 가로선 -->
+          <line id="t2_dxLine" x1="190" y1="113" x2="257" y2="113" stroke="#1565C0" stroke-width="1.8"
+            stroke-linecap="round" marker-end="url(#ah-b2)" />
+          <!-- dy 세로선 -->
+          <line id="t2_dyLine" x1="190" y1="170" x2="190" y2="113" stroke="#1A5C1A" stroke-width="1.8"
+            stroke-linecap="round" marker-end="url(#ah-g2)" />
+          <!-- 직각 기호 -->
+          <rect id="t2_rtAngle" x="190" y="113" width="12" height="12" fill="none" stroke="#888" stroke-width="1" />
+          <!-- 반지름 선 -->
+          <line id="t2_rLine" x1="190" y1="170" x2="257" y2="113" stroke="#A82020" stroke-width="2.5"
+            stroke-linecap="round" marker-end="url(#ah-r2)" />
+          <!-- 각도 호 -->
+          <path id="t2_angArc" fill="none" stroke="#A82020" stroke-width="1.5" />
+
+          <!-- 중심점 -->
+          <circle id="t2_center" cx="190" cy="170" r="5" fill="#1B3A5C" />
+          <text id="t2_cLabel" x="196" y="184" font-size="11" fill="#1B3A5C" font-weight="700">(Cx,Cy)</text>
+
+          <!-- 목표점 (드래그 가능) — id="t2_dragTarget" -->
+          <g id="t2_dragTarget">
+            <circle id="t2_ptP2" cx="257" cy="113" r="12" fill="none" stroke="#E91E63" stroke-width="1.5"
+              opacity="0.3" />
+            <circle id="t2_ptP" cx="257" cy="113" r="6" fill="#E91E63" />
+          </g>
+          <text id="t2_pLabel" x="265" y="108" font-size="11" fill="#E91E63" font-weight="700">(X,Y)</text>
+
+          <!-- 레이블들 -->
+          <text id="t2_dxLabel" x="223" y="108" font-size="11" fill="#1565C0" font-weight="700"
+            text-anchor="middle">R×cos(θ)</text>
+          <text id="t2_dyLabel" x="184" y="144" font-size="11" fill="#1A5C1A" font-weight="700"
+            text-anchor="end">R×sin(θ)</text>
+          <text id="t2_rLabel" x="228" y="136" font-size="11" fill="#A82020" font-weight="700">R=80</text>
+          <text id="t2_angLabel" x="218" y="165" font-size="11" fill="#A82020" font-weight="700">45°</text>
+        </svg>
+      </div>
+
+      <!-- 오른쪽: 삼각비 공식 전체 표 + 결과 -->
+      <div style="display:flex;flex-direction:column;gap:6px;min-height:0;">
+        <div class="panel" style="flex:1;overflow:auto;">
+          <div class="ptitle">삼각비 — 2개 알면 나머지 계산</div>
+
+          <table class="ftable">
+            <thead>
+              <tr>
+                <th>알고 있는 값</th>
+                <th>구하는 공식</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- R + θ -->
+              <tr>
+                <td><span class="tag" style="background:#FDECEA;color:#A82020">R + θ</span></td>
+                <td>
+                  <code>X = Cx + R×<b>cos(θ)</b></code><br>
+                  <code>Y = Cy + R×<b>sin(θ)</b></code>
+                </td>
+              </tr>
+              <!-- X + Y (dx, dy) -->
+              <tr>
+                <td><span class="tag" style="background:#E3F0FA;color:#1565C0">X + Y</span></td>
+                <td>
+                  <code>dx = X−Cx,  dy = Y−Cy</code><br>
+                  <code>R = <b>√(dx²+dy²)</b></code><br>
+                  <code>θ = <b>atan2(dy, dx)</b></code>
+                </td>
+              </tr>
+              <!-- R + X -->
+              <tr>
+                <td><span class="tag" style="background:#F3E5F5;color:#6A1B9A">R + X</span></td>
+                <td>
+                  <code>dx = X−Cx</code><br>
+                  <code>cos(θ) = dx/R</code><br>
+                  <code>θ = <b>acos(dx/R)</b></code><br>
+                  <code>Y = Cy + R×sin(θ)</code>
+                </td>
+              </tr>
+              <!-- R + Y -->
+              <tr>
+                <td><span class="tag" style="background:#E8F5E9;color:#1A5C1A">R + Y</span></td>
+                <td>
+                  <code>dy = Y−Cy</code><br>
+                  <code>sin(θ) = dy/R</code><br>
+                  <code>θ = <b>asin(dy/R)</b></code><br>
+                  <code>X = Cx + R×cos(θ)</code>
+                </td>
+              </tr>
+              <!-- θ + X -->
+              <tr>
+                <td><span class="tag" style="background:#FFF3E0;color:#E65100">θ + X</span></td>
+                <td>
+                  <code>dx = X−Cx</code><br>
+                  <code>R = <b>dx / cos(θ)</b></code><br>
+                  <code>Y = Cy + R×sin(θ)</code>
+                </td>
+              </tr>
+              <!-- θ + Y -->
+              <tr>
+                <td><span class="tag" style="background:#FFF8E1;color:#CF4500">θ + Y</span></td>
+                <td>
+                  <code>dy = Y−Cy</code><br>
+                  <code>R = <b>dy / sin(θ)</b></code><br>
+                  <code>X = Cx + R×cos(θ)</code>
+                </td>
+              </tr>
+              <!-- 항등식 -->
+              <tr>
+                <td><span class="tag" style="background:#F0F4F8;color:#475569">항등식</span></td>
+                <td>
+                  <code>sin²θ + cos²θ = 1</code><br>
+                  <code>tan(θ) = sin(θ)/cos(θ)</code><br>
+                  <code>R² = dx² + dy²</code>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- 결과 박스 -->
+          <div class="result-box">
+            <div style="display:flex;gap:10px;justify-content:space-around;flex-wrap:wrap;">
+              <div>
+                <div class="rlbl">X 좌표</div>
+                <div class="rval" id="t2_resX">156.569</div>
+              </div>
+              <div style="width:1px;background:#2C5580"></div>
+              <div>
+                <div class="rlbl">Y 좌표</div>
+                <div class="rval" id="t2_resY">156.569</div>
+              </div>
+              <div style="width:1px;background:#2C5580"></div>
+              <div>
+                <div class="rlbl">각도 θ</div>
+                <div class="rval" id="t2_resAng">45°</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end mid -->
+
+    <!-- 하단 바 -->
+    <div class="bar">
+      <div class="bitem">
+        <div class="blbl">중심 Cx</div>
+        <div class="bval" id="t2_iCx">100mm</div>
+      </div>
+      <div class="bdiv"></div>
+      <div class="bitem">
+        <div class="blbl">중심 Cy</div>
+        <div class="bval" id="t2_iCy">100mm</div>
+      </div>
+      <div class="bdiv"></div>
+      <div class="bitem">
+        <div class="blbl">반지름 R</div>
+        <div class="bval" id="t2_iR">80mm</div>
+      </div>
+      <div class="bdiv"></div>
+      <div class="bitem">
+        <div class="blbl">각도 θ</div>
+        <div class="bval" id="t2_iAng">45°</div>
+      </div>
+      <div class="bdiv"></div>
+      <div class="bitem">
+        <div class="blbl">→ X</div>
+        <div class="bval" id="t2_iX">156.569</div>
+      </div>
+      <div class="bdiv"></div>
+      <div class="bitem">
+        <div class="blbl">→ Y</div>
+        <div class="bval" id="t2_iY">156.569</div>
+      </div>
+    </div>
+
+  </div><!-- end .app -->
+
+  <script>
+    /* ─────────────────────────────────────
+       상수: SVG 중심 고정 위치 & 스케일
+       SVG viewBox = 380×340
+       중심 = (190, 170)
+       1mm = 1.5px
+    ───────────────────────────────────── */
+    const CX_SVG = 190, CY_SVG = 170, SC = 1.5;
+
+    /* 슬라이더 프리셋 버튼 */
+    function t2_set(type, val) {
+      if (type === 'cx') document.getElementById('t2_sl-cx').value = val;
+      if (type === 'cy') document.getElementById('t2_sl-cy').value = val;
+      if (type === 'r') document.getElementById('t2_sl-r').value = val;
+      if (type === 'ang') document.getElementById('t2_sl-ang').value = val;
+      t2_update();
+    }
+
+    /* ─── 메인 업데이트 함수 ─── */
+    function t2_update() {
+      const cx = parseFloat(document.getElementById('t2_sl-cx').value);
+      const cy = parseFloat(document.getElementById('t2_sl-cy').value);
+      const R = parseFloat(document.getElementById('t2_sl-r').value);
+      const deg = parseFloat(document.getElementById('t2_sl-ang').value);
+      const rad = deg * Math.PI / 180;
+      const cosV = Math.cos(rad), sinV = Math.sin(rad);
+
+      // mm 계산 결과
+      const X = cx + R * cosV;
+      const Y = cy + R * sinV;   // Y+ = 위 방향
+
+      // SVG 픽셀 좌표 (중심은 CX_SVG, CY_SVG 고정)
+      const svgR = R * SC;
+      const ptX = CX_SVG + R * cosV * SC;
+      const ptY = CY_SVG - R * sinV * SC;   // SVG Y는 위가 0이라 빼기
+
+      const s = id => document.getElementById('t2_' + id);
+
+      // 외곽 눈금 라벨 업데이트
+      s('lbl_x_m100').textContent = cx - 100;
+      s('lbl_x_m50').textContent = cx - 50;
+      s('lbl_x_0').textContent = cx;
+      s('lbl_x_p50').textContent = cx + 50;
+      s('lbl_x_p100').textContent = cx + 100;
+
+      s('lbl_y_p100').textContent = cy + 100;
+      s('lbl_y_p50').textContent = cy + 50;
+      s('lbl_y_0').textContent = cy;
+      s('lbl_y_m50').textContent = cy - 50;
+      s('lbl_y_m100').textContent = cy - 100;
+
+      // 원
+      s('circle').setAttribute('r', svgR);
+
+      // 외접 정사각형
+      s('sqBounding').setAttribute('x', CX_SVG - svgR);
+      s('sqBounding').setAttribute('y', CY_SVG - svgR);
+      s('sqBounding').setAttribute('width', svgR * 2);
+      s('sqBounding').setAttribute('height', svgR * 2);
+
+      // 반지름 선
+      s('rLine').setAttribute('x2', ptX); s('rLine').setAttribute('y2', ptY);
+
+      // dx/dy 보조선
+      s('dxLine').setAttribute('x1', CX_SVG); s('dxLine').setAttribute('y1', ptY);
+      s('dxLine').setAttribute('x2', ptX); s('dxLine').setAttribute('y2', ptY);
+      s('dyLine').setAttribute('x1', CX_SVG); s('dyLine').setAttribute('y1', CY_SVG);
+      s('dyLine').setAttribute('x2', CX_SVG); s('dyLine').setAttribute('y2', ptY);
+
+      // 직각 기호
+      const rs = 12;
+      s('rtAngle').setAttribute('x', CX_SVG + (ptX >= CX_SVG ? 0 : -rs));
+      s('rtAngle').setAttribute('y', ptY + (ptY <= CY_SVG ? 0 : -rs));
+
+      // 각도 호
+      const arcR = Math.max(Math.min(svgR * 0.30, 30), 12);
+      const lg = deg > 180 ? 1 : 0;
+      const axE = CX_SVG + arcR * cosV;
+      const ayE = CY_SVG - arcR * sinV;
+      s('angArc').setAttribute('d', `M ${CX_SVG + arcR} ${CY_SVG} A ${arcR} ${arcR} 0 ${lg} 0 ${axE} ${ayE}`);
+
+      // 목표점 이동
+      s('ptP').setAttribute('cx', ptX); s('ptP').setAttribute('cy', ptY);
+      s('ptP2').setAttribute('cx', ptX); s('ptP2').setAttribute('cy', ptY);
+
+      // 레이블
+      const ox = ptX > CX_SVG ? 12 : -75;
+      const oy = ptY < CY_SVG ? -10 : 18;
+      s('pLabel').setAttribute('x', ptX + ox); s('pLabel').setAttribute('y', ptY + oy);
+      s('pLabel').textContent = `(${X.toFixed(1)}, ${Y.toFixed(1)})`;
+
+      const dmx = (CX_SVG + ptX) / 2;
+      s('dxLabel').setAttribute('x', dmx);
+      s('dxLabel').setAttribute('y', ptY + (ptY < CY_SVG ? -5 : 13));
+
+      const dmy = (CY_SVG + ptY) / 2;
+      s('dyLabel').setAttribute('x', CX_SVG + (ptX >= CX_SVG ? -4 : 5));
+      s('dyLabel').setAttribute('y', dmy + 4);
+      s('dyLabel').setAttribute('text-anchor', ptX >= CX_SVG ? 'end' : 'start');
+
+      const rlx = (CX_SVG + ptX) / 2 + (ptY < CY_SVG ? 8 : -12);
+      const rly = (CY_SVG + ptY) / 2 + (ptX > CX_SVG ? -6 : 6);
+      s('rLabel').setAttribute('x', rlx); s('rLabel').setAttribute('y', rly);
+      s('rLabel').textContent = 'R=' + R;
+
+      const alr = arcR + 12;
+      s('angLabel').setAttribute('x', CX_SVG + alr * Math.cos(rad / 2));
+      s('angLabel').setAttribute('y', CY_SVG - alr * Math.sin(rad / 2) + 4);
+      s('angLabel').textContent = deg.toFixed(1) + '°';
+
+      // 왼쪽 공식 박스
+      s('vCx').textContent = cx + 'mm'; s('vCy').textContent = cy + 'mm';
+      s('vR').textContent = R + 'mm'; s('vAng').textContent = deg.toFixed(1) + '°';
+      s('fAng').textContent = deg.toFixed(1); s('fAng2').textContent = deg.toFixed(1);
+      s('fCx').textContent = cx; s('fCy').textContent = cy;
+      s('fR').textContent = R; s('fR2').textContent = R;
+      s('fCos').textContent = cosV.toFixed(5); s('fSin').textContent = sinV.toFixed(5);
+      s('fX').textContent = X.toFixed(3); s('fY').textContent = Y.toFixed(3);
+
+      // 결과 박스
+      s('resX').textContent = X.toFixed(3); s('resY').textContent = Y.toFixed(3);
+      s('resAng').textContent = deg.toFixed(1) + '°';
+
+      // 하단 바
+      s('iCx').textContent = cx + 'mm'; s('iCy').textContent = cy + 'mm';
+      s('iR').textContent = R + 'mm'; s('iAng').textContent = deg.toFixed(1) + '°';
+      s('iX').textContent = X.toFixed(3); s('iY').textContent = Y.toFixed(3);
+    }
+
+    /* ─────────────────────────────────────
+       드래그 로직
+       빨간점을 드래그하면 → SVG 내 마우스 위치 → 중심(CX_SVG, CY_SVG) 기준 dx,dy 계산
+       → R = √(dx²+dy²) → θ = atan2(-dy, dx) (SVG Y반전) → 슬라이더 업데이트
+    ───────────────────────────────────── */
+    let isDragging = false;
+
+    const dragEl = document.getElementById('t2_dragTarget');
+    const svgEl = document.getElementById('t2_svgEl');
+
+    // SVG 화면좌표 → viewBox 좌표 변환
+    function svgPoint(evt) {
+      const rect = svgEl.getBoundingClientRect();
+      const vw = 380, vh = 340;
+      const scaleX = vw / rect.width;
+      const scaleY = vh / rect.height;
+      const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+      const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+      return {
+        x: (clientX - rect.left) * scaleX,
+        y: (clientY - rect.top) * scaleY
+      };
+    }
+
+    function onDragMove(evt) {
+      if (!isDragging) return;
+      evt.preventDefault();
+      const pt = svgPoint(evt);
+
+      // 중심(CX_SVG, CY_SVG) 기준 오프셋 (SVG 픽셀)
+      const dx_px = pt.x - CX_SVG;
+      const dy_px = -(pt.y - CY_SVG);  // SVG Y 반전 → 수학 좌표계
+
+      // mm 변환
+      const dx_mm = dx_px / SC;
+      const dy_mm = dy_px / SC;
+
+      // R 계산 (최소 5, 최대 150)
+      const newR = Math.min(150, Math.max(5, Math.sqrt(dx_mm * dx_mm + dy_mm * dy_mm)));
+
+      // 각도 계산 (0~360°)
+      let newDeg = Math.atan2(dy_mm, dx_mm) * 180 / Math.PI;
+      if (newDeg < 0) newDeg += 360;
+
+      // 슬라이더 업데이트
+      document.getElementById('t2_sl-r').value = Math.round(newR);
+      document.getElementById('t2_sl-ang').value = Math.round(newDeg);
+
+      t2_update();
+    }
+
+    dragEl.addEventListener('mousedown', e => { isDragging = true; e.preventDefault(); });
+    dragEl.addEventListener('touchstart', e => { isDragging = true; e.preventDefault(); }, { passive: false });
+    window.addEventListener('mousemove', onDragMove);
+    window.addEventListener('touchmove', onDragMove, { passive: false });
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('touchend', () => isDragging = false);
+
+    // 슬라이더 이벤트
+    ['t2_sl-cx', 't2_sl-cy', 't2_sl-r', 't2_sl-ang'].forEach(id =>
+      document.getElementById(id).addEventListener('input', t2_update)
+    );
+
+    // 초기 실행
+    t2_update();
+  </script>
+</body>
+
+</html>

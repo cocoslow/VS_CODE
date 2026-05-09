@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zodd's PLC Project Packager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .zodd-card {
+            background: white;
+            border: 4px solid #000;
+            border-radius: 24px;
+            box-shadow: 8px 8px 0px #000;
+        }
+
+        .drop-zone {
+            border: 4px dashed #cbd5e1;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+
+        .drop-zone.active {
+            border-color: #2563eb;
+            background: #eff6ff;
+            transform: scale(1.01);
+        }
+
+        .file-item {
+            border: 3px solid #000;
+            transition: all 0.2s;
+        }
+
+        .file-item:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .plc-tag {
+            background: #7c3aed;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.6rem;
+            font-weight: 800;
+        }
+    </style>
+</head>
+
+<body class="p-8 h-screen overflow-hidden flex flex-col">
+
+    <div class="max-w-5xl mx-auto w-full flex-1 flex flex-col overflow-hidden">
+        <!-- Header -->
+        <div class="zodd-card p-6 flex justify-between items-center mb-6">
+            <div class="flex items-center gap-4">
+                <div class="bg-indigo-600 p-3 rounded-xl text-white shadow-lg"><i data-lucide="folder-archive"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-black uppercase tracking-tight text-slate-800">PLC Project Packager</h1>
+                    <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">PLC 파일 및 압축 폴더 내장 시스템</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="text-[0.6rem] font-black text-slate-400 uppercase block mb-1">Target Extensions</span>
+                <div class="flex gap-2">
+                    <span class="plc-tag">.GXW</span>
+                    <span class="plc-tag">.ZIP</span>
+                    <span class="plc-tag">.CSV</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-6 flex-1 overflow-hidden">
+            <!-- Left: Upload & Info (40%) -->
+            <div class="w-[40%] flex flex-col gap-6">
+                <div class="zodd-card p-6 flex-1 flex flex-col">
+                    <h3 class="text-sm font-black text-slate-400 uppercase mb-4 flex items-center gap-2">
+                        <i data-lucide="upload-cloud" size="16"></i> 파일/폴더 추가
+                    </h3>
+
+                    <div id="drop-zone"
+                        class="drop-zone flex-1 rounded-2xl flex flex-col items-center justify-center cursor-pointer p-6 text-center group">
+                        <input type="file" id="file-input" class="hidden" multiple onchange="handleFiles(this.files)">
+                        <div
+                            class="p-4 bg-white rounded-full shadow-md mb-4 group-hover:scale-110 transition-transform">
+                            <i data-lucide="file-plus" class="text-indigo-500" size="40"></i>
+                        </div>
+                        <span class="text-slate-600 font-black text-lg block mb-1">여기로 파일을 던지세요</span>
+                        <span class="text-slate-400 text-xs font-bold">PLC 단일 파일 혹은 프로젝트 압축(.zip) 파일</span>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
+                        <div class="flex items-center gap-2 mb-2 text-amber-700">
+                            <i data-lucide="alert-triangle" size="16"></i>
+                            <span class="text-[0.7rem] font-black uppercase">Engineer's Note</span>
+                        </div>
+                        <p class="text-[0.75rem] leading-relaxed text-amber-900 font-bold">
+                            PLC 프로젝트 폴더는 파일이 매우 많으므로, **반드시 압축(.zip)**해서 올리는 것을 권장합니다. 압축된 파일 하나가 통째로 HTML에 저장됩니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Embedded List (60%) -->
+            <div class="w-[60%] flex flex-col overflow-hidden">
+                <div class="zodd-card p-6 flex-1 flex flex-col overflow-hidden">
+                    <h3
+                        class="text-sm font-black text-slate-400 uppercase mb-6 border-b-2 pb-2 flex justify-between items-center">
+                        <span class="flex items-center gap-2"><i data-lucide="list-checks" size="16"></i> 내장된 자산
+                            리스트</span>
+                        <span id="file-count" class="bg-slate-100 px-2 py-0.5 rounded text-[0.6rem] text-slate-500">0
+                            Files</span>
+                    </h3>
+
+                    <div id="file-list" class="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                        <div id="empty-msg" class="h-full flex flex-col items-center justify-center text-slate-300">
+                            <i data-lucide="ghost" size="48" class="mb-4 opacity-20"></i>
+                            <span class="font-black italic uppercase tracking-widest opacity-30 text-xl">Empty
+                                Storage</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+
+        // 드래그 앤 드롭 이벤트
+        dropZone.onclick = () => fileInput.click();
+        dropZone.onsragover = (e) => { e.preventDefault(); dropZone.classList.add('active'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('active');
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('active');
+            handleFiles(e.dataTransfer.files);
+        };
+
+        function handleFiles(files) {
+            const emptyMsg = document.getElementById('empty-msg');
+            if (emptyMsg) emptyMsg.style.display = 'none';
+
+            for (let file of files) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const fileData = {
+                        name: file.name,
+                        size: formatBytes(file.size),
+                        type: file.name.split('.').pop().toUpperCase(),
+                        base64: e.target.result,
+                        date: new Date().toLocaleString()
+                    };
+                    addFileToList(fileData);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addFileToList(file) {
+            const list = document.getElementById('file-list');
+            const div = document.createElement('div');
+            div.className = "file-item p-4 rounded-2xl flex justify-between items-center bg-white";
+
+            let icon = 'file';
+            if (['ZIP', 'RAR', '7Z'].includes(file.type)) icon = 'archive';
+            if (['GXW', 'GX3', 'SLP'].includes(file.type)) icon = 'cpu';
+            if (['PNG', 'JPG', 'JPEG'].includes(file.type)) icon = 'image';
+
+            div.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-slate-100 rounded-xl text-slate-600 shadow-sm"><i data-lucide="${icon}"></i></div>
+                    <div>
+                        <div class="font-black text-slate-800 text-sm leading-tight mb-1">${file.name}</div>
+                        <div class="flex gap-2 items-center">
+                            <span class="plc-tag !bg-slate-200 !text-slate-600">${file.type}</span>
+                            <span class="text-[0.6rem] font-bold text-slate-400 uppercase">${file.size}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="downloadFile('${file.name}', '${file.base64}')" class="bg-black text-white px-4 py-2 rounded-xl font-black text-[0.65rem] uppercase hover:bg-indigo-600 transition-colors flex items-center gap-2">
+                        <i data-lucide="download" size="14"></i> Get File
+                    </button>
+                </div>
+            `;
+            list.prepend(div);
+            lucide.createIcons();
+            updateCount();
+        }
+
+        function downloadFile(name, base64) {
+            const link = document.createElement('a');
+            link.href = base64;
+            link.download = name;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        function updateCount() {
+            const count = document.querySelectorAll('.file-item').length;
+            document.getElementById('file-count').innerText = `${count} Files Embedded`;
+        }
+    </script>
+</body>
+
+</html>

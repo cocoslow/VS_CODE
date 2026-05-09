@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC 핵심 명령어 시뮬레이터 (Zodd Ver.)</title>
+    <style>
+        :root {
+            --primary: #2563eb;    /* 조드 비례식 파랑 */
+            --secondary: #6366f1;  /* 미쓰비시 보라 */
+            --success: #f59e0b;
+            --bg: #f1f5f9;
+            --panel: #ffffff;
+            --code-bg: #1e293b;
+            --addr-text: #475569;
+            --variable: #ff79c6;   /* 핑크색 변수 */
+        }
+        body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; background-color: var(--bg); padding: 15px; color: #334155; margin: 0; }
+        
+        .container { max-width: 950px; margin: 0 auto; background: var(--panel); padding: 2rem; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); box-sizing: border-box; }
+        
+        /* 탭 디자인 */
+        .tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid #e2e8f0; }
+        .tab-btn { padding: 12px 25px; border: none; background: none; cursor: pointer; font-weight: bold; color: #64748b; border-bottom: 4px solid transparent; transition: all 0.2s; font-size: 1rem; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-btn.mitsu.active { color: var(--secondary); border-bottom-color: var(--secondary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        h2 { border-left: 6px solid var(--primary); padding-left: 12px; margin-bottom: 25px; font-size: 1.25rem; }
+        #mitsu h2 { border-left-color: var(--secondary); }
+        
+        .section-title { font-size: 0.9rem; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 5px; }
+        .section-title.input { color: var(--primary); }
+        .section-title.m-input { color: var(--secondary); }
+        .section-title.result { color: #b45309; }
+
+        .input-grid { display: grid; grid-template-columns: 1fr; gap: 15px; margin-bottom: 20px; }
+        @media (min-width: 768px) { .input-grid { grid-template-columns: 1fr 1fr; } }
+
+        .input-box { background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; position: relative; }
+        .input-box label { font-size: 0.85rem; font-weight: bold; color: #64748b; margin-bottom: 12px; display: block; }
+        
+        .range-inputs { display: flex; align-items: center; gap: 10px; }
+        .input-field { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .input-field input { width: 100%; padding: 10px; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 1rem; text-align: center; font-weight: bold; color: var(--primary); box-sizing: border-box; }
+        #mitsu .input-field input { color: var(--secondary); }
+        .input-field .addr-label { font-family: monospace; font-size: 0.75rem; color: #64748b; text-align: center; background: #f8fafc; border-radius: 4px; padding: 2px 0; border: 1px solid #e2e8f0; }
+
+        .slider-section { background: #eff6ff; padding: 20px; border-radius: 12px; border: 1px solid #bfdbfe; margin-bottom: 20px; }
+        #mitsu .slider-section { background: #f5f3ff; border-color: #ddd6fe; }
+        .slider-section label { color: var(--primary); font-weight: bold; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-size: 0.9rem; }
+        #mitsu .slider-section label { color: var(--secondary); }
+        .slider-section input[type="range"] { width: 100%; height: 8px; border-radius: 5px; cursor: pointer; accent-color: var(--primary); margin: 15px 0; }
+        #mitsu .slider-section input[type="range"] { accent-color: var(--secondary); }
+        
+        .control-group { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 10px auto 0; max-width: 420px; }
+        .action-btn { flex: 1; background-color: white; border: 1.5px solid var(--primary); color: var(--primary); padding: 6px 0; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; transition: all 0.2s; text-align: center; min-width: 70px; }
+        #mitsu .action-btn { border-color: var(--secondary); color: var(--secondary); }
+        .action-btn:hover { background-color: var(--primary); color: white; }
+        #mitsu .action-btn:hover { background-color: var(--secondary); color: white; }
+
+        .direct-input { width: 110px; padding: 6px; border: 2px solid var(--primary); border-radius: 6px; text-align: center; font-size: 1.1rem; font-weight: bold; color: var(--primary); }
+        #mitsu .direct-input { border-color: var(--secondary); color: var(--secondary); }
+
+        .formula-container { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 20px 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; font-family: 'Consolas', monospace; font-size: 1rem; color: #475569; display: flex; justify-content: center; align-items: center; gap: 4px; overflow-x: auto; min-height: 90px; }
+        .formula-term { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; vertical-align: middle; }
+        .formula-term b { color: var(--primary); font-size: 1.1rem; }
+        #mitsu .formula-term b { color: var(--secondary); }
+        .formula-term i { color: #d97706; font-style: normal; font-weight: bold; font-size: 1.1rem; }
+        .formula-term span { font-weight: bold; }
+        .formula-term small { font-size: 0.65rem; color: #94a3b8; font-weight: normal; background: #f1f5f9; padding: 1px 4px; border-radius: 3px; white-space: nowrap; }
+        .formula-op { font-size: 1.2rem; font-weight: bold; color: #94a3b8; padding: 0 2px; margin-bottom: 18px; }
+
+        .result-card { display: flex; justify-content: space-around; align-items: center; background: #fdfaff; padding: 30px; border-radius: 15px; border: 2px solid #ddd6fe; text-align: center; }
+        .res-item { flex: 1; }
+        .res-item .val { font-size: 3rem; font-weight: 900; display: block; }
+        .res-item.input .val { color: var(--primary); }
+        #mitsu .res-item.input .val { color: var(--secondary); }
+        .res-item.output .val { color: #d97706; }
+        .res-item .unit { font-size: 0.85rem; font-weight: bold; color: #4338ca; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .arrow { font-size: 2.5rem; color: #818cf8; font-weight: bold; }
+
+        .code-container { margin-top: 25px; }
+        .code-header { background: #334155; color: white; padding: 10px 15px; border-radius: 8px 8px 0 0; font-size: 0.8rem; font-weight: bold; display: flex; justify-content: space-between; }
+        .code-block { background: var(--code-bg); color: #e2e8f0; padding: 20px; border-radius: 0 0 8px 8px; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.9rem; white-space: pre; overflow-x: auto; line-height: 1.6; border-left: 5px solid var(--primary); }
+        #mitsu .code-block { border-left-color: var(--secondary); }
+        
+        .var { color: var(--variable); font-weight: bold; }
+        .comment { color: #6272a4; font-style: italic; }
+
+        @media (max-width: 600px) {
+            .result-card { flex-direction: column; gap: 15px; }
+            .arrow { transform: rotate(90deg); margin: 5px 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="tabs">
+        <button class="tab-btn active" id="btn-std" onclick="switchTab('std')">탭 1: 조드 비례식 (DSCL)</button>
+        <button class="tab-btn mitsu" id="btn-mitsu" onclick="switchTab('mitsu')">탭 2: 미쓰비시 SCL (좌표 포인트)</button>
+    </div>
+
+    <!-- 탭 1: 기존 비례식 -->
+    <div id="std" class="tab-content active">
+        <h2>탭 1: 2포인트 비례식 시뮬레이터 (DSCL)</h2>
+        <div class="section-title input">● 범위 설정 (설정 데이터 s1)</div>
+        <div class="input-grid">
+            <div class="input-box">
+                <label>SOURCE (원본 범위)</label>
+                <div class="range-inputs">
+                    <div class="input-field">
+                        <div class="addr-label">D100 [st_ScaleData]</div>
+                        <input type="number" id="s-sMin" value="0" oninput="updateStd()">
+                    </div>
+                    <span style="color:#cbd5e1; font-weight:bold;">~</span>
+                    <div class="input-field">
+                        <div class="addr-label">D102 (Max)</div>
+                        <input type="number" id="s-sMax" value="8000" oninput="updateStd()">
+                    </div>
+                </div>
+            </div>
+            <div class="input-box">
+                <label>DESTINATION (결과 범위)</label>
+                <div class="range-inputs">
+                    <div class="input-field">
+                        <div class="addr-label">D104 (Min)</div>
+                        <input type="number" id="s-dMin" value="0" oninput="updateStd()">
+                    </div>
+                    <span style="color:#cbd5e1; font-weight:bold;">~</span>
+                    <div class="input-field">
+                        <div class="addr-label">D106 (Max)</div>
+                        <input type="number" id="s-dMax" value="300" oninput="updateStd()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slider-section">
+            <label>
+                <span>현재 입력값 (s2) <span style="color:var(--primary); font-size:0.8rem;">[D10 / i_Analog_Value]</span></span>
+                <input type="number" id="s-in-num" class="direct-input" value="2000" oninput="syncStdFromNum()">
+            </label>
+            <input type="range" id="s-in" min="0" max="8000" value="2000" oninput="syncStdFromSlider()">
+            <div class="control-group">
+                <button class="action-btn" onclick="stdSetMin()">MIN</button>
+                <button class="action-btn" onclick="stdSetMid()">중앙값</button>
+                <button class="action-btn" onclick="stdSetZero()">0 리셋</button>
+                <button class="action-btn" onclick="stdSetMax()">MAX</button>
+            </div>
+        </div>
+
+        <div class="section-title result">● 변환 결과 (DINT 비례 연산)</div>
+        <div class="formula-container" id="std-formula"></div>
+        <div class="result-card">
+            <div class="res-item input">
+                <span class="unit">Input (s2) <span style="color:var(--primary); font-size:0.8rem; margin-left:4px;">[D10]</span></span>
+                <span class="val" id="std-res-in">2000</span>
+            </div>
+            <div class="arrow">▶</div>
+            <div class="res-item output">
+                <span class="unit">Scaled (d) <span style="color:#d97706; font-size:0.8rem; margin-left:4px;">[D20]</span></span>
+                <span class="val" id="std-res-out">75</span>
+            </div>
+        </div>
+        <div class="code-container">
+            <div class="code-header"><span>GX Works3 ST Example (DSCL)</span></div>
+            <div class="code-block" id="std-code"></div>
+        </div>
+    </div>
+
+    <!-- 탭 2: 미쓰비시 포인트 방식 -->
+    <div id="mitsu" class="tab-content">
+        <h2>탭 2: 미쓰비시 iQ-R 좌표 포인트 스케일링 (2포인트)</h2>
+        <div class="section-title m-input">● 좌표 포인트 설정 (s2 주소 시작: D22 [st_Table])</div>
+        <div class="input-grid">
+            <div class="input-box" style="border-color: var(--secondary);">
+                <label>Point 1 (시작점 Min)</label>
+                <div class="range-inputs">
+                    <div class="input-field">
+                        <div class="addr-label">D24 [st_Table[2]]</div>
+                        <label>X (입력 Min)</label>
+                        <input type="number" id="p1x" value="0" oninput="updateMitsu()">
+                    </div>
+                    <div class="input-field">
+                        <div class="addr-label">D26 [st_Table[4]]</div>
+                        <label>Y (출력 Min)</label>
+                        <input type="number" id="p1y" value="0" oninput="updateMitsu()">
+                    </div>
+                </div>
+            </div>
+            <div class="input-box" style="border-color: var(--secondary);">
+                <label>Point 2 (종료점 Max)</label>
+                <div class="range-inputs">
+                    <div class="input-field">
+                        <div class="addr-label">D28 [st_Table[6]]</div>
+                        <label>X (입력 Max)</label>
+                        <input type="number" id="p2x" value="4000" oninput="updateMitsu()">
+                    </div>
+                    <div class="input-field">
+                        <div class="addr-label">D30 [st_Table[8]]</div>
+                        <label>Y (출력 Max)</label>
+                        <input type="number" id="p2y" value="100" oninput="updateMitsu()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="slider-section">
+            <label>
+                <span>현재 입력값 (s1) <span style="color:var(--secondary); font-size:0.8rem;">[D10 / i_Raw_Value]</span></span>
+                <input type="number" id="m-in-num" class="direct-input" value="2000" oninput="syncMitsuFromNum()">
+            </label>
+            <input type="range" id="m-in" min="0" max="4000" value="2000" oninput="syncMitsuFromSlider()">
+            <div class="control-group">
+                <button class="action-btn" onclick="mitsuSetMin()">MIN</button>
+                <button class="action-btn" onclick="mitsuSetMid()">중앙값</button>
+                <button class="action-btn" onclick="mitsuSetZero()">0 리셋</button>
+                <button class="action-btn" onclick="mitsuSetMax()">MAX</button>
+            </div>
+        </div>
+
+        <div class="section-title result">● 변환 결과 (좌표 추종 연산)</div>
+        <div class="formula-container" id="mitsu-formula"></div>
+        <div class="result-card" style="border-color: #ddd6fe; background: #faf5ff;">
+            <div class="res-item input">
+                <span class="unit" style="color:var(--secondary);">Input (s1) [D10]</span>
+                <span class="val" id="m-res-in" style="color:var(--secondary);">2000</span>
+            </div>
+            <div class="arrow" style="color:var(--secondary);">▶</div>
+            <div class="res-item output">
+                <span class="unit" style="color:#4338ca;">Result (d) [D20]</span>
+                <span class="val" id="m-res-out" style="color: #4338ca;">50</span>
+            </div>
+        </div>
+        <div class="code-container">
+            <div class="code-header" style="background: var(--secondary);"><span>GX Works3 ST Example (DSCL Point)</span></div>
+            <div class="code-block" id="mitsu-code"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById('btn-' + tabId).classList.add('active');
+        if(tabId === 'std') updateStd(); else updateMitsu();
+    }
+
+    const pink = (t) => `<span class="var">${t}</span>`;
+    const comm = (t) => `<span class="comment">${t}</span>`;
+    const term = (v, l, t='span') => `<div class="formula-term"><${t}>${v}</${t}><small>${l}</small></div>`;
+    const op = (s) => `<div class="formula-op">${s}</div>`;
+
+    function updateStd() {
+        const sMin = parseFloat(document.getElementById('s-sMin').value) || 0;
+        const sMax = parseFloat(document.getElementById('s-sMax').value) || 0;
+        const dMin = parseFloat(document.getElementById('s-dMin').value) || 0;
+        const dMax = parseFloat(document.getElementById('s-dMax').value) || 0;
+        const slider = document.getElementById('s-in');
+        slider.min = Math.min(sMin, sMax);
+        slider.max = Math.max(sMin, sMax);
+        const input = parseFloat(slider.value);
+        document.getElementById('s-in-num').value = input;
+        document.getElementById('std-res-in').innerText = input;
+
+        let res = (sMax !== sMin) ? ((input - sMin) * (dMax - dMin) / (sMax - sMin)) + dMin : dMin;
+        const finalRes = Math.round(res);
+        document.getElementById('std-res-out').innerText = finalRes;
+
+        document.getElementById('std-formula').innerHTML = `${op('((')}${term(input,'입력','b')}${op('-')}${term(sMin,'sMin')}${op(')')}${op('*')}${op('(')}${term(dMax,'dMax')}${op('-')}${term(dMin,'dMin')}${op(')')}${op('/')}${op('(')}${term(sMax,'sMax')}${op('-')}${term(sMin,'sMin')}${op(')')}${op(')')}${op('+')}${term(dMin,'dMin')}${op('=')}${term(finalRes,'결과','i')}`;
+
+        document.getElementById('std-code').innerHTML = `${comm('// [Label] st_ScaleData: DINT[4]')}\n${pink('st_ScaleData')}[0] := ${sMin};\n${pink('st_ScaleData')}[2] := ${sMax};\n${pink('st_ScaleData')}[4] := ${dMin};\n${pink('st_ScaleData')}[6] := ${dMax};\n\nDSCL(SM400, ${pink('st_ScaleData')}[0], ${pink('i_Analog_Value')}, ${pink('o_Result')});`;
+    }
+
+    function updateMitsu() {
+        const p1x = parseFloat(document.getElementById('p1x').value) || 0;
+        const p1y = parseFloat(document.getElementById('p1y').value) || 0;
+        const p2x = parseFloat(document.getElementById('p2x').value) || 0;
+        const p2y = parseFloat(document.getElementById('p2y').value) || 0;
+        const slider = document.getElementById('m-in');
+        slider.min = Math.min(p1x, p2x);
+        slider.max = Math.max(p1x, p2x);
+        const input = parseFloat(slider.value);
+        document.getElementById('m-in-num').value = input;
+        document.getElementById('m-res-in').innerText = input;
+
+        let res = (p2x !== p1x) ? ((input - p1x) * (p2y - p1y) / (p2x - p1x)) + p1y : p1y;
+        const finalRes = Math.round(res);
+        document.getElementById('m-res-out').innerText = finalRes;
+
+        document.getElementById('mitsu-formula').innerHTML = `${op('(')}${term(input,'입력','b')}${op('-')}${term(p1x,'P1 X')}${op(')')}${op('*')}${op('(')}${term(p2y,'P2 Y')}${op('-')}${term(p1y,'P1 Y')}${op(')')}${op('/')}${op('(')}${term(p2x,'P2 X')}${op('-')}${term(p1x,'P1 X')}${op(')')}${op('+')}${term(p1y,'P1 Y')}${op('=')}${term(finalRes,'결과','i')}`;
+
+        document.getElementById('mitsu-code').innerHTML = `${comm('// [Label] st_Table: DINT[10]')}\n${pink('st_Table')}[0] := 2; ${comm('// 포인트 수 (D22)')}\n${pink('st_Table')}[2] := ${p1x}; ${pink('st_Table')}[4] := ${p1y}; ${comm('// D24, D26')}\n${pink('st_Table')}[6] := ${p2x}; ${pink('st_Table')}[8] := ${p2y}; ${comm('// D28, D30')}\n\nDSCL(SM400, ${pink('i_Level_Raw')}, ${pink('st_Table')}[0], ${pink('o_Result')});`;
+    }
+
+    // 버튼 핸들러
+    function syncStdFromNum(){ document.getElementById('s-in').value = document.getElementById('s-in-num').value; updateStd(); }
+    function syncStdFromSlider(){ updateStd(); }
+    function stdSetMin(){ document.getElementById('s-in').value = document.getElementById('s-sMin').value; updateStd(); }
+    function stdSetMax(){ document.getElementById('s-in').value = document.getElementById('s-sMax').value; updateStd(); }
+    function stdSetZero(){ document.getElementById('s-in').value = 0; updateStd(); }
+    function stdSetMid(){ const mn = parseFloat(document.getElementById('s-sMin').value), mx = parseFloat(document.getElementById('s-sMax').value); document.getElementById('s-in').value = (mn+mx)/2; updateStd(); }
+
+    function syncMitsuFromNum(){ document.getElementById('m-in').value = document.getElementById('m-in-num').value; updateMitsu(); }
+    function syncMitsuFromSlider(){ updateMitsu(); }
+    function mitsuSetMin(){ document.getElementById('m-in').value = document.getElementById('p1x').value; updateMitsu(); }
+    function mitsuSetMax(){ document.getElementById('m-in').value = document.getElementById('p2x').value; updateMitsu(); }
+    function mitsuSetZero(){ document.getElementById('m-in').value = 0; updateMitsu(); }
+    function mitsuSetMid(){ const mn = parseFloat(document.getElementById('p1x').value), mx = parseFloat(document.getElementById('p2x').value); document.getElementById('m-in').value = (mn+mx)/2; updateMitsu(); }
+
+    window.onload = () => { updateStd(); updateMitsu(); };
+</script>
+</body>
+</html>
