@@ -2,13 +2,187 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>테스트 페이지</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC & 수학 매뉴얼 허브</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+            --accent1: #3b82f6;
+            --accent2: #8b5cf6;
+            --accent3: #10b981;
+            --hover-bg: #334155;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            font-size: 1.1rem;
+        }
+
+        .pdf-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            color: white;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .pdf-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(139, 92, 246, 0.5);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.5);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .card:nth-child(1) h2 { color: var(--accent1); }
+        .card:nth-child(2) h2 { color: var(--accent3); }
+        .card:nth-child(3) h2 { color: var(--accent2); }
+
+        .link-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .link-item a {
+            display: block;
+            padding: 12px 16px;
+            color: var(--text-main);
+            text-decoration: none;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .link-item a:hover {
+            background-color: var(--hover-bg);
+            padding-left: 24px;
+            color: #60a5fa;
+        }
+    </style>
 </head>
 <body>
-    <h1>배포 성공!</h1>
-    <p>현재 cocoslow 계정으로 배포 중인 테스트 사이트입니다.</p>
-    
-    <!-- 나중에 구글 드라이브 PDF 링크를 여기에 넣으면 돼 -->
-    <a href="여기에_구글드라이브_링크_넣기" target="_blank">PDF 매뉴얼 보기</a>
+
+<div class="container">
+    <header>
+        <h1>PLC & 수학 매뉴얼 허브</h1>
+        <p class="subtitle">작성된 모든 HTML 문서들을 한눈에 탐색하세요.</p>
+        <!-- 나중에 구글 드라이브 PDF 링크를 여기에 넣으면 돼 -->
+        <a href="여기에_구글드라이브_링크_넣기" target="_blank" class="pdf-link">📄 PDF 매뉴얼 보기</a>
+    </header>
+
+    <div class="grid">
+        <!-- 10 PLC 폴더 -->
+        <div class="card">
+            <h2>⚙️ 10 PLC 매뉴얼</h2>
+            <ul class="link-list">
+                <li class="link-item"><a href="./PLC -MTR_매트릭스.html">PLC -MTR_매트릭스</a></li>
+                <li class="link-item"><a href="./PLC-BAND불감대영역.html">PLC-BAND불감대영역</a></li>
+                <li class="link-item"><a href="./PLC-BON(비트판정).html">PLC-BON(비트판정)</a></li>
+                <li class="link-item"><a href="./PLC-DATE&TIME.html">PLC-DATE&TIME</a></li>
+                <li class="link-item"><a href="./PLC-DSFR_워드_ 시프트.html">PLC-DSFR_워드_시프트</a></li>
+                <li class="link-item"><a href="./PLC-DSORTD_정렬.html">PLC-DSORTD_정렬</a></li>
+                <li class="link-item"><a href="./PLC-FIFW-선입선출.html">PLC-FIFW-선입선출</a></li>
+                <li class="link-item"><a href="./PLC-PWM_펄스폭.html">PLC-PWM_펄스폭</a></li>
+                <li class="link-item"><a href="./PLC-RAMPQ_경사신호.html">PLC-RAMPQ_경사신호</a></li>
+                <li class="link-item"><a href="./PLC-ROR_n비트_우_로테이션.html">PLC-ROR_n비트_우_로테이션</a></li>
+                <li class="link-item"><a href="./PLC-ROTC_로터리_테이블.html">PLC-ROTC_로터리_테이블</a></li>
+                <li class="link-item"><a href="./PLC-SCL-스케일링.html">PLC-SCL-스케일링</a></li>
+                <li class="link-item"><a href="./PLC-SERDATA_데이터검색.html">PLC-SERDATA_데이터검색</a></li>
+                <li class="link-item"><a href="./PLC-SFR_n비트_우_시프트.html">PLC-SFR_n비트_우_시프트</a></li>
+                <li class="link-item"><a href="./PLC-SUM_비트체크.html">PLC-SUM_비트체크</a></li>
+                <li class="link-item"><a href="./PLC-TTMR특수_타이머.html">PLC-TTMR특수_타이머</a></li>
+                <li class="link-item"><a href="./[서보]전자기어비.html">[서보]전자기어비</a></li>
+            </ul>
+        </div>
+
+        <!-- 20 수학 폴더 -->
+        <div class="card">
+            <h2>📐 20 수학 공식 및 원리</h2>
+            <ul class="link-list">
+                <li class="link-item"><a href="../20 수학/수학_45도_삼각형_설명_2.html">수학_45도_삼각형_설명_2</a></li>
+                <li class="link-item"><a href="../20 수학/수학_XY_ 원호_그리기.html">수학_XY_원호_그리기</a></li>
+                <li class="link-item"><a href="../20 수학/수학_각도반지름_XY좌표.html">수학_각도반지름_XY좌표</a></li>
+                <li class="link-item"><a href="../20 수학/수학_각도입력_좌표_회전.html">수학_각도입력_좌표_회전</a></li>
+                <li class="link-item"><a href="../20 수학/수학_비례식_계산.html">수학_비례식_계산</a></li>
+                <li class="link-item"><a href="../20 수학/수학_센서2개로 정렬하기.html">수학_센서2개로_정렬하기</a></li>
+                <li class="link-item"><a href="../20 수학/수학_코너_삼각형_설명.html">수학_코너_삼각형_설명</a></li>
+            </ul>
+        </div>
+
+        <!-- 메인 HTML 폴더 -->
+        <div class="card">
+            <h2>📂 기타 문서 (메인 폴더)</h2>
+            <ul class="link-list">
+                <li class="link-item"><a href="../소결로_히팅수량계산 .html">소결로_히팅수량계산</a></li>
+                <li class="link-item"><a href="../이더넷 네트워크 계층도 .html">이더넷_네트워크_계층도</a></li>
+                <li class="link-item"><a href="../파일저장.html">파일저장</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
