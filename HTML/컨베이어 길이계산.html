@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>컨베이어 설계 통합 플래너 Ultimate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+        }
+
+        .input-group:focus-within label {
+            color: #3b82f6;
+        }
+
+        .result-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .result-card:hover {
+            transform: translateY(-4px);
+        }
+
+        @keyframes flow {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-40px);
+            }
+        }
+
+        .belt-animation {
+            background-image: linear-gradient(90deg, #e2e8f0 25%, transparent 25%, transparent 50%, #e2e8f0 50%, #e2e8f0 75%, transparent 75%, transparent 100%);
+            background-size: 40px 100%;
+            animation: flow 2s linear infinite;
+        }
+
+        .dimension-line {
+            stroke: #64748b;
+            stroke-width: 1.5;
+            marker-start: url(#arrowhead-start);
+            marker-end: url(#arrowhead-end);
+        }
+
+        .dimension-text {
+            font-size: 11px;
+            font-weight: 700;
+            fill: #475569;
+        }
+
+        .dimension-val {
+            font-size: 10px;
+            font-weight: 800;
+            fill: #1e293b;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+
+<body class="p-4 md:p-6 w-full min-h-screen flex flex-col bg-[#f1f5f9]">
+    <div class="w-full h-full flex flex-col flex-1 mx-auto max-w-[1600px]">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 flex-shrink-0">
+            <div>
+                <h1 class="text-4xl font-black tracking-tighter text-slate-900">CONVEYOR <span
+                        class="text-blue-600 italic">ULTIMATE</span></h1>
+                <p class="text-slate-500 font-medium text-sm">물류 공정 계산과 물리적 레이아웃 시각화의 통합</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">System Status</span>
+                <div
+                    class="bg-emerald-500 text-white px-4 py-1.5 rounded-full text-[10px] font-black shadow-lg shadow-emerald-200 animate-pulse">
+                    LIVE ENGINE ACTIVE
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0">
+            <!-- Left: Input Section -->
+            <div class="lg:col-span-4 space-y-4">
+                <section class="glass-panel p-6 rounded-[2rem] shadow-xl shadow-slate-200/50">
+                    <h2
+                        class="text-xs font-black text-blue-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span> 01. 공정 타임 라인
+                    </h2>
+                    <div class="space-y-5">
+                        <div class="input-group">
+                            <label class="block text-[11px] font-bold text-slate-500 mb-2 ml-1">투입 주기 (Takt
+                                Time)</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="feedInterval" value="60"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all">
+                                <select id="feedUnit"
+                                    class="bg-slate-800 text-white border-none rounded-2xl px-4 text-xs font-black uppercase"
+                                    onchange="calculate()">
+                                    <option value="sec">SEC</option>
+                                    <option value="min">MIN</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-[11px] font-bold text-slate-500 mb-2 ml-1">체류 시간
+                                (Retention)</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="dwellTime" value="20"
+                                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all">
+                                <select id="dwellUnit"
+                                    class="bg-slate-800 text-white border-none rounded-2xl px-4 text-xs font-black uppercase"
+                                    onchange="calculate()">
+                                    <option value="min" selected>MIN</option>
+                                    <option value="sec">SEC</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-panel p-6 rounded-[2rem] shadow-xl shadow-slate-200/50">
+                    <h2
+                        class="text-xs font-black text-blue-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span> 02. 물리적 사양 (mm)
+                    </h2>
+                    <div class="space-y-5">
+                        <div class="input-group">
+                            <label class="block text-[11px] font-bold text-slate-500 mb-2 ml-1 text-blue-600">제품 길이
+                                (Length)</label>
+                            <input type="number" id="prodLen" value="450"
+                                class="w-full bg-slate-50 border border-blue-100 rounded-2xl px-5 py-4 text-lg font-bold outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-[11px] font-bold text-slate-500 mb-2 ml-1 text-emerald-600">제품 간격
+                                (Gap)</label>
+                            <input type="number" id="prodGap" value="50"
+                                class="w-full bg-slate-50 border border-emerald-100 rounded-2xl px-5 py-4 text-lg font-bold outline-none focus:ring-4 focus:ring-emerald-100 focus:border-emerald-500 transition-all">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-panel p-6 rounded-[2rem] shadow-xl shadow-slate-200/50">
+                    <h2
+                        class="text-xs font-black text-blue-500 uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-blue-500 rounded-full"></span> 03. 기계적 여유
+                    </h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="input-group">
+                            <label class="block text-[11px] font-bold text-slate-500 mb-2 ml-1">고정 마진 (mm)</label>
+                            <input type="number" id="marginFixed" value="300"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-[11px] font-bold text-slate-500 mb-2 ml-1">안전 계수 (%)</label>
+                            <input type="number" id="safetyFactor" value="10"
+                                class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-5 py-4 text-lg font-bold outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all">
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right: Results & Visual Guide Integration -->
+            <div class="lg:col-span-8 space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div
+                        class="result-card bg-slate-900 text-white p-8 rounded-[2rem] shadow-2xl border border-slate-800 relative overflow-hidden group">
+                        <div
+                            class="absolute -right-4 -top-4 w-24 h-24 bg-blue-500/10 rounded-full group-hover:scale-150 transition-transform duration-700">
+                        </div>
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">최종 제작 사양</p>
+                        <div class="flex items-baseline gap-2 relative">
+                            <span id="resFinalLen" class="text-5xl font-black text-blue-400">0.00</span>
+                            <span class="text-slate-500 font-black text-xl italic uppercase">M</span>
+                        </div>
+                    </div>
+                    <div class="result-card bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200/50">
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">동시 체류 수량</p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="resQty" class="text-5xl font-black text-slate-800">0</span>
+                            <span class="text-slate-400 font-black text-xl italic uppercase">EA</span>
+                        </div>
+                    </div>
+                    <div class="result-card bg-white p-8 rounded-[2rem] shadow-sm border border-slate-200/50">
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">운전 벨트 속도</p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="resSpeed" class="text-5xl font-black text-emerald-500">0.00</span>
+                            <span class="text-slate-400 font-black text-sm italic uppercase">m/min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <section
+                    class="glass-panel rounded-[2rem] p-8 overflow-hidden relative border border-blue-100 shadow-lg shadow-blue-50">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z">
+                                </path>
+                            </svg>
+                            물리적 레이아웃 구성 가이드 (<span id="svgGuideTitle">1.0</span>m 점유 기준)
+                        </h3>
+                        <span
+                            class="text-[10px] font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-full uppercase">Visual
+                            Reference Guide</span>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 border border-slate-100">
+                        <svg viewBox="0 0 800 280" class="w-full h-auto drop-shadow-sm">
+                            <defs>
+                                <marker id="arrowhead-start" markerWidth="10" markerHeight="7" refX="0" refY="3.5"
+                                    orient="auto">
+                                    <polygon points="10 0, 10 7, 0 3.5" fill="#64748b" />
+                                </marker>
+                                <marker id="arrowhead-end" markerWidth="10" markerHeight="7" refX="10" refY="3.5"
+                                    orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+                                </marker>
+                                <pattern id="diagonalHatch" patternUnits="userSpaceOnUse" width="4" height="4">
+                                    <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2"
+                                        style="stroke:#f1f5f9; stroke-width:1" />
+                                </pattern>
+                            </defs>
+
+                            <!-- Track -->
+                            <rect x="50" y="80" width="700" height="40" rx="20" fill="url(#diagonalHatch)"
+                                stroke="#e2e8f0" stroke-width="2" />
+                            <rect x="50" y="85" width="700" height="30" rx="15" fill="#f8fafc" stroke="#cbd5e1"
+                                stroke-dasharray="4,4" />
+
+                            <!-- Zone 1: Pure Product (1,000mm) -->
+                            <rect x="150" y="85" width="400" height="30" rx="4" fill="#3b82f6" fill-opacity="0.1"
+                                stroke="#3b82f6" stroke-width="2" stroke-dasharray="3" />
+                            <text x="350" y="105" text-anchor="middle"
+                                class="font-black fill-blue-600 text-[10px] uppercase">제품 점유 영역</text>
+                            <text id="svgPureLenVal" x="350" y="117" text-anchor="middle"
+                                class="dimension-val fill-blue-800">1,000mm</text>
+
+                            <!-- Zone 2: Margins -->
+                            <!-- Loading -->
+                            <rect x="50" y="85" width="100" height="30" rx="4" fill="#f59e0b" fill-opacity="0.1"
+                                stroke="#f59e0b" stroke-width="2" />
+                            <text id="svgLoadText" x="100" y="70" text-anchor="middle"
+                                class="text-[9px] font-black fill-amber-600 uppercase">로딩 (150mm)</text>
+
+                            <!-- Unloading -->
+                            <rect x="550" y="85" width="100" height="30" rx="4" fill="#f59e0b" fill-opacity="0.1"
+                                stroke="#f59e0b" stroke-width="2" />
+                            <text id="svgUnloadText" x="600" y="70" text-anchor="middle"
+                                class="text-[9px] font-black fill-amber-600 uppercase">언로딩 (150mm)</text>
+
+                            <!-- Zone 3: Safety -->
+                            <rect x="650" y="85" width="100" height="30" rx="4" fill="#ef4444" fill-opacity="0.1"
+                                stroke="#ef4444" stroke-width="2" stroke-dasharray="2" />
+                            <text id="svgSafetyRateText" x="700" y="70" text-anchor="middle"
+                                class="text-[9px] font-black fill-red-600 uppercase">안전 계수 (10%)</text>
+                            <text id="svgSafetyValText" x="700" y="105" text-anchor="middle" class="dimension-val fill-red-800">≈ 130mm</text>
+
+                            <!-- Dimension Lines with Numbers -->
+                            <line x1="150" y1="145" x2="550" y2="145" class="dimension-line" />
+                            <text id="svgTheoLenText" x="350" y="160" text-anchor="middle" class="dimension-text">이론적 필요 길이 = 1,000mm</text>
+
+                            <line x1="50" y1="190" x2="650" y2="190" class="dimension-line" style="stroke: #f59e0b;" />
+                            <text id="svgMechLenText" x="350" y="205" text-anchor="middle" class="dimension-text" style="fill: #d97706;">기계 물리적 길이 (1,000 + 300) = 1,300mm</text>
+
+                            <line x1="50" y1="240" x2="750" y2="240" class="dimension-line"
+                                style="stroke: #10b981; stroke-width: 2.5;" />
+                            <text id="svgFinalLenText" x="400" y="255" text-anchor="middle"
+                                class="text-[11px] font-black fill-emerald-600 uppercase tracking-tighter">최종 제작 사양 (1,300 × 1.1) = 1,430mm</text>
+                        </svg>
+                    </div>
+                </section>
+
+                <!-- Engineering Reasoning -->
+                <div id="diagPanel" class="relative bg-slate-900 border border-slate-800 rounded-[2rem] p-8 text-white shadow-2xl overflow-hidden group">
+                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-blue-500/10 blur-3xl rounded-full group-hover:bg-blue-500/20 transition-colors duration-700"></div>
+                    <div class="absolute -bottom-20 -left-20 w-64 h-64 bg-emerald-500/10 blur-3xl rounded-full group-hover:bg-emerald-500/20 transition-colors duration-700"></div>
+                    <div class="relative z-10">
+                        <h3 class="flex items-center gap-3 text-slate-300 font-black mb-6 uppercase tracking-widest text-xs">
+                            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Engineering Analysis Report
+                        </h3>
+                        <div id="diagContent" class="space-y-4">
+                            <!-- JS로 채워짐 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Simulation -->
+                <div
+                    class="relative bg-slate-900 h-48 rounded-[2rem] overflow-hidden border-8 border-slate-800 shadow-inner">
+                    <div class="absolute inset-0 belt-animation opacity-20"></div>
+                    <div id="simContainer" class="absolute inset-0 flex items-center px-16">
+                        <!-- 제품 아이콘들이 생성됨 -->
+                    </div>
+                    <div class="absolute top-4 left-6 flex items-center gap-2">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
+                        <span class="text-[9px] font-black text-emerald-500 tracking-[0.3em] uppercase">Simulating
+                            Data...</span>
+                    </div>
+                    <div
+                        class="absolute bottom-4 right-8 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/10 text-white text-[9px] font-black uppercase tracking-widest">
+                        Frame: Realtime Calculation
+                    </div>
+                </div>
+
+                <!-- History Table -->
+                <div class="glass-panel p-6 rounded-[2rem] shadow-sm border border-slate-200">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xs font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            최근 계산 기록 (최대 5개)
+                        </h3>
+                        <button onclick="saveRecordToHistory()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-colors shadow-md">
+                            현재 결과 저장
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b-2 border-slate-200 text-[10px] uppercase text-slate-400 tracking-wider">
+                                    <th class="py-2 px-3 font-bold">시간</th>
+                                    <th class="py-2 px-3 font-bold">입력 요약</th>
+                                    <th class="py-2 px-3 font-bold text-center">체류 수량</th>
+                                    <th class="py-2 px-3 font-bold text-center">속도 (m/min)</th>
+                                    <th class="py-2 px-3 font-bold text-right">최종 길이</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTbody">
+                                <!-- JS로 채워짐 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="mt-auto py-6 border-t border-slate-200 text-center flex-shrink-0">
+            <p class="text-slate-400 text-[10px] font-bold uppercase tracking-[0.4em]">Design & Logistics Integrated
+                Planner Pro Ultimate</p>
+        </footer>
+    </div>
+
+    <script>
+        function calculate() {
+            // 입력값 취득
+            const L = parseFloat(document.getElementById('prodLen').value) || 0;
+            const G = parseFloat(document.getElementById('prodGap').value) || 0;
+            const margin = parseFloat(document.getElementById('marginFixed').value) || 0;
+            const safety = parseFloat(document.getElementById('safetyFactor').value) || 0;
+
+            let t_feed = parseFloat(document.getElementById('feedInterval').value) || 1;
+            let t_dwell = parseFloat(document.getElementById('dwellTime').value) || 0;
+
+            // 단위 환산 (모두 '초'로 통일)
+            const feedInSec = document.getElementById('feedUnit').value === 'min' ? t_feed * 60 : t_feed;
+            const dwellInSec = document.getElementById('dwellUnit').value === 'min' ? t_dwell * 60 : t_dwell;
+
+            if (feedInSec <= 0) return;
+
+            // 1. 체류 수량 (N) 계산: 체류시간 / 투입주기 (올림 처리)
+            const N = Math.ceil(dwellInSec / feedInSec);
+
+            // 2. 피치(Pitch) 및 순수 점유 길이
+            const pitch = L + G;
+            const occupiedLenM = (N * pitch) / 1000;
+
+            // 3. 최종 기계 길이
+            const baseLenM = occupiedLenM + (margin / 1000);
+            const finalLenM = baseLenM * (1 + (safety / 100));
+
+            // 4. 운전 속도 (m/min)
+            const speedMmin = (pitch * (60 / feedInSec)) / 1000;
+
+            // 결과 업데이트
+            document.getElementById('resFinalLen').innerText = finalLenM.toFixed(2);
+            document.getElementById('resQty').innerText = N;
+            document.getElementById('resSpeed').innerText = speedMmin.toFixed(3);
+
+            // SVG 레이아웃 수치 업데이트
+            if (document.getElementById('svgGuideTitle')) {
+                document.getElementById('svgGuideTitle').innerText = occupiedLenM.toFixed(2);
+                document.getElementById('svgPureLenVal').innerText = (occupiedLenM * 1000).toFixed(0) + "mm";
+                document.getElementById('svgLoadText').innerText = "로딩 (" + (margin / 2).toFixed(0) + "mm)";
+                document.getElementById('svgUnloadText').innerText = "언로딩 (" + (margin / 2).toFixed(0) + "mm)";
+                document.getElementById('svgSafetyRateText').innerText = "안전 계수 (" + safety + "%)";
+                document.getElementById('svgSafetyValText').innerText = "≈ " + (baseLenM * 1000 * safety / 100).toFixed(0) + "mm";
+                document.getElementById('svgTheoLenText').innerText = "이론적 필요 길이 = " + (occupiedLenM * 1000).toFixed(0) + "mm";
+                document.getElementById('svgMechLenText').innerText = "기계 물리적 길이 (" + (occupiedLenM * 1000).toFixed(0) + " + " + margin + ") = " + (baseLenM * 1000).toFixed(0) + "mm";
+                document.getElementById('svgFinalLenText').innerText = "최종 제작 사양 (" + (baseLenM * 1000).toFixed(0) + " × " + (1 + safety/100).toFixed(2) + ") = " + (finalLenM * 1000).toFixed(0) + "mm";
+            }
+
+            // 진단 메시지 생성
+            updateDiagnosis(N, dwellInSec, feedInSec, L, G, finalLenM, speedMmin, margin, safety);
+            updateSimulation(N, speedMmin);
+            saveInputs();
+        }
+
+        // 로컬 스토리지 저장 및 불러오기
+        function saveInputs() {
+            const data = {
+                feedInterval: document.getElementById('feedInterval').value,
+                feedUnit: document.getElementById('feedUnit').value,
+                dwellTime: document.getElementById('dwellTime').value,
+                dwellUnit: document.getElementById('dwellUnit').value,
+                prodLen: document.getElementById('prodLen').value,
+                prodGap: document.getElementById('prodGap').value,
+                marginFixed: document.getElementById('marginFixed').value,
+                safetyFactor: document.getElementById('safetyFactor').value
+            };
+            localStorage.setItem('conveyorInputs', JSON.stringify(data));
+        }
+
+        function loadInputs() {
+            const dataStr = localStorage.getItem('conveyorInputs');
+            if (dataStr) {
+                try {
+                    const data = JSON.parse(dataStr);
+                    Object.keys(data).forEach(k => {
+                        const el = document.getElementById(k);
+                        if (el) el.value = data[k];
+                    });
+                } catch(e) {}
+            }
+        }
+
+        function updateDiagnosis(N, dwell, feed, L, G, finalLen, speed, margin, safety) {
+            const content = document.getElementById('diagContent');
+            let html = "";
+
+            // 로직 설명 1: 수량
+            html += `<div class="bg-slate-800/50 backdrop-blur-sm p-5 rounded-2xl border border-slate-700/50 hover:border-slate-600 transition-colors">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
+                            <p class="text-slate-400 text-[10px] uppercase font-black tracking-widest">01. 수량 산출 근거</p>
+                        </div>
+                        <p class="font-black text-2xl text-white mb-2">벨트 내 상시 체류: <span class="text-blue-400">${N}</span> <span class="text-sm text-slate-500">EA</span></p>
+                        <p class="text-slate-400 text-xs font-medium leading-relaxed">${Math.round(dwell)}초의 공정 시간을 보장하기 위해 ${Math.round(feed)}초마다 투입되는 제품을 줄 세운 결과입니다.</p>
+                     </div>`;
+
+            // 로직 설명 2: 왜 이 길이인가?
+            const pureLen = (N * (L + G)) / 1000;
+            html += `<div class="bg-slate-800/50 backdrop-blur-sm p-5 rounded-2xl border border-slate-700/50 hover:border-slate-600 transition-colors">
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                            <p class="text-slate-400 text-[10px] uppercase font-black tracking-widest">02. 길이 구성 요소</p>
+                        </div>
+                        <div class="space-y-3 font-medium text-sm">
+                            <div class="flex justify-between items-center text-slate-300">
+                                <span>순수 점유 길이 <span class="text-[10px] text-slate-500 ml-1">(Pitch × N)</span></span> 
+                                <span class="font-mono text-white">${pureLen.toFixed(2)}m</span>
+                            </div>
+                            <div class="flex justify-between items-center text-amber-200/80">
+                                <span>기계적 고정 마진 <span class="text-[10px] text-amber-500/50 ml-1">(Fixed)</span></span> 
+                                <span class="font-mono">+ ${(margin / 1000).toFixed(2)}m</span>
+                            </div>
+                            <div class="flex justify-between items-center text-red-300/80">
+                                <span>안전 계수 적용 <span class="text-[10px] text-red-500/50 ml-1">(${safety}%)</span></span> 
+                                <span class="font-mono">× ${(1 + safety / 100).toFixed(2)}</span>
+                            </div>
+                            <div class="border-t border-slate-700/80 pt-3 mt-3 flex justify-between items-end">
+                                <span class="text-slate-400 font-bold text-xs uppercase tracking-wider">최종 설계 길이</span> 
+                                <span class="text-3xl font-black text-white font-mono">${finalLen.toFixed(2)}<span class="text-base text-slate-500 ml-1">m</span></span>
+                            </div>
+                        </div>
+                     </div>`;
+
+            // 경고 메시지
+            if (G === 0) {
+                html += `<div class="flex items-center gap-4 bg-red-500/10 backdrop-blur-md p-4 rounded-2xl border border-red-500/30 mt-4">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center text-red-500">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </div>
+                            <div>
+                                <h4 class="text-red-400 text-[11px] font-black uppercase tracking-widest mb-1">Critical Warning</h4>
+                                <p class="text-red-200/80 text-xs font-medium leading-relaxed">제품 간격(Gap) 0mm 설정됨. 실제 환경에서는 제품 충돌 및 센서 인식 불능이 예상됩니다.</p>
+                            </div>
+                         </div>`;
+            }
+
+            content.innerHTML = html;
+        }
+
+        function updateSimulation(count, speed) {
+            const container = document.getElementById('simContainer');
+            container.innerHTML = "";
+            const displayCount = Math.min(count, 12);
+
+            for (let i = 0; i < displayCount; i++) {
+                const box = document.createElement('div');
+                box.className = "h-14 bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl shadow-2xl border-b-4 border-blue-800 flex-shrink-0 mr-4 flex items-center justify-center";
+                box.style.width = "65px";
+                box.innerHTML = `<span class="text-[9px] font-black text-white/40 italic">UNIT</span>`;
+                container.appendChild(box);
+            }
+        }
+
+        // 초기 실행 및 이벤트 바인딩
+        const inputs = ['feedInterval', 'dwellTime', 'prodLen', 'prodGap', 'marginFixed', 'safetyFactor'];
+        inputs.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('input', calculate);
+        });
+
+        // 기록(테이블) 관련 로직
+        let historyRecords = [];
+        
+        function saveRecordToHistory() {
+            const finalLenM = document.getElementById('resFinalLen').innerText;
+            const N = document.getElementById('resQty').innerText;
+            const speed = document.getElementById('resSpeed').innerText;
+            const L = document.getElementById('prodLen').value;
+            const G = document.getElementById('prodGap').value;
+            const T = document.getElementById('feedInterval').value + document.getElementById('feedUnit').value;
+            
+            const record = {
+                date: new Date().toLocaleTimeString(),
+                desc: `L:${L} G:${G} / 주기:${T}`,
+                qty: N,
+                speed: speed,
+                length: finalLenM
+            };
+            
+            historyRecords.unshift(record);
+            if(historyRecords.length > 5) historyRecords.pop();
+            
+            localStorage.setItem('conveyorHistory', JSON.stringify(historyRecords));
+            renderHistoryTable();
+        }
+        
+        function loadHistory() {
+            const hStr = localStorage.getItem('conveyorHistory');
+            if(hStr) {
+                try {
+                    historyRecords = JSON.parse(hStr);
+                } catch(e) {}
+            }
+            renderHistoryTable();
+        }
+        
+        function renderHistoryTable() {
+            const tbody = document.getElementById('historyTbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            historyRecords.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-slate-100 text-xs hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-2 px-3 text-slate-500">${r.date}</td>
+                    <td class="py-2 px-3 font-bold text-slate-700">${r.desc}</td>
+                    <td class="py-2 px-3 text-center text-slate-600">${r.qty} EA</td>
+                    <td class="py-2 px-3 text-center text-emerald-600 font-bold">${r.speed}</td>
+                    <td class="py-2 px-3 text-right text-blue-600 font-black">${r.length} M</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.onload = () => {
+            loadInputs();
+            loadHistory();
+            calculate();
+        };
+    </script>
+</body>
+
+</html>

@@ -270,7 +270,7 @@
             </div>
         </div>
         <div class="pointer-box px-8 py-3 text-center border-4 border-black min-w-[200px]">
-            <span class="text-[0.6rem] font-black block opacity-70 uppercase tracking-tight">Duty Cycle (s1/s2)</span>
+            <span class="text-[0.6rem] font-black block opacity-70 uppercase tracking-tight">듀티 사이클 (s1/s2)</span>
             <span id="duty-label" class="text-2xl font-black text-white">50%</span>
         </div>
     </div>
@@ -282,7 +282,7 @@
         <div class="w-[18%] flex flex-col gap-4">
             <div class="zodd-card p-6 flex flex-col h-full shadow-[6px_6px_0px_#000]">
                 <h3 class="text-xs font-black text-slate-400 uppercase mb-5 border-b-2 pb-2 flex items-center gap-2">
-                    <i data-lucide="zap" size="16"></i> COMMAND SELECT
+                    <i data-lucide="zap" size="16"></i> 명령어 선택
                 </h3>
                 <div class="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
                     <button class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between active">
@@ -291,18 +291,16 @@
                     </button>
                     <div class="p-5 bg-blue-50 border-2 border-dashed border-blue-200 rounded-2xl text-center">
                         <span
-                            class="text-[0.6rem] font-black text-blue-400 uppercase tracking-widest leading-relaxed">Pulse
-                            Train<br />Generator</span>
+                            class="text-[0.6rem] font-black text-blue-400 uppercase tracking-widest leading-relaxed">펄스 열<br />발생기</span>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2">
                     <button onclick="setFastPreset()"
                         class="bg-indigo-500 hover:bg-indigo-600 text-white p-3 rounded-xl border-2 border-black font-black text-xs uppercase tracking-widest shadow-[3px_3px_0px_#000] active:translate-y-1 active:shadow-none transition-all">
-                        High Speed (20%)
+                        고속 모드 (20%)
                     </button>
                     <button onclick="resetTable()"
-                        class="mt-2 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600">Reset
-                        Defaults</button>
+                        class="mt-2 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600">초기 설정으로 리셋</button>
                 </div>
             </div>
         </div>
@@ -312,23 +310,21 @@
             <div class="zodd-card p-6 flex-1 flex flex-col shadow-[10px_10px_0px_#000] overflow-hidden relative">
                 <div class="flex justify-between items-end mb-6">
                     <div>
-                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">Output
-                            State</span>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">출력 상태</span>
                         <div class="flex items-center gap-3">
                             <h2 id="status-display"
-                                class="text-3xl font-black text-slate-800 tracking-tighter uppercase">RUNNING</h2>
+                                class="text-3xl font-black text-slate-800 tracking-tighter uppercase">동작 중</h2>
                             <div id="output-lamp" class="output-lamp"></div>
                         </div>
                     </div>
-                    <div id="error-tag" class="status-tag border-red-600 text-red-600 hidden uppercase">Error: s1 ≥ s2
+                    <div id="error-tag" class="status-tag border-red-600 text-red-600 hidden uppercase">오류: s1 ≥ s2
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
                         <div class="flex-1">
-                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">ON TIME
-                                (s1)</label>
+                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">ON 시간 (s1)</label>
                             <input type="number" id="input-s1" value="500" min="1" max="65535"
                                 class="data-input text-blue-600" onchange="updatePWM()">
                         </div>
@@ -339,8 +335,7 @@
                     </div>
                     <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
                         <div class="flex-1">
-                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">PERIOD
-                                (s2)</label>
+                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">주기 시간 (s2)</label>
                             <input type="number" id="input-s2" value="1000" min="2" max="65535"
                                 class="data-input text-orange-600" onchange="updatePWM()">
                         </div>
@@ -401,11 +396,11 @@
                 <div class="flex gap-3">
                     <button onclick="undo()" id="undo-btn"
                         class="flex-1 bg-slate-800 hover:bg-black text-white h-16 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-lg flex items-center justify-center gap-3 transition-all">
-                        <i data-lucide="rotate-ccw"></i> UNDO
+                        <i data-lucide="rotate-ccw"></i> 되돌리기
                     </button>
                     <button onclick="toggleRun()" id="exec-btn"
                         class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-16 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-xl flex items-center justify-center gap-3 transition-all">
-                        <i data-lucide="play-circle" fill="white"></i> <span id="run-text">STOP OUTPUT</span>
+                        <i data-lucide="play-circle" fill="white"></i> <span id="run-text">출력 정지</span>
                     </button>
                 </div>
             </div>
@@ -417,26 +412,25 @@
                 class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] overflow-hidden border-2 border-slate-700">
                 <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
                     <i data-lucide="book-open" class="text-pink-500"></i>
-                    <h3 class="text-xl font-black uppercase tracking-widest">Technical Guide</h3>
-                    <div id="save-status" class="save-indicator ml-auto">SAVED!</div>
+                    <h3 class="text-xl font-black uppercase tracking-widest">기술 가이드</h3>
+                    <div id="save-status" class="save-indicator ml-auto">저장 완료!</div>
                 </div>
 
                 <div class="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2">
                     <div class="bg-slate-800/80 p-6 rounded-3xl border-2 border-slate-700 shadow-inner">
                         <h4 class="text-2xl font-black text-blue-400 mb-2">PWM (Pulse Modulation)</h4>
                         <div class="st-syntax-large text-emerald-400">PWM(EN, s1, s2, d);</div>
-                        <p class="text-sm font-bold text-slate-300 leading-relaxed uppercase tracking-tighter mb-4">
-                            Generates a pulse with ON time (s1) and Period (s2) to device (d).</p>
+                        <p class="text-sm font-bold text-slate-300 leading-relaxed mb-4">
+                            ON 시간(s1) 및 주기 시간(s2)을 가진 펄스를 대상 디바이스(d)로 출력합니다.</p>
 
                         <div class="mt-2">
                             <span
-                                class="text-[0.7rem] font-black text-slate-500 uppercase tracking-widest block mb-3 border-b border-slate-700 pb-1">Operand
-                                Specifications</span>
+                                class="text-[0.7rem] font-black text-slate-500 uppercase tracking-widest block mb-3 border-b border-slate-700 pb-1">피연산자 사양</span>
                             <table class="operand-table">
                                 <thead>
                                     <tr>
-                                        <th>Operand</th>
-                                        <th>Description</th>
+                                        <th>피연산자</th>
+                                        <th>설명</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -460,7 +454,7 @@
                     <div class="p-5 bg-black/50 border border-slate-700 rounded-2xl">
                         <span
                             class="text-[0.7rem] font-black text-slate-500 uppercase block mb-3 flex items-center gap-2">
-                            <i data-lucide="code" size="14"></i> ST Program Example
+                            <i data-lucide="code" size="14"></i> ST 프로그램 예제
                         </span>
                         <div class="st-code-box">
                             // 0.5초 ON, 1초 주기<br>
@@ -487,7 +481,7 @@
                     class="memo-section-header flex justify-between items-center border-b border-emerald-900/50 pb-4 mb-4">
                     <div class="flex items-center gap-3 text-emerald-400">
                         <i data-lucide="clipboard-list"></i>
-                        <h3 class="text-lg font-black uppercase">Global Notes</h3>
+                        <h3 class="text-lg font-black uppercase">전체 메모</h3>
                     </div>
                 </div>
                 <textarea id="global-memo" class="memo-textarea flex-1 border-emerald-900/50 mb-6"
@@ -495,7 +489,7 @@
 
                 <div class="flex items-center gap-3 mb-4 text-blue-400 border-t border-slate-800 pt-6">
                     <i data-lucide="pencil-line"></i>
-                    <h3 class="text-lg font-black uppercase">PWM Memo</h3>
+                    <h3 class="text-lg font-black uppercase">PWM 메모</h3>
                 </div>
                 <textarea id="op-memo" class="memo-textarea flex-1 border-blue-900/50"
                     placeholder="PWM 명령어 개별 기록..."></textarea>
@@ -618,8 +612,8 @@
 
         function toggleRun() {
             isRunning = !isRunning;
-            document.getElementById('run-text').innerText = isRunning ? "STOP OUTPUT" : "START OUTPUT";
-            document.getElementById('status-display').innerText = isRunning ? "RUNNING" : "STOPPED";
+            document.getElementById('run-text').innerText = isRunning ? "출력 정지" : "출력 시작";
+            document.getElementById('status-display').innerText = isRunning ? "동작 중" : "정지됨";
             document.getElementById('status-display').className = isRunning ? "text-3xl font-black text-slate-800 tracking-tighter uppercase" : "text-3xl font-black text-red-500 tracking-tighter uppercase";
         }
 

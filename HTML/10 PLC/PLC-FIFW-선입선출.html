@@ -276,14 +276,12 @@
         <div class="flex items-center gap-4">
             <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg"><i data-lucide="layers" size="30"></i></div>
             <div>
-                <h1 class="text-3xl font-black uppercase tracking-tighter">PLC DATA TABLE MASTER</h1>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Advanced Instruction Simulation
-                    Laboratory</p>
+                <h1 class="text-3xl font-black uppercase tracking-tighter">PLC 데이터 테이블 마스터</h1>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">고급 명령어 시뮬레이션 연구소</p>
             </div>
         </div>
         <div class="pointer-box px-8 py-3 text-center border-4 border-black">
-            <span class="text-[0.65rem] font-black block opacity-70 uppercase tracking-tight">Active Elements
-                (D100)</span>
+            <span class="text-[0.65rem] font-black block opacity-70 uppercase tracking-tight">활성 데이터 수 (D100)</span>
             <span id="ptr-val" class="text-3xl font-black text-white">0</span>
         </div>
     </div>
@@ -295,7 +293,7 @@
         <div class="w-[20%] flex flex-col gap-4">
             <div class="zodd-card p-6 flex flex-col h-full shadow-[6px_6px_0px_#000]">
                 <h3 class="text-xs font-black text-slate-400 uppercase mb-5 border-b-2 pb-2 flex items-center gap-2">
-                    <i data-lucide="zap" size="16"></i> COMMAND SELECT
+                    <i data-lucide="zap" size="16"></i> 명령어 선택
                 </h3>
 
                 <div class="space-y-3 flex-1 overflow-y-auto pr-1 custom-scrollbar">
@@ -326,8 +324,7 @@
                     </button>
                 </div>
                 <button onclick="resetTable()"
-                    class="mt-4 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600 transition-colors">Clear
-                    All Data</button>
+                    class="mt-4 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600 transition-colors">모든 데이터 삭제</button>
             </div>
         </div>
 
@@ -338,12 +335,12 @@
                     <div class="flex items-center gap-4">
                         <div>
                             <span
-                                class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">Status</span>
+                                class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">상태</span>
                             <h2 id="status-display"
-                                class="text-3xl font-black text-slate-800 tracking-tighter uppercase">READY</h2>
+                                class="text-3xl font-black text-slate-800 tracking-tighter uppercase">대기 중</h2>
                         </div>
                         <div id="read-result-area" class="invisible">
-                            <span class="text-[0.7rem] font-black text-blue-600 uppercase block">Result</span>
+                            <span class="text-[0.7rem] font-black text-blue-600 uppercase block">결과</span>
                             <div class="result-display-panel"><span id="extracted-val"
                                     class="result-value-text">---</span></div>
                         </div>
@@ -354,8 +351,7 @@
                 <div class="grid grid-cols-2 gap-4 mb-8">
                     <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
                         <div class="flex-1">
-                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">SOURCE
-                                (S)</label>
+                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">소스 데이터 (S)</label>
                             <input type="number" id="input-s" value="100" class="data-input text-blue-600">
                         </div>
                         <div class="flex flex-col gap-1 ml-3">
@@ -365,8 +361,7 @@
                     </div>
                     <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
                         <div class="flex-1">
-                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">INDEX
-                                (N)</label>
+                            <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">인덱스 번호 (N)</label>
                             <input type="number" id="input-n" value="0" min="0" max="14"
                                 class="data-input text-orange-600">
                         </div>
@@ -380,11 +375,11 @@
                 <div class="flex gap-3 mb-6">
                     <button onclick="undo()"
                         class="flex-1 bg-slate-800 hover:bg-black text-white h-20 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-xl flex items-center justify-center gap-3 transition-all">
-                        <i data-lucide="rotate-ccw"></i> UNDO
+                        <i data-lucide="rotate-ccw"></i> 되돌리기
                     </button>
                     <button onclick="runExecution()" id="exec-btn"
                         class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-20 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-2xl flex items-center justify-center gap-3 transition-all">
-                        <i data-lucide="play" fill="white"></i> EXECUTE
+                        <i data-lucide="play" fill="white"></i> 실행
                     </button>
                 </div>
 
@@ -398,8 +393,8 @@
                         <div
                             class="bg-blue-600 p-3 rounded-xl border-4 border-black flex justify-between items-center text-white">
                             <span id="ptr-center" class="text-2xl font-black">0</span><span
-                                class="text-[0.6rem] font-black uppercase">Length</span></div>
-                        <div class="text-xs font-black text-blue-300 italic uppercase">Ptr</div>
+                                class="text-[0.6rem] font-black uppercase">데이터 수</span></div>
+                        <div class="text-xs font-black text-blue-300 italic uppercase">포인터</div>
                     </div>
                     <div id="table-body" class="space-y-2 pb-10"></div>
                 </div>
@@ -412,8 +407,8 @@
                 class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] overflow-hidden">
                 <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
                     <i data-lucide="book-open" class="text-pink-500"></i>
-                    <h3 class="text-xl font-black uppercase tracking-widest">Manual</h3>
-                    <div id="save-status" class="save-indicator ml-auto">SAVED!</div>
+                    <h3 class="text-xl font-black uppercase tracking-widest">기술 매뉴얼</h3>
+                    <div id="save-status" class="save-indicator ml-auto">저장 완료!</div>
                 </div>
 
                 <div class="flex gap-1 mb-6 overflow-x-auto no-scrollbar border-b border-slate-800">
@@ -439,7 +434,7 @@
                 <div class="mb-8 flex-1 flex flex-col">
                     <div class="flex items-center gap-3 mb-4 text-emerald-400 border-b border-emerald-900/50 pb-2">
                         <i data-lucide="clipboard-list" size="20"></i>
-                        <h3 class="text-lg font-black uppercase">Global Notes</h3>
+                        <h3 class="text-lg font-black uppercase">전체 메모</h3>
                     </div>
                     <textarea id="global-memo" class="memo-textarea flex-1 border-emerald-900/50"
                         placeholder="프로젝트 전체 특이사항 기록..."></textarea>
@@ -447,7 +442,7 @@
                 <div class="flex-1 flex flex-col pt-4 border-t border-slate-800">
                     <div class="flex items-center gap-3 mb-4 text-blue-400">
                         <i data-lucide="pencil-line" size="20"></i>
-                        <h3 id="memo-title" class="text-lg font-black uppercase">FIFW Memo</h3>
+                        <h3 id="memo-title" class="text-lg font-black uppercase">FIFW 메모</h3>
                     </div>
                     <textarea id="op-memo" class="memo-textarea flex-1 border-blue-900/50"
                         placeholder="명령어 개별 메모 기록..."></textarea>
@@ -528,14 +523,14 @@
             const activeBtn = document.getElementById(`btn-${op}`); if (activeBtn) activeBtn.classList.add('active');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             const activeTab = document.getElementById(`tab-${op}`); if (activeTab) activeTab.classList.add('active');
-            document.getElementById('status-display').innerText = `READY: ${op}`;
+            document.getElementById('status-display').innerText = `대기 중: ${op}`;
             updateHandbook(op); renderTable();
         }
 
         function updateHandbook(name) {
             const content = document.getElementById('hb-content');
             const data = manual[name];
-            let operandHtml = `<table class="operand-table"><thead><tr><th>Operand</th><th>Description</th></tr></thead><tbody>`;
+            let operandHtml = `<table class="operand-table"><thead><tr><th>피연산자</th><th>설명</th></tr></thead><tbody>`;
             data.operands.forEach(o => { operandHtml += `<tr><td><span class="op-tag">${o.label}</span></td><td>${o.content}</td></tr>`; });
             operandHtml += `</tbody></table>`;
             content.innerHTML = `<div class="bg-slate-800/80 p-6 rounded-3xl border-2 border-slate-700">
@@ -548,12 +543,12 @@
                     <div><span class="text-[0.7rem] font-black text-slate-500 uppercase block mb-2 tracking-widest flex items-center gap-2"><i data-lucide="move" size="14"></i> 데이터 물리 이동</span>
                         <div class="bg-black/50 p-4 rounded-xl border border-slate-700 text-xs text-orange-300 font-mono">${data.flow}</div>
                     </div>
-                    <div><span class="text-[0.7rem] font-black text-slate-500 uppercase block mb-2 tracking-widest flex items-center gap-2"><i data-lucide="code" size="14"></i> ST Example Code</span>
+                    <div><span class="text-[0.7rem] font-black text-slate-500 uppercase block mb-2 tracking-widest flex items-center gap-2"><i data-lucide="code" size="14"></i> ST 예제 코드</span>
                         <div class="st-code-box">${data.st}</div>
                     </div>
                 </div>`;
             document.getElementById('hb-tip').innerText = data.tip;
-            document.getElementById('memo-title').innerText = `${name} Memo`;
+            document.getElementById('memo-title').innerText = `${name} 메모`;
             document.getElementById('op-memo').value = memoData[name] || '';
             lucide.createIcons();
         }
@@ -595,7 +590,7 @@
         }
 
         function saveHistory() { history.push(JSON.parse(JSON.stringify(tableData))); if (history.length > 20) history.shift(); }
-        function undo() { if (history.length > 0) { tableData = history.pop(); document.getElementById('status-display').innerText = "UNDO: SUCCESS"; document.getElementById('read-result-area').classList.add('invisible'); renderTable(); } }
+        function undo() { if (history.length > 0) { tableData = history.pop(); document.getElementById('status-display').innerText = "되돌리기: 성공"; document.getElementById('read-result-area').classList.add('invisible'); renderTable(); } }
         function updateData(idx, val) { saveHistory(); const num = parseInt(val); if (!isNaN(num)) { if (idx < tableData.length) tableData[idx] = num; else tableData.push(num); } else tableData.splice(idx, 1); renderTable(); }
         function stepS(d) { document.getElementById('input-s').value = parseInt(document.getElementById('input-s').value) + d; renderTable(); }
         function stepN(d) { let el = document.getElementById('input-n'); let val = parseInt(el.value) + d; el.value = Math.max(0, Math.min(14, val)); renderTable(); }

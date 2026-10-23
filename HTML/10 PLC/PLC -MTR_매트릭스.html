@@ -245,12 +245,11 @@
                 <h1 class="text-3xl font-black uppercase tracking-tighter text-slate-800">
                     <span class="text-blue-600">MTR</span>-매트릭스 입력 제어
                 </h1>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest text-blue-600">Multiplexed Input
-                    Scan Simulation</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest text-blue-600">다중 입력 스캔 시뮬레이션</p>
             </div>
         </div>
         <div class="pointer-box px-8 py-3 text-center border-4 border-black min-w-[220px]">
-            <span class="text-[0.6rem] font-black block opacity-70 uppercase tracking-tight">Active Scan Line (Y)</span>
+            <span class="text-[0.6rem] font-black block opacity-70 uppercase tracking-tight">활성 스캔 라인 (Y)</span>
             <span id="scan-label" class="text-2xl font-black text-white text-emerald-400">Y00</span>
         </div>
     </div>
@@ -262,7 +261,7 @@
         <div class="w-[18%] flex flex-col gap-4">
             <div class="zodd-card p-6 flex flex-col h-full shadow-[6px_6px_0px_#000]">
                 <h3 class="text-xs font-black text-slate-400 uppercase mb-5 border-b-2 pb-2 flex items-center gap-2">
-                    <i data-lucide="zap" size="16"></i> COMMAND SELECT
+                    <i data-lucide="zap" size="16"></i> 명령어 선택
                 </h3>
                 <div class="space-y-3 flex-1 overflow-y-auto custom-scrollbar">
                     <button class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between active">
@@ -271,18 +270,18 @@
                     </button>
                     <div class="p-5 bg-blue-50 border-2 border-dashed border-blue-200 rounded-2xl text-center">
                         <span
-                            class="text-[0.6rem] font-black text-blue-400 uppercase tracking-widest leading-relaxed">Keypad
-                            Scan<br />System Mode</span>
+                            class="text-[0.6rem] font-black text-blue-400 uppercase tracking-widest leading-relaxed">키패드
+                            스캔<br />시스템 모드</span>
                     </div>
                 </div>
                 <div class="flex flex-col gap-2">
                     <button onclick="toggleScan()" id="scan-btn"
                         class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl border-2 border-black font-black text-sm uppercase tracking-widest shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
-                        <i data-lucide="play" id="scan-icon" size="16"></i> <span id="scan-text">STOP SCAN</span>
+                        <i data-lucide="play" id="scan-icon" size="16"></i> <span id="scan-text">스캔 중지</span>
                     </button>
                     <button onclick="clearKeys()"
-                        class="mt-2 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600">Release
-                        All Keys</button>
+                        class="mt-2 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600">모든 키
+                        해제</button>
                 </div>
             </div>
         </div>
@@ -292,14 +291,13 @@
             <div class="zodd-card p-6 flex-1 flex flex-col shadow-[10px_10px_0px_#000] overflow-hidden relative">
                 <div class="flex justify-between items-end mb-6">
                     <div>
-                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">Simulation
-                            View</span>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">시뮬레이션
+                            화면</span>
                         <h2 id="status-display" class="text-3xl font-black text-slate-800 tracking-tighter uppercase">
-                            SCANNING...</h2>
+                            스캔 중...</h2>
                     </div>
                     <div class="text-right">
-                        <span class="text-[0.6rem] font-black text-slate-500 uppercase block mb-1">Detected
-                            Points</span>
+                        <span class="text-[0.6rem] font-black text-slate-500 uppercase block mb-1">감지된 포인트</span>
                         <span id="hit-count" class="text-2xl font-black text-blue-600">0</span>
                     </div>
                 </div>
@@ -324,12 +322,12 @@
 
                 <div class="mt-6 p-5 bg-black rounded-2xl flex justify-between items-center text-white">
                     <div>
-                        <div class="text-[0.6rem] text-slate-400 font-bold uppercase mb-1">Target Data Start</div>
+                        <div class="text-[0.6rem] text-slate-400 font-bold uppercase mb-1">저장 시작 디바이스</div>
                         <div class="text-2xl font-black text-yellow-400">M0 ~ M63</div>
                     </div>
                     <div class="text-right">
-                        <div class="text-[0.6rem] text-slate-400 font-bold uppercase mb-1">Current Hit</div>
-                        <div class="text-lg font-black text-blue-400" id="current-hit-addr">NONE</div>
+                        <div class="text-[0.6rem] text-slate-400 font-bold uppercase mb-1">현재 감지된 위치</div>
+                        <div class="text-lg font-black text-blue-400" id="current-hit-addr">없음</div>
                     </div>
                 </div>
             </div>
@@ -341,26 +339,26 @@
                 class="zodd-card p-8 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] overflow-hidden border-2 border-slate-700">
                 <div class="flex items-center gap-3 mb-6 border-b border-slate-700 pb-4">
                     <i data-lucide="book-open" class="text-pink-500"></i>
-                    <h3 class="text-xl font-black uppercase tracking-widest">Technical Guide</h3>
-                    <div id="save-status" class="save-indicator ml-auto">SAVED!</div>
+                    <h3 class="text-xl font-black uppercase tracking-widest">기술 가이드</h3>
+                    <div id="save-status" class="save-indicator ml-auto">저장 완료!</div>
                 </div>
 
                 <div class="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2">
                     <div class="bg-slate-800/80 p-6 rounded-3xl border-2 border-slate-700 shadow-inner">
                         <h4 class="text-2xl font-black text-blue-400 mb-2">MTR (Matrix Input)</h4>
                         <div class="st-syntax-large text-emerald-400">MTR(s, n, d, n2);</div>
-                        <p class="text-sm font-bold text-slate-300 leading-relaxed uppercase tracking-tighter mb-4">
-                            Reads 8*n switches into d starting from input s.</p>
+                        <p class="text-sm font-bold text-slate-300 leading-relaxed mb-4">
+                            입력 s로부터 8*n개의 스위치 상태를 읽어 d에 저장합니다.</p>
 
                         <div class="mt-2">
                             <span
-                                class="text-[0.7rem] font-black text-slate-500 uppercase tracking-widest block mb-3 border-b border-slate-700 pb-1">Operand
-                                Specifications</span>
+                                class="text-[0.7rem] font-black text-slate-500 uppercase tracking-widest block mb-3 border-b border-slate-700 pb-1">피연산자(오퍼랜드)
+                                사양</span>
                             <table class="operand-table">
                                 <thead>
                                     <tr>
-                                        <th>Operand</th>
-                                        <th>Description</th>
+                                        <th>피연산자</th>
+                                        <th>설명</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -388,7 +386,7 @@
                     <div class="p-5 bg-black/50 border border-slate-700 rounded-2xl">
                         <span
                             class="text-[0.7rem] font-black text-slate-500 uppercase block mb-3 flex items-center gap-2">
-                            <i data-lucide="code" size="14"></i> ST Program Example
+                            <i data-lucide="code" size="14"></i> ST 프로그램 예제
                         </span>
                         <div class="st-code-box">
                             // 8x8 키패드 읽기<br>
@@ -416,7 +414,7 @@
                     class="memo-section-header flex justify-between items-center border-b border-emerald-900/50 pb-4 mb-4">
                     <div class="flex items-center gap-3 text-emerald-400">
                         <i data-lucide="clipboard-list"></i>
-                        <h3 class="text-lg font-black uppercase">Global Notes</h3>
+                        <h3 class="text-lg font-black uppercase">전체 메모</h3>
                     </div>
                 </div>
                 <textarea id="global-memo" class="memo-textarea flex-1 border-emerald-900/50 mb-6"
@@ -424,7 +422,7 @@
 
                 <div class="flex items-center gap-3 mb-4 text-blue-400 border-t border-slate-800 pt-6">
                     <i data-lucide="pencil-line"></i>
-                    <h3 class="text-lg font-black uppercase">MTR Memo</h3>
+                    <h3 class="text-lg font-black uppercase">MTR 메모</h3>
                 </div>
                 <textarea id="op-memo" class="memo-textarea flex-1 border-blue-900/50"
                     placeholder="MTR 명령어 개별 기록..."></textarea>
@@ -522,14 +520,14 @@
             if (isScanning) {
                 startScan();
                 btn.className = btn.className.replace('bg-emerald-500', 'bg-blue-600');
-                text.innerText = "STOP SCAN";
-                status.innerText = "SCANNING...";
+                text.innerText = "스캔 중지";
+                status.innerText = "스캔 중...";
                 status.className = "text-3xl font-black text-slate-800 tracking-tighter uppercase";
             } else {
                 clearInterval(scanInterval);
                 btn.className = btn.className.replace('bg-blue-600', 'bg-emerald-500');
-                text.innerText = "START SCAN";
-                status.innerText = "HALTED";
+                text.innerText = "스캔 시작";
+                status.innerText = "정지됨";
                 status.className = "text-3xl font-black text-red-500 tracking-tighter uppercase";
                 document.querySelectorAll('.mtr-key').forEach(el => el.classList.remove('scanning'));
             }
@@ -538,7 +536,7 @@
 
         function updateHits() {
             document.getElementById('hit-count').innerText = pressedKeys.size;
-            if (pressedKeys.size === 0) document.getElementById('current-hit-addr').innerText = "NONE";
+            if (pressedKeys.size === 0) document.getElementById('current-hit-addr').innerText = "없음";
         }
 
         function initMemos() {

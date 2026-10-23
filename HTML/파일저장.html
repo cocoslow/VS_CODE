@@ -64,12 +64,12 @@
                 <div class="bg-indigo-600 p-3 rounded-xl text-white shadow-lg"><i data-lucide="folder-archive"></i>
                 </div>
                 <div>
-                    <h1 class="text-3xl font-black uppercase tracking-tight text-slate-800">PLC Project Packager</h1>
+                    <h1 class="text-3xl font-black uppercase tracking-tight text-slate-800">PLC 프로젝트 패키저</h1>
                     <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">PLC 파일 및 압축 폴더 내장 시스템</p>
                 </div>
             </div>
             <div class="text-right">
-                <span class="text-[0.6rem] font-black text-slate-400 uppercase block mb-1">Target Extensions</span>
+                <span class="text-[0.6rem] font-black text-slate-400 uppercase block mb-1">대상 확장자</span>
                 <div class="flex gap-2">
                     <span class="plc-tag">.GXW</span>
                     <span class="plc-tag">.ZIP</span>
@@ -100,7 +100,7 @@
                     <div class="mt-6 p-4 bg-amber-50 border-2 border-amber-200 rounded-xl">
                         <div class="flex items-center gap-2 mb-2 text-amber-700">
                             <i data-lucide="alert-triangle" size="16"></i>
-                            <span class="text-[0.7rem] font-black uppercase">Engineer's Note</span>
+                            <span class="text-[0.7rem] font-black uppercase">참고사항 (엔지니어 노트)</span>
                         </div>
                         <p class="text-[0.75rem] leading-relaxed text-amber-900 font-bold">
                             PLC 프로젝트 폴더는 파일이 매우 많으므로, **반드시 압축(.zip)**해서 올리는 것을 권장합니다. 압축된 파일 하나가 통째로 HTML에 저장됩니다.
@@ -116,15 +116,13 @@
                         class="text-sm font-black text-slate-400 uppercase mb-6 border-b-2 pb-2 flex justify-between items-center">
                         <span class="flex items-center gap-2"><i data-lucide="list-checks" size="16"></i> 내장된 자산
                             리스트</span>
-                        <span id="file-count" class="bg-slate-100 px-2 py-0.5 rounded text-[0.6rem] text-slate-500">0
-                            Files</span>
+                        <span id="file-count" class="bg-slate-100 px-2 py-0.5 rounded text-[0.6rem] text-slate-500">0개 파일</span>
                     </h3>
 
                     <div id="file-list" class="flex-1 overflow-y-auto pr-2 space-y-3 custom-scrollbar">
                         <div id="empty-msg" class="h-full flex flex-col items-center justify-center text-slate-300">
                             <i data-lucide="ghost" size="48" class="mb-4 opacity-20"></i>
-                            <span class="font-black italic uppercase tracking-widest opacity-30 text-xl">Empty
-                                Storage</span>
+                            <span class="font-black italic uppercase tracking-widest opacity-30 text-xl">저장소 비어 있음</span>
                         </div>
                     </div>
                 </div>
