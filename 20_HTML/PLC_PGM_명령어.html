@@ -294,11 +294,11 @@ html, body { margin:0; padding:0; }
                     </div>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <button onclick="toggleScan()" id="scan-btn"
+                    <button onclick="__mtr_toggleScan()" id="scan-btn"
                         class="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl border-2 border-black font-black text-sm uppercase tracking-widest shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
                         <i data-lucide="play" id="scan-icon" size="16"></i> <span id="scan-text">스캔 중지</span>
                     </button>
-                    <button onclick="clearKeys()"
+                    <button onclick="__mtr_clearKeys()"
                         class="mt-2 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600">모든 키
                         해제</button>
                 </div>
@@ -576,6 +576,8 @@ html, body { margin:0; padding:0; }
 
         window.onload = init;
     
+window.__mtr_clearKeys = clearKeys;
+window.__mtr_toggleScan = toggleScan;
 })();</script>
 </section>
 <section id="sec-band" class="plc-section" style="display:none">
@@ -841,8 +843,8 @@ html, body { margin:0; padding:0; }
         }</style>
 <div class="container">
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('band', this)">BAND (불감대)</button>
-            <button class="tab-btn" onclick="switchTab('zone', this)">ZONE (존 제어)</button>
+            <button class="tab-btn active" onclick="__band_switchTab('band', this)">BAND (불감대)</button>
+            <button class="tab-btn" onclick="__band_switchTab('zone', this)">ZONE (존 제어)</button>
         </div>
 
         <!-- BAND 탭 내용 -->
@@ -851,12 +853,12 @@ html, body { margin:0; padding:0; }
 
             <p>어떤 상황에서 쓰는지 궁금하지? 아래 예제를 클릭해봐!</p>
             <div class="example-grid">
-                <button class="ex-btn active" onclick="loadEx(1, this)">1. 센서 노이즈</button>
-                <button class="ex-btn" onclick="loadEx(2, this)">2. 조이스틱 중립</button>
-                <button class="ex-btn" onclick="loadEx(3, this)">3. 서보 헌팅방지</button>
-                <button class="ex-btn" onclick="loadEx(4, this)">4. 로드셀 영점</button>
-                <button class="ex-btn" onclick="loadEx(5, this)">5. 텐션 완충</button>
-                <button class="ex-btn" onclick="loadEx(6, this)">🎲 랜덤(심화)</button>
+                <button class="ex-btn active" onclick="__band_loadEx(1, this)">1. 센서 노이즈</button>
+                <button class="ex-btn" onclick="__band_loadEx(2, this)">2. 조이스틱 중립</button>
+                <button class="ex-btn" onclick="__band_loadEx(3, this)">3. 서보 헌팅방지</button>
+                <button class="ex-btn" onclick="__band_loadEx(4, this)">4. 로드셀 영점</button>
+                <button class="ex-btn" onclick="__band_loadEx(5, this)">5. 텐션 완충</button>
+                <button class="ex-btn" onclick="__band_loadEx(6, this)">🎲 랜덤(심화)</button>
             </div>
 
             <div id="scenario-desc">
@@ -866,19 +868,19 @@ html, body { margin:0; padding:0; }
             <div class="control-panel">
                 <div class="slider-row">
                     <label>Min (하한값): <span id="s1-txt">-3</span></label>
-                    <input type="range" id="s1" min="-100" max="100" value="-3" oninput="sync()">
+                    <input type="range" id="s1" min="-100" max="100" value="-3" oninput="__band_sync()">
                 </div>
                 <div class="slider-row">
                     <label>Max (상한값): <span id="s2-txt">3</span></label>
-                    <input type="range" id="s2" min="-100" max="100" value="3" oninput="sync()">
+                    <input type="range" id="s2" min="-100" max="100" value="3" oninput="__band_sync()">
                 </div>
                 <div class="slider-row">
                     <label>In (입력값): <span id="s3-txt">2</span></label>
                     <div class="input-group">
-                        <input type="range" id="s3" min="-100" max="100" value="2" oninput="sync()">
+                        <input type="range" id="s3" min="-100" max="100" value="2" oninput="__band_sync()">
                         <div class="btn-group">
-                            <button class="adj-btn" onclick="adjustValue('s3', -1)">▼</button>
-                            <button class="adj-btn" onclick="adjustValue('s3', 1)">▲</button>
+                            <button class="adj-btn" onclick="__band_adjustValue('s3', -1)">▼</button>
+                            <button class="adj-btn" onclick="__band_adjustValue('s3', 1)">▲</button>
                         </div>
                     </div>
                 </div>
@@ -922,19 +924,19 @@ html, body { margin:0; padding:0; }
             <div class="control-panel">
                 <div class="slider-row">
                     <label>Min(s1, 하한): <span id="z-s1-t">-30</span></label>
-                    <input type="range" id="z-s1" min="-100" max="100" value="-30" oninput="syncZone()">
+                    <input type="range" id="z-s1" min="-100" max="100" value="-30" oninput="__band_syncZone()">
                 </div>
                 <div class="slider-row">
                     <label>Max(s2, 상한): <span id="z-s2-t">30</span></label>
-                    <input type="range" id="z-s2" min="-100" max="100" value="30" oninput="syncZone()">
+                    <input type="range" id="z-s2" min="-100" max="100" value="30" oninput="__band_syncZone()">
                 </div>
                 <div class="slider-row">
                     <label>In(s3, 입력): <span id="z-s3-t">50</span></label>
                     <div class="input-group">
-                        <input type="range" id="z-s3" min="-100" max="100" value="50" oninput="syncZone()">
+                        <input type="range" id="z-s3" min="-100" max="100" value="50" oninput="__band_syncZone()">
                         <div class="btn-group">
-                            <button class="adj-btn" onclick="adjustZoneValue('z-s3', -1)">▼</button>
-                            <button class="adj-btn" onclick="adjustZoneValue('z-s3', 1)">▲</button>
+                            <button class="adj-btn" onclick="__band_adjustZoneValue('z-s3', -1)">▼</button>
+                            <button class="adj-btn" onclick="__band_adjustZoneValue('z-s3', 1)">▲</button>
                         </div>
                     </div>
                 </div>
@@ -1116,6 +1118,12 @@ html, body { margin:0; padding:0; }
         createZoneRuler();
         syncZone();
     
+window.__band_adjustValue = adjustValue;
+window.__band_adjustZoneValue = adjustZoneValue;
+window.__band_loadEx = loadEx;
+window.__band_switchTab = switchTab;
+window.__band_sync = sync;
+window.__band_syncZone = syncZone;
 })();</script>
 </section>
 <section id="sec-bon" class="plc-section" style="display:none">
@@ -1243,7 +1251,7 @@ html, body { margin:0; padding:0; }
                         </h3>
                         <div class="flex items-center gap-4">
                             <label class="font-black text-sm text-slate-700">판정할 비트 번호 (n):</label>
-                            <input type="number" id="sec-bon-n-input" value="5" min="0" max="15" oninput="update()"
+                            <input type="number" id="sec-bon-n-input" value="5" min="0" max="15" oninput="__bon_update()"
                                 class="w-20 py-2 text-center text-xl font-black rounded-lg">
                         </div>
                     </div>
@@ -1373,6 +1381,7 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
 
         window.onload = init;
     
+window.__bon_update = update;
 })();</script>
 </section>
 <section id="sec-date" class="plc-section" style="display:none">
@@ -1649,49 +1658,49 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
                     <i data-lucide="zap" size="14"></i> 명령어 선택
                 </h3>
                 <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar pr-1">
-                    <button onclick="selectOp('DATERD')" id="btn-DATERD"
+                    <button onclick="__date_selectOp('DATERD')" id="btn-DATERD"
                         class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between active">
                         <div>
                             <span class="btn-main-label">DATERD</span>
                             <span class="btn-sub-label">시계 데이터 읽기</span>
                         </div>
                     </button>
-                    <button onclick="selectOp('DATEWR')" id="btn-DATEWR"
+                    <button onclick="__date_selectOp('DATEWR')" id="btn-DATEWR"
                         class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
                         <div>
                             <span class="btn-main-label">DATEWR</span>
                             <span class="btn-sub-label">시계 데이터 쓰기</span>
                         </div>
                     </button>
-                    <button onclick="selectOp('TIME2SEC')" id="btn-TIME2SEC"
+                    <button onclick="__date_selectOp('TIME2SEC')" id="btn-TIME2SEC"
                         class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
                         <div>
                             <span class="btn-main-label">TIME2SEC</span>
                             <span class="btn-sub-label">시분초 → 초 변환</span>
                         </div>
                     </button>
-                    <button onclick="selectOp('SEC2TIME')" id="btn-SEC2TIME"
+                    <button onclick="__date_selectOp('SEC2TIME')" id="btn-SEC2TIME"
                         class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
                         <div>
                             <span class="btn-main-label">SEC2TIME</span>
                             <span class="btn-sub-label">초 → 시분초 역변환</span>
                         </div>
                     </button>
-                    <button onclick="selectOp('TCMP')" id="btn-TCMP"
+                    <button onclick="__date_selectOp('TCMP')" id="btn-TCMP"
                         class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
                         <div>
                             <span class="btn-main-label">TCMP</span>
                             <span class="btn-sub-label">시간 데이터 비교</span>
                         </div>
                     </button>
-                    <button onclick="selectOp('DUTY')" id="btn-DUTY"
+                    <button onclick="__date_selectOp('DUTY')" id="btn-DUTY"
                         class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
                         <div>
                             <span class="btn-main-label">DUTY</span>
                             <span class="btn-sub-label">타이밍 펄스 발생</span>
                         </div>
                     </button>
-                    <button onclick="selectOp('TIMCHK')" id="btn-TIMCHK"
+                    <button onclick="__date_selectOp('TIMCHK')" id="btn-TIMCHK"
                         class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
                         <div>
                             <span class="btn-main-label">TIMCHK</span>
@@ -1720,11 +1729,11 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
                 </div>
 
                 <div class="mt-4 flex gap-3">
-                    <button type="button" onclick="undo()"
+                    <button type="button" onclick="__date_undo()"
                         class="flex-1 bg-slate-800 hover:bg-black text-white h-14 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-base flex items-center justify-center gap-2 transition-all">
                         <i data-lucide="rotate-ccw" size="18"></i> 되돌리기
                     </button>
-                    <button type="button" onclick="executeAction()" id="sec-date-exec-btn"
+                    <button type="button" onclick="__date_executeAction()" id="sec-date-exec-btn"
                         class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-14 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-lg flex items-center justify-center gap-2 transition-all">
                         <i data-lucide="play-circle" size="22" fill="white"></i> <span id="exec-text">실행</span>
                     </button>
@@ -1986,12 +1995,12 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
                                 <span class="text-[0.7rem] font-bold text-blue-600">▲/▼ 또는 직접 입력</span>
                             </div>
                             <div class="grid grid-cols-2 gap-3">
-                                ${renderEditableReg(20, '연도 (Year)', editRTC.year, 'year', 'changeEditRTC')}
-                                ${renderEditableReg(23, '시 (Hour)', editRTC.hour, 'hour', 'changeEditRTC')}
-                                ${renderEditableReg(21, '월 (Month)', editRTC.month, 'month', 'changeEditRTC')}
-                                ${renderEditableReg(24, '분 (Minute)', editRTC.min, 'min', 'changeEditRTC')}
-                                ${renderEditableReg(22, '일 (Day)', editRTC.day, 'day', 'changeEditRTC')}
-                                ${renderEditableReg(25, '초 (Second)', editRTC.sec, 'sec', 'changeEditRTC')}
+                                ${renderEditableReg(20, '연도 (Year)', editRTC.year, 'year', '__date_changeEditRTC')}
+                                ${renderEditableReg(23, '시 (Hour)', editRTC.hour, 'hour', '__date_changeEditRTC')}
+                                ${renderEditableReg(21, '월 (Month)', editRTC.month, 'month', '__date_changeEditRTC')}
+                                ${renderEditableReg(24, '분 (Minute)', editRTC.min, 'min', '__date_changeEditRTC')}
+                                ${renderEditableReg(22, '일 (Day)', editRTC.day, 'day', '__date_changeEditRTC')}
+                                ${renderEditableReg(25, '초 (Second)', editRTC.sec, 'sec', '__date_changeEditRTC')}
                             </div>
                             <div class="mt-3 p-3 bg-emerald-50 border-2 border-emerald-500 rounded-xl text-center">
                                 <span class="text-xs font-black text-emerald-800">
@@ -2008,11 +2017,11 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
                         <div class="bg-white p-5 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] space-y-4">
                             <span class="text-xs font-black text-slate-500 uppercase block mb-1">입력 시분초 (D10, D11, D12)</span>
                             <div class="flex justify-around items-center bg-slate-50 p-4 rounded-xl border-2 border-black">
-                                ${renderInputColumn('HH (시)', time2secInput.hour, 'hour', 'changeTime2Sec')}
+                                ${renderInputColumn('HH (시)', time2secInput.hour, 'hour', '__date_changeTime2Sec')}
                                 <span class="text-3xl font-black text-slate-400">:</span>
-                                ${renderInputColumn('MM (분)', time2secInput.min, 'min', 'changeTime2Sec')}
+                                ${renderInputColumn('MM (분)', time2secInput.min, 'min', '__date_changeTime2Sec')}
                                 <span class="text-3xl font-black text-slate-400">:</span>
-                                ${renderInputColumn('SS (초)', time2secInput.sec, 'sec', 'changeTime2Sec')}
+                                ${renderInputColumn('SS (초)', time2secInput.sec, 'sec', '__date_changeTime2Sec')}
                             </div>
                             <div class="text-center text-2xl text-blue-500 font-bold">⬇️ (HH×3600) + (MM×60) + SS</div>
                             <div class="bg-blue-900 p-5 rounded-2xl text-center text-white border-4 border-black shadow-[4px_4px_0px_#000]">
@@ -2034,12 +2043,12 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
                                     <span class="text-[0.7rem] block uppercase tracking-wider text-indigo-300 font-bold mb-1">입력 누적 초 (D100)</span>
                                     <input type="number" min="0" value="${totalSeconds}"
                                         class="bg-transparent text-3xl font-black text-cyan-300 w-full text-center outline-none font-mono"
-                                        onchange="updateTotalSeconds(this.value)">
+                                        onchange="__date_updateTotalSeconds(this.value)">
                                 </div>
                                 <div class="flex flex-col gap-1 ml-4">
-                                    <button type="button" onclick="adjustTotalSeconds(3600)" class="ud-btn !w-14 text-[0.65rem]">+1시간</button>
-                                    <button type="button" onclick="adjustTotalSeconds(60)" class="ud-btn !w-14 text-[0.65rem]">+1분</button>
-                                    <button type="button" onclick="adjustTotalSeconds(-60)" class="ud-btn !w-14 text-[0.65rem]">-1분</button>
+                                    <button type="button" onclick="__date_adjustTotalSeconds(3600)" class="ud-btn !w-14 text-[0.65rem]">+1시간</button>
+                                    <button type="button" onclick="__date_adjustTotalSeconds(60)" class="ud-btn !w-14 text-[0.65rem]">+1분</button>
+                                    <button type="button" onclick="__date_adjustTotalSeconds(-60)" class="ud-btn !w-14 text-[0.65rem]">-1분</button>
                                 </div>
                             </div>
                             <div class="text-center text-2xl text-indigo-600 font-bold">⬇️ 시 / 분 / 초 역변환</div>
@@ -2080,11 +2089,11 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
                             <div>
                                 <span class="text-xs font-black text-slate-500 uppercase block mb-1">목표 시각 설정 (s1:시, s2:분, s3:초)</span>
                                 <div class="flex justify-around bg-slate-50 p-4 rounded-xl border-2 border-black">
-                                    ${renderInputColumn('목표 시', tcmpTime.hour, 'hour', 'changeTCMP')}
+                                    ${renderInputColumn('목표 시', tcmpTime.hour, 'hour', '__date_changeTCMP')}
                                     <span class="text-3xl font-black text-slate-300">:</span>
-                                    ${renderInputColumn('목표 분', tcmpTime.min, 'min', 'changeTCMP')}
+                                    ${renderInputColumn('목표 분', tcmpTime.min, 'min', '__date_changeTCMP')}
                                     <span class="text-3xl font-black text-slate-300">:</span>
-                                    ${renderInputColumn('목표 초', tcmpTime.sec, 'sec', 'changeTCMP')}
+                                    ${renderInputColumn('목표 초', tcmpTime.sec, 'sec', '__date_changeTCMP')}
                                 </div>
                             </div>
 
@@ -2141,11 +2150,11 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
                                         <label class="text-[0.65rem] block font-black text-slate-400">ON 시간 (n1, 초)</label>
                                         <input type="number" min="1" value="${dutySettings.on}"
                                             class="font-black text-xl w-14 text-center bg-transparent outline-none font-mono"
-                                            onchange="updateDutySetting('on', this.value)">
+                                            onchange="__date_updateDutySetting('on', this.value)">
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <button type="button" onclick="adjustDutySetting('on', 1)" class="ud-btn">▲</button>
-                                        <button type="button" onclick="adjustDutySetting('on', -1)" class="ud-btn">▼</button>
+                                        <button type="button" onclick="__date_adjustDutySetting('on', 1)" class="ud-btn">▲</button>
+                                        <button type="button" onclick="__date_adjustDutySetting('on', -1)" class="ud-btn">▼</button>
                                     </div>
                                 </div>
                                 <div class="p-3 border-2 border-black rounded-xl flex items-center justify-between bg-slate-50">
@@ -2153,11 +2162,11 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
                                         <label class="text-[0.65rem] block font-black text-slate-400">전체 주기 (n2, 초)</label>
                                         <input type="number" min="2" value="${dutySettings.total}"
                                             class="font-black text-xl w-14 text-center bg-transparent outline-none font-mono"
-                                            onchange="updateDutySetting('total', this.value)">
+                                            onchange="__date_updateDutySetting('total', this.value)">
                                     </div>
                                     <div class="flex flex-col gap-1">
-                                        <button type="button" onclick="adjustDutySetting('total', 1)" class="ud-btn">▲</button>
-                                        <button type="button" onclick="adjustDutySetting('total', -1)" class="ud-btn">▼</button>
+                                        <button type="button" onclick="__date_adjustDutySetting('total', 1)" class="ud-btn">▲</button>
+                                        <button type="button" onclick="__date_adjustDutySetting('total', -1)" class="ud-btn">▼</button>
                                     </div>
                                 </div>
                             </div>
@@ -2198,7 +2207,7 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
                             </div>
 
                             <div class="w-full flex justify-end">
-                                <button type="button" onclick="resetTimchk()" class="text-xs font-bold text-slate-500 hover:text-black underline">
+                                <button type="button" onclick="__date_resetTimchk()" class="text-xs font-bold text-slate-500 hover:text-black underline">
                                     타이머 리셋 (0으로 초기화)
                                 </button>
                             </div>
@@ -2640,6 +2649,17 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
             safeCreateIcons();
         };
     
+window.__date_adjustDutySetting = adjustDutySetting;
+window.__date_adjustTotalSeconds = adjustTotalSeconds;
+window.__date_executeAction = executeAction;
+window.__date_resetTimchk = resetTimchk;
+window.__date_selectOp = selectOp;
+window.__date_undo = undo;
+window.__date_updateDutySetting = updateDutySetting;
+window.__date_updateTotalSeconds = updateTotalSeconds;
+window.__date_changeEditRTC = changeEditRTC;
+window.__date_changeTime2Sec = changeTime2Sec;
+window.__date_changeTCMP = changeTCMP;
 })();</script>
 </section>
 <section id="sec-dsfr" class="plc-section" style="display:none">
@@ -2858,16 +2878,16 @@ BON(1, <span class="var">D10</span>, <span id="sec-bon-code-n2">5</span>, <span 
                             <div class="flex items-center gap-3 bg-white px-4 py-2 border-2 border-black rounded-xl">
                                 <label class="text-[0.65rem] font-black text-slate-400 uppercase">Shift Range
                                     (n):</label>
-                                <input type="number" id="sec-dsfr-n-input" value="7" min="2" max="100" oninput="changeN()"
+                                <input type="number" id="sec-dsfr-n-input" value="7" min="2" max="100" oninput="__dsfr_changeN()"
                                     class="w-16 text-center text-2xl font-black outline-none text-blue-600">
                                 <div class="flex flex-col gap-1">
-                                    <button onclick="stepN(1)" class="ud-btn text-[0.7rem]">▲</button>
-                                    <button onclick="stepN(-1)" class="ud-btn text-[0.7rem]">▼</button>
+                                    <button onclick="__dsfr_stepN(1)" class="ud-btn text-[0.7rem]">▲</button>
+                                    <button onclick="__dsfr_stepN(-1)" class="ud-btn text-[0.7rem]">▼</button>
                                 </div>
                             </div>
-                            <button onclick="executeShift()"
+                            <button onclick="__dsfr_executeShift()"
                                 class="btn-shift bg-blue-600 text-white px-10 py-3 font-black rounded-lg uppercase text-lg">Shift</button>
-                            <button onclick="resetData()"
+                            <button onclick="__dsfr_resetData()"
                                 class="btn-shift bg-white text-black px-10 py-3 font-black rounded-lg text-lg">초기화</button>
                         </div>
                     </div>
@@ -2984,7 +3004,7 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                 const val = wordData[i] || 0;
                 div.innerHTML = `
                 <span class="unit-label">D${addr}</span>
-                <input type="number" value="${val}" class="unit-value" ${interactive ? '' : 'disabled'} oninput="updateData(${i}, this.value)">
+                <input type="number" value="${val}" class="unit-value" ${interactive ? '' : 'disabled'} oninput="__dsfr_updateData(${i}, this.value)">
             `;
                 container.appendChild(div);
             }
@@ -3094,6 +3114,11 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
         window.onload = init;
         window.onresize = drawAllArrows;
     
+window.__dsfr_changeN = changeN;
+window.__dsfr_executeShift = executeShift;
+window.__dsfr_resetData = resetData;
+window.__dsfr_stepN = stepN;
+window.__dsfr_updateData = updateData;
 })();</script>
 </section>
 <section id="sec-dsortd" class="plc-section" style="display:none">
@@ -3385,11 +3410,11 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                     </div>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <button onclick="randomizeTable()"
+                    <button onclick="__dsortd_randomizeTable()"
                         class="bg-emerald-500 hover:bg-emerald-600 text-white p-3 rounded-xl border-2 border-black font-black text-xs uppercase tracking-widest shadow-[3px_3px_0px_#000] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
                         <i data-lucide="refresh-cw" size="14"></i> 랜덤 데이터 생성
                     </button>
-                    <button onclick="resetTable()"
+                    <button onclick="__dsortd_resetTable()"
                         class="mt-2 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600">메모리 초기화</button>
                 </div>
             </div>
@@ -3414,7 +3439,7 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                                 <span id="sm703-label" class="text-[0.75rem] font-black text-blue-600 uppercase">OFF (오름)</span>
                             </div>
                             <label class="toggle-switch">
-                                <input type="checkbox" id="sm703-toggle" onchange="updateSortMode()">
+                                <input type="checkbox" id="sm703-toggle" onchange="__dsortd_updateSortMode()">
                                 <span class="slider"></span>
                             </label>
                         </div>
@@ -3426,11 +3451,11 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                         <div class="flex-1">
                             <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">데이터 수 (N)</label>
                             <input type="number" id="sec-dsortd-input-n" value="6" min="2" max="10"
-                                class="data-input text-blue-600" onchange="renderTable()">
+                                class="data-input text-blue-600" onchange="__dsortd_renderTable()">
                         </div>
                         <div class="flex flex-col gap-1 ml-3">
-                            <button onclick="stepN(1)" class="ud-btn">▲</button>
-                            <button onclick="stepN(-1)" class="ud-btn">▼</button>
+                            <button onclick="__dsortd_stepN(1)" class="ud-btn">▲</button>
+                            <button onclick="__dsortd_stepN(-1)" class="ud-btn">▼</button>
                         </div>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
@@ -3440,18 +3465,18 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                                 class="data-input text-orange-600">
                         </div>
                         <div class="flex flex-col gap-1 ml-3">
-                            <button onclick="stepS2(1)" class="ud-btn">▲</button>
-                            <button onclick="stepS2(-1)" class="ud-btn">▼</button>
+                            <button onclick="__dsortd_stepS2(1)" class="ud-btn">▲</button>
+                            <button onclick="__dsortd_stepS2(-1)" class="ud-btn">▼</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex gap-3 mb-6">
-                    <button onclick="undo()" id="sec-dsortd-undo-btn"
+                    <button onclick="__dsortd_undo()" id="sec-dsortd-undo-btn"
                         class="flex-1 bg-slate-800 hover:bg-black text-white h-20 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-xl flex items-center justify-center gap-3 transition-all">
                         <i data-lucide="rotate-ccw"></i> 되돌리기
                     </button>
-                    <button onclick="runSort()" id="sec-dsortd-exec-btn"
+                    <button onclick="__dsortd_runSort()" id="sec-dsortd-exec-btn"
                         class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-20 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-2xl flex items-center justify-center gap-3 transition-all">
                         <i data-lucide="play-circle" fill="white"></i> 정렬 시작
                     </button>
@@ -3591,7 +3616,7 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                 row.innerHTML = `
                     <div class="text-[0.75rem] font-mono text-slate-500 font-black text-center leading-tight">D${addr1}<br/>D${addr2}</div>
                     <div class="h-16 rounded-xl border-[3px] border-black flex items-center px-6 bg-white shadow-[3px_3px_0px_#000] relative overflow-hidden">
-                        <input type="number" value="${val}" class="data-input" onchange="updateData(${i}, this.value)" ${isSorting ? 'disabled' : ''}>
+                        <input type="number" value="${val}" class="data-input" onchange="__dsortd_updateData(${i}, this.value)" ${isSorting ? 'disabled' : ''}>
                         <div class="absolute inset-0 bg-blue-500/5 pointer-events-none opacity-0 transition-opacity compare-highlight"></div>
                     </div>
                     <div class="text-right font-mono text-[0.6rem] font-black text-slate-300 italic uppercase">#${i}</div>`;
@@ -3707,6 +3732,15 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
 
         window.onload = () => { lucide.createIcons(); initMemos(); renderTable(); updateSortMode(); };
     
+window.__dsortd_randomizeTable = randomizeTable;
+window.__dsortd_renderTable = renderTable;
+window.__dsortd_resetTable = resetTable;
+window.__dsortd_runSort = runSort;
+window.__dsortd_stepN = stepN;
+window.__dsortd_stepS2 = stepS2;
+window.__dsortd_undo = undo;
+window.__dsortd_updateData = updateData;
+window.__dsortd_updateSortMode = updateSortMode;
 })();</script>
 </section>
 <section id="sec-fifw" class="plc-section" style="display:none">
@@ -3961,33 +3995,33 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                 </h3>
 
                 <div class="space-y-3 flex-1 overflow-y-auto pr-1 custom-scrollbar">
-                    <button onclick="selectOp('FIFW')" id="btn-FIFW"
+                    <button onclick="__fifw_selectOp('FIFW')" id="btn-FIFW"
                         class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between">
                         <div><span class="btn-main-label">FIFW</span><span class="btn-sub-label">(테이블 쓰기)</span></div>
                         <i data-lucide="chevron-right"></i>
                     </button>
-                    <button onclick="selectOp('FIFR')" id="btn-FIFR"
+                    <button onclick="__fifw_selectOp('FIFR')" id="btn-FIFR"
                         class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between">
                         <div><span class="btn-main-label">FIFR</span><span class="btn-sub-label">(선입 읽기)</span></div>
                         <i data-lucide="log-out" class="text-blue-600"></i>
                     </button>
-                    <button onclick="selectOp('FPOP')" id="btn-FPOP"
+                    <button onclick="__fifw_selectOp('FPOP')" id="btn-FPOP"
                         class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between">
                         <div><span class="btn-main-label">FPOP</span><span class="btn-sub-label">(후입 읽기)</span></div>
                         <i data-lucide="arrow-down-to-dot" class="text-orange-600"></i>
                     </button>
-                    <button onclick="selectOp('FINS')" id="btn-FINS"
+                    <button onclick="__fifw_selectOp('FINS')" id="btn-FINS"
                         class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between">
                         <div><span class="btn-main-label">FINS</span><span class="btn-sub-label">(데이터 삽입)</span></div>
                         <i data-lucide="user-plus" class="text-emerald-600"></i>
                     </button>
-                    <button onclick="selectOp('FDEL')" id="btn-FDEL"
+                    <button onclick="__fifw_selectOp('FDEL')" id="btn-FDEL"
                         class="op-select-btn bg-white w-full rounded-2xl flex items-center justify-between">
                         <div><span class="btn-main-label">FDEL</span><span class="btn-sub-label">(데이터 삭제)</span></div>
                         <i data-lucide="user-minus" class="text-rose-600"></i>
                     </button>
                 </div>
-                <button onclick="resetTable()"
+                <button onclick="__fifw_resetTable()"
                     class="mt-4 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600 transition-colors">모든 데이터 삭제</button>
             </div>
         </div>
@@ -4019,8 +4053,8 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                             <input type="number" id="input-s" value="100" class="data-input text-blue-600">
                         </div>
                         <div class="flex flex-col gap-1 ml-3">
-                            <button onclick="stepS(10)" class="ud-btn">▲</button>
-                            <button onclick="stepS(-10)" class="ud-btn">▼</button>
+                            <button onclick="__fifw_stepS(10)" class="ud-btn">▲</button>
+                            <button onclick="__fifw_stepS(-10)" class="ud-btn">▼</button>
                         </div>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
@@ -4030,18 +4064,18 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                                 class="data-input text-orange-600">
                         </div>
                         <div class="flex flex-col gap-1 ml-3">
-                            <button onclick="stepN(1)" class="ud-btn">▲</button>
-                            <button onclick="stepN(-1)" class="ud-btn">▼</button>
+                            <button onclick="__fifw_stepN(1)" class="ud-btn">▲</button>
+                            <button onclick="__fifw_stepN(-1)" class="ud-btn">▼</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex gap-3 mb-6">
-                    <button onclick="undo()"
+                    <button onclick="__fifw_undo()"
                         class="flex-1 bg-slate-800 hover:bg-black text-white h-20 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-xl flex items-center justify-center gap-3 transition-all">
                         <i data-lucide="rotate-ccw"></i> 되돌리기
                     </button>
-                    <button onclick="runExecution()" id="sec-fifw-exec-btn"
+                    <button onclick="__fifw_runExecution()" id="sec-fifw-exec-btn"
                         class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-20 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-2xl flex items-center justify-center gap-3 transition-all">
                         <i data-lucide="play" fill="white"></i> 실행
                     </button>
@@ -4076,11 +4110,11 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                 </div>
 
                 <div class="flex gap-1 mb-6 overflow-x-auto no-scrollbar border-b border-slate-800">
-                    <button onclick="selectOp('FIFW')" id="tab-FIFW" class="tab-btn px-3 py-2 font-black">FIFW</button>
-                    <button onclick="selectOp('FIFR')" id="tab-FIFR" class="tab-btn px-3 py-2 font-black">FIFR</button>
-                    <button onclick="selectOp('FPOP')" id="tab-FPOP" class="tab-btn px-3 py-2 font-black">FPOP</button>
-                    <button onclick="selectOp('FINS')" id="tab-FINS" class="tab-btn px-3 py-2 font-black">FINS</button>
-                    <button onclick="selectOp('FDEL')" id="tab-FDEL" class="tab-btn px-3 py-2 font-black">FDEL</button>
+                    <button onclick="__fifw_selectOp('FIFW')" id="tab-FIFW" class="tab-btn px-3 py-2 font-black">FIFW</button>
+                    <button onclick="__fifw_selectOp('FIFR')" id="tab-FIFR" class="tab-btn px-3 py-2 font-black">FIFR</button>
+                    <button onclick="__fifw_selectOp('FPOP')" id="tab-FPOP" class="tab-btn px-3 py-2 font-black">FPOP</button>
+                    <button onclick="__fifw_selectOp('FINS')" id="tab-FINS" class="tab-btn px-3 py-2 font-black">FINS</button>
+                    <button onclick="__fifw_selectOp('FDEL')" id="tab-FDEL" class="tab-btn px-3 py-2 font-black">FDEL</button>
                 </div>
 
                 <div id="sec-fifw-hb-content" class="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2"></div>
@@ -4173,7 +4207,7 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                 row.className = `grid grid-cols-[80px_1fr_60px] gap-4 items-center transition-all duration-300`;
                 row.innerHTML = `<div class="text-[0.65rem] font-mono text-slate-400 font-black text-center">D${101 + i}</div>
                     <div class="h-12 rounded-xl border-[3px] flex items-center px-4 relative transition-all ${val !== null ? 'bg-white ' + borderClass + ' shadow-[3px_3px_0px_#000]' : 'bg-slate-50 border-slate-200 border-dashed'}">
-                        <input type="number" value="${val !== null ? val : ''}" class="data-input" onchange="updateData(${i}, this.value)" ${val === null && i > tableData.length ? 'disabled' : ''}>
+                        <input type="number" value="${val !== null ? val : ''}" class="data-input" onchange="__fifw_updateData(${i}, this.value)" ${val === null && i > tableData.length ? 'disabled' : ''}>
                     </div>
                     <div class="text-right font-mono text-[0.6rem] font-black text-slate-300 italic uppercase">#${i}</div>`;
                 body.appendChild(row);
@@ -4276,6 +4310,13 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
             lucide.createIcons(); initMemos(); selectOp('FIFW'); renderTable();
         };
     
+window.__fifw_resetTable = resetTable;
+window.__fifw_runExecution = runExecution;
+window.__fifw_selectOp = selectOp;
+window.__fifw_stepN = stepN;
+window.__fifw_stepS = stepS;
+window.__fifw_undo = undo;
+window.__fifw_updateData = updateData;
 })();</script>
 </section>
 <section id="sec-pwm" class="plc-section" style="display:none">
@@ -4529,11 +4570,11 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                     </div>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <button onclick="setFastPreset()"
+                    <button onclick="__pwm_setFastPreset()"
                         class="bg-indigo-500 hover:bg-indigo-600 text-white p-3 rounded-xl border-2 border-black font-black text-xs uppercase tracking-widest shadow-[3px_3px_0px_#000] active:translate-y-1 active:shadow-none transition-all">
                         고속 모드 (20%)
                     </button>
-                    <button onclick="resetTable()"
+                    <button onclick="__pwm_resetTable()"
                         class="mt-2 text-slate-400 font-black text-xs uppercase tracking-widest hover:text-red-600">초기 설정으로 리셋</button>
                 </div>
             </div>
@@ -4560,22 +4601,22 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                         <div class="flex-1">
                             <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">ON 시간 (s1)</label>
                             <input type="number" id="sec-pwm-input-s1" value="500" min="1" max="65535"
-                                class="data-input text-blue-600" onchange="updatePWM()">
+                                class="data-input text-blue-600" onchange="__pwm_updatePWM()">
                         </div>
                         <div class="flex flex-col gap-1 ml-3">
-                            <button onclick="stepS1(100)" class="ud-btn">▲</button>
-                            <button onclick="stepS1(-100)" class="ud-btn">▼</button>
+                            <button onclick="__pwm_stepS1(100)" class="ud-btn">▲</button>
+                            <button onclick="__pwm_stepS1(-100)" class="ud-btn">▼</button>
                         </div>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-3xl border-2 border-black flex items-center justify-between">
                         <div class="flex-1">
                             <label class="text-[0.65rem] font-black text-slate-500 uppercase block mb-1">주기 시간 (s2)</label>
                             <input type="number" id="sec-pwm-input-s2" value="1000" min="2" max="65535"
-                                class="data-input text-orange-600" onchange="updatePWM()">
+                                class="data-input text-orange-600" onchange="__pwm_updatePWM()">
                         </div>
                         <div class="flex flex-col gap-1 ml-3">
-                            <button onclick="stepS2(100)" class="ud-btn">▲</button>
-                            <button onclick="stepS2(-100)" class="ud-btn">▼</button>
+                            <button onclick="__pwm_stepS2(100)" class="ud-btn">▲</button>
+                            <button onclick="__pwm_stepS2(-100)" class="ud-btn">▼</button>
                         </div>
                     </div>
                 </div>
@@ -4628,11 +4669,11 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                 </div>
 
                 <div class="flex gap-3">
-                    <button onclick="undo()" id="sec-pwm-undo-btn"
+                    <button onclick="__pwm_undo()" id="sec-pwm-undo-btn"
                         class="flex-1 bg-slate-800 hover:bg-black text-white h-16 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-lg flex items-center justify-center gap-3 transition-all">
                         <i data-lucide="rotate-ccw"></i> 되돌리기
                     </button>
-                    <button onclick="toggleRun()" id="sec-pwm-exec-btn"
+                    <button onclick="__pwm_toggleRun()" id="sec-pwm-exec-btn"
                         class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-16 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-xl flex items-center justify-center gap-3 transition-all">
                         <i data-lucide="play-circle" fill="white"></i> <span id="run-text">출력 정지</span>
                     </button>
@@ -4907,6 +4948,13 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
             animateOutput();
         };
     
+window.__pwm_resetTable = resetTable;
+window.__pwm_setFastPreset = setFastPreset;
+window.__pwm_stepS1 = stepS1;
+window.__pwm_stepS2 = stepS2;
+window.__pwm_toggleRun = toggleRun;
+window.__pwm_undo = undo;
+window.__pwm_updatePWM = updatePWM;
 })();</script>
 </section>
 <section id="sec-rampq" class="plc-section" style="display:none">
@@ -5040,10 +5088,10 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                             경사 신호 시각화
                         </h3>
                         <div class="flex gap-2">
-                            <button onclick="startRamp()"
+                            <button onclick="__rampq_startRamp()"
                                 class="btn-action bg-blue-600 text-white px-6 py-2 font-black rounded-lg">START (X0
                                 ON)</button>
-                            <button onclick="resetRamp()"
+                            <button onclick="__rampq_resetRamp()"
                                 class="btn-action bg-white text-black px-6 py-2 font-black rounded-lg">RESET</button>
                         </div>
                     </div>
@@ -5073,7 +5121,7 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                                 <span class="text-[0.6rem] font-black text-indigo-400 uppercase tracking-tighter">Target
                                     Reach Time</span>
                                 <div class="flex items-center gap-1">
-                                    <input type="number" id="calc-sec" value="3" oninput="calculateSteps()"
+                                    <input type="number" id="calc-sec" value="3" oninput="__rampq_calculateSteps()"
                                         class="w-12 bg-transparent text-xl font-black text-indigo-700 focus:outline-none">
                                     <span class="font-black text-indigo-700">초 동안 상승</span>
                                 </div>
@@ -5104,7 +5152,7 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                         </div>
                         <div class="bg-white p-3 rounded-lg border-2 border-black border-indigo-500">
                             <label class="text-[0.65rem] font-bold text-indigo-400 uppercase">Steps (n)</label>
-                            <input type="number" id="sec-rampq-input-n" value="300" oninput="updateLabels()"
+                            <input type="number" id="sec-rampq-input-n" value="300" oninput="__rampq_updateLabels()"
                                 class="text-2xl font-black w-full outline-none text-indigo-600">
                         </div>
                     </div>
@@ -5246,6 +5294,10 @@ RAMPQ(<span class="var">X0</span>, 0, 1000, <span class="var">D10</span>, 300, <
 
         window.onload = calculateSteps;
     
+window.__rampq_calculateSteps = calculateSteps;
+window.__rampq_resetRamp = resetRamp;
+window.__rampq_startRamp = startRamp;
+window.__rampq_updateLabels = updateLabels;
 })();</script>
 </section>
 <section id="sec-ror" class="plc-section" style="display:none">
@@ -5468,16 +5520,16 @@ RAMPQ(<span class="var">X0</span>, 0, 1000, <span class="var">D10</span>, 300, <
                         <div class="flex items-center gap-4">
                             <div class="flex items-center gap-3 bg-white px-3 py-1 border-2 border-black rounded-xl">
                                 <label class="text-[0.6rem] font-black text-slate-400 uppercase">Rotate (n):</label>
-                                <input type="number" id="sec-ror-n-input" value="1" min="0" max="15" oninput="updateLabels()"
+                                <input type="number" id="sec-ror-n-input" value="1" min="0" max="15" oninput="__ror_updateLabels()"
                                     class="w-12 text-center text-xl font-black outline-none text-blue-600">
                                 <div class="flex flex-col gap-1">
-                                    <button onclick="stepN(1)" class="ud-btn">▲</button>
-                                    <button onclick="stepN(-1)" class="ud-btn">▼</button>
+                                    <button onclick="__ror_stepN(1)" class="ud-btn">▲</button>
+                                    <button onclick="__ror_stepN(-1)" class="ud-btn">▼</button>
                                 </div>
                             </div>
-                            <button onclick="executeRotate()"
+                            <button onclick="__ror_executeRotate()"
                                 class="btn-shift bg-blue-600 text-white px-8 py-3 font-black rounded-lg uppercase">Rotate</button>
-                            <button onclick="resetBits()"
+                            <button onclick="__ror_resetBits()"
                                 class="btn-shift bg-white text-black px-8 py-3 font-black rounded-lg">초기화</button>
                         </div>
                     </div>
@@ -5716,6 +5768,10 @@ RORP(1, <span id="sec-ror-code-n2">1</span>, <span class="var">D10</span>);
         window.onload = init;
         window.onresize = drawAllArrows;
     
+window.__ror_executeRotate = executeRotate;
+window.__ror_resetBits = resetBits;
+window.__ror_stepN = stepN;
+window.__ror_updateLabels = updateLabels;
 })();</script>
 </section>
 <section id="sec-rotc" class="plc-section" style="display:none">
@@ -5911,8 +5967,8 @@ RORP(1, <span id="sec-ror-code-n2">1</span>, <span class="var">D10</span>);
                                 <input type="number" id="target-station" value="0" min="0" max="9" readonly
                                     class="text-3xl font-black w-1/2 bg-transparent outline-none">
                                 <div class="flex flex-col gap-1">
-                                    <button onclick="changeStation(1)" class="ud-btn text-lg">▲</button>
-                                    <button onclick="changeStation(-1)" class="ud-btn text-lg">▼</button>
+                                    <button onclick="__rotc_changeStation(1)" class="ud-btn text-lg">▲</button>
+                                    <button onclick="__rotc_changeStation(-1)" class="ud-btn text-lg">▼</button>
                                 </div>
                             </div>
                         </div>
@@ -6090,6 +6146,7 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
 
         window.onload = init;
     
+window.__rotc_changeStation = changeStation;
 })();</script>
 </section>
 <section id="sec-scl" class="plc-section" style="display:none">
@@ -6166,8 +6223,8 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
 #sec-scl .arrow { transform: rotate(90deg); margin: 5px 0; }}</style>
 <div class="container">
     <div class="tabs">
-        <button class="tab-btn active" id="btn-std" onclick="switchTab('std')">탭 1: 조드 비례식 (DSCL)</button>
-        <button class="tab-btn mitsu" id="btn-mitsu" onclick="switchTab('mitsu')">탭 2: 미쓰비시 SCL (좌표 포인트)</button>
+        <button class="tab-btn active" id="btn-std" onclick="__scl_switchTab('std')">탭 1: 조드 비례식 (DSCL)</button>
+        <button class="tab-btn mitsu" id="btn-mitsu" onclick="__scl_switchTab('mitsu')">탭 2: 미쓰비시 SCL (좌표 포인트)</button>
     </div>
 
     <!-- 탭 1: 기존 비례식 -->
@@ -6180,12 +6237,12 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
                 <div class="range-inputs">
                     <div class="input-field">
                         <div class="addr-label">D100 [st_ScaleData]</div>
-                        <input type="number" id="s-sMin" value="0" oninput="updateStd()">
+                        <input type="number" id="s-sMin" value="0" oninput="__scl_updateStd()">
                     </div>
                     <span style="color:#cbd5e1; font-weight:bold;">~</span>
                     <div class="input-field">
                         <div class="addr-label">D102 (Max)</div>
-                        <input type="number" id="s-sMax" value="8000" oninput="updateStd()">
+                        <input type="number" id="s-sMax" value="8000" oninput="__scl_updateStd()">
                     </div>
                 </div>
             </div>
@@ -6194,12 +6251,12 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
                 <div class="range-inputs">
                     <div class="input-field">
                         <div class="addr-label">D104 (Min)</div>
-                        <input type="number" id="s-dMin" value="0" oninput="updateStd()">
+                        <input type="number" id="s-dMin" value="0" oninput="__scl_updateStd()">
                     </div>
                     <span style="color:#cbd5e1; font-weight:bold;">~</span>
                     <div class="input-field">
                         <div class="addr-label">D106 (Max)</div>
-                        <input type="number" id="s-dMax" value="300" oninput="updateStd()">
+                        <input type="number" id="s-dMax" value="300" oninput="__scl_updateStd()">
                     </div>
                 </div>
             </div>
@@ -6208,14 +6265,14 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
         <div class="slider-section">
             <label>
                 <span>현재 입력값 (s2) <span style="color:var(--primary); font-size:0.8rem;">[D10 / i_Analog_Value]</span></span>
-                <input type="number" id="s-in-num" class="direct-input" value="2000" oninput="syncStdFromNum()">
+                <input type="number" id="s-in-num" class="direct-input" value="2000" oninput="__scl_syncStdFromNum()">
             </label>
-            <input type="range" id="s-in" min="0" max="8000" value="2000" oninput="syncStdFromSlider()">
+            <input type="range" id="s-in" min="0" max="8000" value="2000" oninput="__scl_syncStdFromSlider()">
             <div class="control-group">
-                <button class="action-btn" onclick="stdSetMin()">MIN</button>
-                <button class="action-btn" onclick="stdSetMid()">중앙값</button>
-                <button class="action-btn" onclick="stdSetZero()">0 리셋</button>
-                <button class="action-btn" onclick="stdSetMax()">MAX</button>
+                <button class="action-btn" onclick="__scl_stdSetMin()">MIN</button>
+                <button class="action-btn" onclick="__scl_stdSetMid()">중앙값</button>
+                <button class="action-btn" onclick="__scl_stdSetZero()">0 리셋</button>
+                <button class="action-btn" onclick="__scl_stdSetMax()">MAX</button>
             </div>
         </div>
 
@@ -6249,12 +6306,12 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
                     <div class="input-field">
                         <div class="addr-label">D24 [st_Table[2]]</div>
                         <label>X (입력 Min)</label>
-                        <input type="number" id="p1x" value="0" oninput="updateMitsu()">
+                        <input type="number" id="p1x" value="0" oninput="__scl_updateMitsu()">
                     </div>
                     <div class="input-field">
                         <div class="addr-label">D26 [st_Table[4]]</div>
                         <label>Y (출력 Min)</label>
-                        <input type="number" id="p1y" value="0" oninput="updateMitsu()">
+                        <input type="number" id="p1y" value="0" oninput="__scl_updateMitsu()">
                     </div>
                 </div>
             </div>
@@ -6264,12 +6321,12 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
                     <div class="input-field">
                         <div class="addr-label">D28 [st_Table[6]]</div>
                         <label>X (입력 Max)</label>
-                        <input type="number" id="p2x" value="4000" oninput="updateMitsu()">
+                        <input type="number" id="p2x" value="4000" oninput="__scl_updateMitsu()">
                     </div>
                     <div class="input-field">
                         <div class="addr-label">D30 [st_Table[8]]</div>
                         <label>Y (출력 Max)</label>
-                        <input type="number" id="p2y" value="100" oninput="updateMitsu()">
+                        <input type="number" id="p2y" value="100" oninput="__scl_updateMitsu()">
                     </div>
                 </div>
             </div>
@@ -6278,14 +6335,14 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
         <div class="slider-section">
             <label>
                 <span>현재 입력값 (s1) <span style="color:var(--secondary); font-size:0.8rem;">[D10 / i_Raw_Value]</span></span>
-                <input type="number" id="m-in-num" class="direct-input" value="2000" oninput="syncMitsuFromNum()">
+                <input type="number" id="m-in-num" class="direct-input" value="2000" oninput="__scl_syncMitsuFromNum()">
             </label>
-            <input type="range" id="m-in" min="0" max="4000" value="2000" oninput="syncMitsuFromSlider()">
+            <input type="range" id="m-in" min="0" max="4000" value="2000" oninput="__scl_syncMitsuFromSlider()">
             <div class="control-group">
-                <button class="action-btn" onclick="mitsuSetMin()">MIN</button>
-                <button class="action-btn" onclick="mitsuSetMid()">중앙값</button>
-                <button class="action-btn" onclick="mitsuSetZero()">0 리셋</button>
-                <button class="action-btn" onclick="mitsuSetMax()">MAX</button>
+                <button class="action-btn" onclick="__scl_mitsuSetMin()">MIN</button>
+                <button class="action-btn" onclick="__scl_mitsuSetMid()">중앙값</button>
+                <button class="action-btn" onclick="__scl_mitsuSetZero()">0 리셋</button>
+                <button class="action-btn" onclick="__scl_mitsuSetMax()">MAX</button>
             </div>
         </div>
 
@@ -6382,6 +6439,21 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
 
     window.onload = () => { updateStd(); updateMitsu(); };
 
+window.__scl_mitsuSetMax = mitsuSetMax;
+window.__scl_mitsuSetMid = mitsuSetMid;
+window.__scl_mitsuSetMin = mitsuSetMin;
+window.__scl_mitsuSetZero = mitsuSetZero;
+window.__scl_stdSetMax = stdSetMax;
+window.__scl_stdSetMid = stdSetMid;
+window.__scl_stdSetMin = stdSetMin;
+window.__scl_stdSetZero = stdSetZero;
+window.__scl_switchTab = switchTab;
+window.__scl_syncMitsuFromNum = syncMitsuFromNum;
+window.__scl_syncMitsuFromSlider = syncMitsuFromSlider;
+window.__scl_syncStdFromNum = syncStdFromNum;
+window.__scl_syncStdFromSlider = syncStdFromSlider;
+window.__scl_updateMitsu = updateMitsu;
+window.__scl_updateStd = updateStd;
 })();</script>
 </section>
 <section id="sec-serdata" class="plc-section" style="display:none">
@@ -6501,14 +6573,14 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
                 <div class="input-card rounded-xl p-5 bg-slate-50">
                     <h3 class="text-blue-700 text-sm font-extrabold flex items-center gap-2 mb-2">검색 키워드 (s1)</h3>
                     <div class="text-center text-[0.7rem] text-slate-400 font-mono mb-1">D10 [st_KeyData]</div>
-                    <input type="number" id="s1-val" value="123" oninput="runSearch()" 
+                    <input type="number" id="s1-val" value="123" oninput="__serdata_runSearch()" 
                            class="w-full bg-transparent text-center text-4xl font-black text-blue-600 outline-none">
                 </div>
 
                 <div class="input-card rounded-xl p-5 bg-slate-50">
                     <h3 class="text-slate-700 text-sm font-extrabold flex items-center gap-2 mb-2">검색 개수 (n)</h3>
                     <div class="text-center text-[0.7rem] text-slate-400 font-mono mb-1">D20 [n_Count]</div>
-                    <input type="number" id="n-val" value="10" min="1" max="20" oninput="initArray()" 
+                    <input type="number" id="n-val" value="10" min="1" max="20" oninput="__serdata_initArray()" 
                            class="w-full bg-transparent text-center text-4xl font-black text-slate-600 outline-none">
                 </div>
             </div>
@@ -6539,9 +6611,9 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-blue-800 text-sm font-extrabold">검색 대상 데이터 (D100~)</h3>
                     <div class="flex gap-3">
-                        <button onclick="randomizeData()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-[0.8rem] font-bold rounded-lg transition-colors">랜덤 생성</button>
-                        <button onclick="clearData()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-[0.8rem] font-bold rounded-lg transition-colors">리셋</button>
-                        <button onclick="runSearch()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[0.8rem] font-bold rounded-lg shadow-md shadow-blue-200">검색 실행</button>
+                        <button onclick="__serdata_randomizeData()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-[0.8rem] font-bold rounded-lg transition-colors">랜덤 생성</button>
+                        <button onclick="__serdata_clearData()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-[0.8rem] font-bold rounded-lg transition-colors">리셋</button>
+                        <button onclick="__serdata_runSearch()" class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[0.8rem] font-bold rounded-lg shadow-md shadow-blue-200">검색 실행</button>
                     </div>
                 </div>
 
@@ -6581,7 +6653,7 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
             div.className = 'relative flex flex-col pt-4';
             div.innerHTML = `
                 <div class="text-center text-[0.65rem] text-slate-400 font-mono mb-1 font-bold">D${100 + i}</div>
-                <input type="number" value="${val}" id="data-${i}" oninput="updateArrayValue(${i}, this.value)"
+                <input type="number" value="${val}" id="data-${i}" oninput="__serdata_updateArrayValue(${i}, this.value)"
                        class="data-cell w-full py-3 rounded-md text-center text-base font-black text-slate-700 outline-none focus:border-blue-500 border-2">
                 <div id="tag-${i}" class="first-tag hidden">First!</div>
             `;
@@ -6658,6 +6730,11 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
 
     window.onload = initArray;
 
+window.__serdata_clearData = clearData;
+window.__serdata_initArray = initArray;
+window.__serdata_randomizeData = randomizeData;
+window.__serdata_runSearch = runSearch;
+window.__serdata_updateArrayValue = updateArrayValue;
 })();</script>
 </section>
 <section id="sec-sfr" class="plc-section" style="display:none">
@@ -6860,11 +6937,11 @@ ROTC(1, <span class="var">D10</span>, 10, 2, <span class="var">M10</span>);
                         </h3>
                         <div class="flex items-center gap-4">
                             <label class="font-black text-sm text-slate-700">시프트 수 (n):</label>
-                            <input type="number" id="sec-sfr-n-input" value="6" min="0" max="15" oninput="updateLabels()"
+                            <input type="number" id="sec-sfr-n-input" value="6" min="0" max="15" oninput="__sfr_updateLabels()"
                                 class="w-20 py-2 text-center text-xl font-black rounded-lg border-2 border-black">
-                            <button onclick="executeShift()"
+                            <button onclick="__sfr_executeShift()"
                                 class="btn-shift bg-blue-600 text-white px-8 py-3 font-black rounded-lg uppercase">Shift</button>
-                            <button onclick="resetBits()"
+                            <button onclick="__sfr_resetBits()"
                                 class="btn-shift bg-white text-black px-8 py-3 font-black rounded-lg">초기화</button>
                         </div>
                     </div>
@@ -7119,6 +7196,9 @@ SFR(1, <span class="var">D10</span>, <span id="sec-sfr-code-n2">6</span>);
         window.onload = init;
         window.onresize = drawAllArrows;
     
+window.__sfr_executeShift = executeShift;
+window.__sfr_resetBits = resetBits;
+window.__sfr_updateLabels = updateLabels;
 })();</script>
 </section>
 <section id="sec-sum" class="plc-section" style="display:none">
@@ -7513,11 +7593,11 @@ SUM(1, <span style="color:#ff79c6">D10</span>, <span style="color:#ff79c6">D20</
                         <!-- 승수 그룹화 및 범위 표기 -->
                         <div class="multiplier-group flex gap-2">
                             <div class="multiplier-label">승수 설정 (Range: 0..2)</div>
-                            <button onclick="setMultiplier(0)" id="m0"
+                            <button onclick="__ttmr_setMultiplier(0)" id="m0"
                                 class="multiplier-btn selected px-3 py-1 rounded-md font-bold text-xs">x1 (s=0)</button>
-                            <button onclick="setMultiplier(1)" id="m1"
+                            <button onclick="__ttmr_setMultiplier(1)" id="m1"
                                 class="multiplier-btn px-3 py-1 rounded-md font-bold text-xs">x10 (s=1)</button>
-                            <button onclick="setMultiplier(2)" id="m2"
+                            <button onclick="__ttmr_setMultiplier(2)" id="m2"
                                 class="multiplier-btn px-3 py-1 rounded-md font-bold text-xs">x100 (s=2)</button>
                         </div>
                     </div>
@@ -7670,6 +7750,7 @@ TTMR(<span class="var">X0</span>, <span class="var">D0</span>, <span class="var"
 
         window.onload = () => setMultiplier(0);
     
+window.__ttmr_setMultiplier = setMultiplier;
 })();</script>
 </section>
   </main>
