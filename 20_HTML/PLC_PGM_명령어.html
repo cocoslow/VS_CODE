@@ -15,7 +15,10 @@
     get: function () { return undefined; }
   });
   window.addEventListener('load', function () {
-    queue.forEach(function (fn) { if (typeof fn === 'function') fn(); });
+    queue.forEach(function (fn) {
+      if (typeof fn !== 'function') return;
+      try { fn(); } catch (e) { console.error('section init failed:', e); }
+    });
   });
 })();
 </script>
@@ -3020,7 +3023,7 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
 
             // 화살표 그리기 (성능 및 시각적 조절을 위해 n이 많으면 투명도 조절)
             for (let i = 0; i < n; i++) {
-                const fromEl = document.querySelector(`#grid-before .word-node-${i}`);
+                const fromEl = document.querySelector(`#sec-dsfr-grid-before .word-node-${i}`);
                 if (!fromEl) continue;
 
                 const fromRect = fromEl.getBoundingClientRect();
@@ -3030,7 +3033,7 @@ DSFRP(1, <span id="sec-dsfr-code-n2">7</span>, <span class="var">D10</span>);
                 let x2, y2, isLost = false;
 
                 if (i > 0) {
-                    const toEl = document.querySelector(`#grid-after .word-node-${i - 1}`);
+                    const toEl = document.querySelector(`#sec-dsfr-grid-after .word-node-${i - 1}`);
                     if (toEl) {
                         const toRect = toEl.getBoundingClientRect();
                         x2 = toRect.left + toRect.width / 2 - rectOverlay.left;
@@ -5621,7 +5624,7 @@ RORP(1, <span id="sec-ror-code-n2">1</span>, <span class="var">D10</span>);
 
             bits.forEach((on, i) => {
                 if (!on) return;
-                const fromEl = document.querySelector(`#grid-before .bit-node-${i}`);
+                const fromEl = document.querySelector(`#sec-ror-grid-before .bit-node-${i}`);
                 if (!fromEl) return;
                 const fromRect = fromEl.getBoundingClientRect();
                 const x1 = fromRect.left + fromRect.width / 2 - rectOverlay.left;
@@ -5629,7 +5632,7 @@ RORP(1, <span id="sec-ror-code-n2">1</span>, <span class="var">D10</span>);
 
                 // 목적지 인덱스 계산 (오른쪽으로 n칸 회전)
                 const targetIdx = (i - n + 16) % 16;
-                const toEl = document.querySelector(`#grid-after .bit-node-${targetIdx}`);
+                const toEl = document.querySelector(`#sec-ror-grid-after .bit-node-${targetIdx}`);
                 if (!toEl) return;
                 const toRect = toEl.getBoundingClientRect();
                 const x2 = toRect.left + toRect.width / 2 - rectOverlay.left;
@@ -7006,7 +7009,7 @@ SFR(1, <span class="var">D10</span>, <span id="sec-sfr-code-n2">6</span>);
             bits.forEach((on, i) => {
                 if (!on) return;
 
-                const fromEl = document.querySelector(`#grid-before .bit-node-${i}`);
+                const fromEl = document.querySelector(`#sec-sfr-grid-before .bit-node-${i}`);
                 if (!fromEl) return;
 
                 const fromRect = fromEl.getBoundingClientRect();
@@ -7018,7 +7021,7 @@ SFR(1, <span class="var">D10</span>, <span id="sec-sfr-code-n2">6</span>);
 
                 if (targetIdx >= 0) {
                     // 데이터 내 이동
-                    const toEl = document.querySelector(`#grid-after .bit-node-${targetIdx}`);
+                    const toEl = document.querySelector(`#sec-sfr-grid-after .bit-node-${targetIdx}`);
                     if (toEl) {
                         const toRect = toEl.getBoundingClientRect();
                         x2 = toRect.left + toRect.width / 2 - rectOverlay.left;
