@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+<!-- 배포 주소: https://cocoslow.github.io/VS_CODE/20_HTML/10%20PLC/PLC-DATE%26TIME.html -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DATE & TIME-PLC 시간 제어 마스터 - Zodd Ver.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .zodd-card {
+            background: white;
+            border: 4px solid #000;
+            border-radius: 24px;
+            box-shadow: 8px 8px 0px #000;
+        }
+
+        .pointer-box {
+            background: #1e293b;
+            color: #3b82f6;
+            border: 3px solid #3b82f6;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tab-btn {
+            border-bottom: 4px solid transparent;
+            transition: 0.2s;
+            white-space: nowrap;
+            font-size: 0.9rem;
+            padding: 8px 12px;
+        }
+
+        .tab-btn.active {
+            border-bottom-color: #2563eb;
+            color: #2563eb;
+            font-weight: 900;
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .op-select-btn {
+            border: 3px solid #000;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            height: 72px;
+            text-align: left;
+            padding: 0 15px;
+            cursor: pointer;
+        }
+
+        .op-select-btn .btn-main-label {
+            font-size: 1.15rem;
+            font-weight: 900;
+            display: block;
+        }
+
+        .op-select-btn .btn-sub-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            opacity: 0.6;
+        }
+
+        .op-select-btn.active {
+            background: #2563eb !important;
+            color: white !important;
+            transform: scale(1.02);
+            z-index: 20;
+            box-shadow: 4px 4px 0px #000;
+        }
+
+        .op-select-btn.active .btn-sub-label {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .clock-display {
+            background: #0f172a;
+            border: 4px solid #334155;
+            border-radius: 20px;
+            padding: 16px 20px;
+            color: #60a5fa;
+            text-align: center;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .clock-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 800;
+            text-shadow: 0 0 15px rgba(96, 165, 250, 0.5);
+            line-height: 1.1;
+        }
+
+        .clock-date {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            font-weight: 700;
+            margin-bottom: 4px;
+            letter-spacing: 0.05em;
+        }
+
+        .data-input {
+            width: 100%;
+            background: transparent;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.3rem;
+            outline: none;
+            border: none;
+            color: #1e293b;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .ud-btn {
+            background: #000;
+            color: #fff;
+            width: 30px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            transition: all 0.1s;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .ud-btn:hover {
+            background: #334155;
+        }
+
+        .ud-btn:active {
+            transform: scale(0.92);
+        }
+
+        .st-syntax-large {
+            background: #020617;
+            border-left: 8px solid #2563eb;
+            padding: 16px;
+            border-radius: 14px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: #38bdf8;
+            margin-bottom: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            line-height: 1.3;
+            word-break: break-all;
+        }
+
+        .st-code-box {
+            background: #000;
+            border: 1px solid #334155;
+            padding: 14px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #f472b6;
+            line-height: 1.6;
+        }
+
+        .lamp {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #000;
+            background: #cbd5e1;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .lamp.on {
+            background: #22c55e;
+            box-shadow: 0 0 12px #22c55e;
+        }
+
+        .lamp.red {
+            background: #ef4444;
+            box-shadow: 0 0 12px #ef4444;
+        }
+
+        .lamp.yellow {
+            background: #eab308;
+            box-shadow: 0 0 12px #eab308;
+        }
+
+        .memo-textarea {
+            width: 100%;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 16px;
+            padding: 16px;
+            color: #f8fafc;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            outline: none;
+            resize: none;
+            transition: all 0.2s;
+        }
+
+        .memo-textarea:focus {
+            border-color: #2563eb;
+            background: #0f172a;
+        }
+
+        .save-indicator {
+            font-size: 0.7rem;
+            color: #22c55e;
+            font-weight: 800;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .pulse-view {
+            height: 60px;
+            background: #1e293b;
+            border-radius: 12px;
+            border: 3px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .pulse-bar {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, #2563eb, #38bdf8);
+            transition: width 0.15s linear;
+        }
+
+        .reg-highlight {
+            animation: highlightPulse 1.2s ease-out;
+        }
+
+        @keyframes highlightPulse {
+            0% {
+                transform: scale(1.02);
+                background-color: #dbeafe;
+                border-color: #2563eb;
+            }
+
+            100% {
+                transform: scale(1);
+                background-color: white;
+                border-color: black;
+            }
+        }
+    </style>
+</head>
+
+<body class="p-4 h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <div class="zodd-card p-4 flex justify-between items-center mb-4">
+        <div class="flex items-center gap-4">
+            <div class="bg-blue-600 p-2.5 rounded-2xl text-white shadow-lg border-2 border-black">
+                <i data-lucide="clock" size="30"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-slate-800">
+                    PLC <span class="text-blue-600">날짜 & 시간</span> 마스터
+                </h1>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest text-blue-600">
+                    통합 RTC 및 시간 연산 엔진 (Zodd Ver.)
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div
+                class="pointer-box px-6 py-2.5 text-center border-4 border-black min-w-[260px] shadow-[4px_4px_0px_#000]">
+                <span class="text-[0.65rem] font-black block opacity-70 uppercase tracking-tight text-slate-300">
+                    PLC 시스템 실시간 모니터 (RTC)
+                </span>
+                <span id="header-clock" class="text-xl font-black text-cyan-400 uppercase tracking-tight font-mono">
+                    2026.00.00 00:00:00 (일)
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4-Column Layout -->
+    <div class="flex-1 flex gap-4 overflow-hidden">
+
+        <!-- Col 1: Command Selection (18%) -->
+        <div class="w-[18%] flex flex-col gap-4">
+            <div class="zodd-card p-5 flex flex-col h-full shadow-[6px_6px_0px_#000]">
+                <h3 class="text-xs font-black text-slate-400 uppercase mb-3 border-b-2 pb-2 flex items-center gap-2">
+                    <i data-lucide="zap" size="14"></i> 명령어 선택
+                </h3>
+                <div class="space-y-2 flex-1 overflow-y-auto custom-scrollbar pr-1">
+                    <button onclick="selectOp('DATERD')" id="btn-DATERD"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between active">
+                        <div>
+                            <span class="btn-main-label">DATERD</span>
+                            <span class="btn-sub-label">시계 데이터 읽기</span>
+                        </div>
+                    </button>
+                    <button onclick="selectOp('DATEWR')" id="btn-DATEWR"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="btn-main-label">DATEWR</span>
+                            <span class="btn-sub-label">시계 데이터 쓰기</span>
+                        </div>
+                    </button>
+                    <button onclick="selectOp('TIME2SEC')" id="btn-TIME2SEC"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="btn-main-label">TIME2SEC</span>
+                            <span class="btn-sub-label">시분초 → 초 변환</span>
+                        </div>
+                    </button>
+                    <button onclick="selectOp('SEC2TIME')" id="btn-SEC2TIME"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="btn-main-label">SEC2TIME</span>
+                            <span class="btn-sub-label">초 → 시분초 역변환</span>
+                        </div>
+                    </button>
+                    <button onclick="selectOp('TCMP')" id="btn-TCMP"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="btn-main-label">TCMP</span>
+                            <span class="btn-sub-label">시간 데이터 비교</span>
+                        </div>
+                    </button>
+                    <button onclick="selectOp('DUTY')" id="btn-DUTY"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="btn-main-label">DUTY</span>
+                            <span class="btn-sub-label">타이밍 펄스 발생</span>
+                        </div>
+                    </button>
+                    <button onclick="selectOp('TIMCHK')" id="btn-TIMCHK"
+                        class="op-select-btn bg-white w-full rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="btn-main-label">TIMCHK</span>
+                            <span class="btn-sub-label">시간 계측 / 타이머</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 2: Live Monitor (32%) -->
+        <div class="w-[32%] flex flex-col gap-4 relative">
+            <div class="zodd-card p-6 flex-1 flex flex-col shadow-[10px_10px_0px_#000] overflow-hidden relative">
+                <div class="flex justify-between items-end mb-4 border-b-2 border-slate-100 pb-3">
+                    <div>
+                        <span class="text-[0.7rem] font-black text-slate-400 uppercase tracking-widest block">상태
+                            모니터</span>
+                        <h2 id="status-display" class="text-2xl font-black text-slate-800 tracking-tight">
+                            DATERD 대기 중
+                        </h2>
+                    </div>
+                </div>
+
+                <div id="sim-content" class="flex-1 flex flex-col gap-4 overflow-y-auto custom-scrollbar pr-2">
+                    <!-- Dynamic Content will be injected here -->
+                </div>
+
+                <div class="mt-4 flex gap-3">
+                    <button type="button" onclick="undo()"
+                        class="flex-1 bg-slate-800 hover:bg-black text-white h-14 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-base flex items-center justify-center gap-2 transition-all">
+                        <i data-lucide="rotate-ccw" size="18"></i> 되돌리기
+                    </button>
+                    <button type="button" onclick="executeAction()" id="exec-btn"
+                        class="flex-[1.5] bg-blue-600 hover:bg-blue-700 text-white h-14 rounded-2xl border-4 border-black shadow-[4px_4px_0px_#000] active:translate-y-1 active:shadow-none font-black text-lg flex items-center justify-center gap-2 transition-all">
+                        <i data-lucide="play-circle" size="22" fill="white"></i> <span id="exec-text">실행</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 3: Handbook (25%) -->
+        <div class="w-[25%] flex flex-col overflow-hidden">
+            <div
+                class="zodd-card p-6 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] overflow-hidden border-2 border-slate-700">
+                <div class="flex items-center gap-3 mb-4 border-b border-slate-700 pb-3">
+                    <i data-lucide="book-open" class="text-pink-500"></i>
+                    <h3 class="text-lg font-black uppercase tracking-widest">기술 매뉴얼</h3>
+                    <div id="save-status" class="save-indicator ml-auto">저장 완료!</div>
+                </div>
+
+                <div id="hb-content" class="space-y-4 flex-1 overflow-y-auto custom-scrollbar pr-2"></div>
+
+                <div class="mt-4 p-4 bg-blue-950/60 border-2 border-blue-500/40 rounded-2xl">
+                    <p class="text-xs font-bold text-blue-200 leading-relaxed flex items-start gap-2">
+                        <i data-lucide="award" size="16" class="text-yellow-400 shrink-0 mt-0.5"></i>
+                        <span id="hb-tip">PLC 내부의 RTC 정보를 다루는 명령어입니다.</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Col 4: Notepads (25%) -->
+        <div class="w-[25%] flex flex-col gap-4 overflow-hidden">
+            <div
+                class="zodd-card p-6 flex-1 flex flex-col bg-slate-900 text-white shadow-[6px_6px_0px_#000] border-emerald-500">
+                <div class="mb-4 flex-1 flex flex-col">
+                    <div class="flex items-center gap-2 mb-2 text-emerald-400 border-b border-emerald-900/50 pb-2">
+                        <i data-lucide="clipboard-list" size="18"></i>
+                        <h3 class="text-base font-black uppercase">전체 메모</h3>
+                    </div>
+                    <textarea id="global-memo" class="memo-textarea flex-1 border-emerald-900/50"
+                        placeholder="프로젝트 전체 시간 제어 특이사항..."></textarea>
+                </div>
+                <div class="flex-1 flex flex-col pt-3 border-t border-slate-800">
+                    <div class="flex items-center gap-2 mb-2 text-blue-400">
+                        <i data-lucide="pencil-line" size="18"></i>
+                        <h3 id="memo-title" class="text-base font-black uppercase">DATERD 메모</h3>
+                    </div>
+                    <textarea id="op-memo" class="memo-textarea flex-1 border-blue-900/50"
+                        placeholder="명령어 개별 기록..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 요일 한국어 명칭
+        const DOW_NAMES = ['일', '월', '화', '수', '목', '금', '토'];
+
+        let currentOp = 'DATERD';
+
+        // 시뮬레이션용 PLC 내부 RTC 오프셋 (DATEWR로 시간 설정 시 반영)
+        let clockOffsetMs = 0;
+
+        function getSimulatedTime() {
+            return new Date(Date.now() + clockOffsetMs);
+        }
+
+        // DATERD: 읽기 저장 레지스터 D10 ~ D16
+        let rtcMemory = { year: 2026, month: 10, day: 22, hour: 17, min: 30, sec: 0, dow: 4 };
+
+        // DATEWR: 설정 데이터 레지스터 D20 ~ D26
+        let editRTC = { year: 2026, month: 10, day: 22, hour: 12, min: 0, sec: 0 };
+
+        // TIME2SEC 입력
+        let time2secInput = { hour: 15, min: 30, sec: 45 };
+
+        // SEC2TIME 입력
+        let totalSeconds = 55845;
+
+        // TCMP 목표 시간
+        let tcmpTime = { hour: 18, min: 0, sec: 0 };
+
+        // DUTY 펄스 설정
+        let dutySettings = { on: 5, total: 10 };
+        let dutyPhase = 0;
+        let isDutyRunning = false;
+
+        // TIMCHK 시간 계측 설정
+        let timchkStart = null;
+        let timchkElapsed = 0; // 0.1초 (100ms) 단위 카운트
+        let isTimerRunning = false;
+
+        // 실행 취소 히스토리
+        let history = [];
+
+        // 메모 데이터
+        let memoData = {
+            DATERD: '',
+            DATEWR: '',
+            TIME2SEC: '',
+            SEC2TIME: '',
+            TCMP: '',
+            DUTY: '',
+            TIMCHK: '',
+            global: ''
+        };
+
+        const manual = {
+            DATERD: {
+                title: "DATERD (Read Clock Data)",
+                syntax: "DATERD(EN, d);",
+                desc: "PLC CPU 내장 시계(RTC)로부터 현재 연, 월, 일, 시, 분, 초, 요일을 읽어 지정된 레지스터(d)에 7워드로 저장합니다.",
+                operands: "(d): 읽기 결과 저장 선두 (D10~D16: 연/월/일/시/분/초/요일)",
+                st: "DATERD(SM400, D10); // 상시 읽기 실행",
+                tip: "실행(EN) 시점의 시스템 시계를 레지스터(D10~D16)로 캡처하여 저장합니다."
+            },
+            DATEWR: {
+                title: "DATEWR (Write Clock Data)",
+                syntax: "DATEWR(EN, s);",
+                desc: "지정된 7워드 레지스터(s)의 연, 월, 일, 시, 분, 초 데이터를 PLC 내장 시계(RTC)에 강제 설정합니다.",
+                operands: "(s): 설정 데이터 선두 (D20~D26: 연/월/일/시/분/초/요일)",
+                st: "DATEWR(M0, D20); // M0 펄스 시 시계 동기화 쓰기",
+                tip: "HMI 등에서 수정한 설정값을 PLC 내장 시계(RTC)에 즉시 덮어씁니다."
+            },
+            TIME2SEC: {
+                title: "TIME2SEC (Time to Seconds)",
+                syntax: "TIME2SEC(EN, s, d);",
+                desc: "연속된 3워드(시, 분, 초) 시간 데이터를 32비트 누적 초(Total Seconds)로 변환합니다.",
+                operands: "(s): 시분초 입력 선두 / (d): 32비트 초 출력 (D40)",
+                st: "TIME2SEC(SM400, D10, D40); // D10(시), D11(분), D12(초) → D40(초)",
+                tip: "공정 가동 시간 비교 또는 주기 계산 시 초 단위로 환산하여 활용합니다."
+            },
+            SEC2TIME: {
+                title: "SEC2TIME (Seconds to Time)",
+                syntax: "SEC2TIME(EN, s, d);",
+                desc: "누적 초(Seconds) 데이터를 시(Hour), 분(Min), 초(Sec) 3워드로 역변환합니다.",
+                operands: "(s): 누적 초 입력 (D100) / (d): 시분초 저장 선두 (D10~D12)",
+                st: "SEC2TIME(SM400, D100, D10); // D100(초) → D10(시), D11(분), D12(초)",
+                tip: "초 단위로 누적된 카운터를 HMI 화면에 시:분:초 형태로 표시할 때 사용합니다."
+            },
+            TCMP: {
+                title: "TCMP (Time Compare)",
+                syntax: "TCMP(EN, s1, s2, s3, s, d);",
+                desc: "목표 시각(s1:시, s2:분, s3:초)과 기준 시각(s)을 비교하여 3개 연속 비트(d+0: 작음, d+1: 일치, d+2: 큼)를 출력합니다.",
+                operands: "(s1~s3): 목표 시분초 / (s): 현재 시각 선두 / (d): 결과 비트 (M10~M12)",
+                st: "TCMP(SM400, 18, 0, 0, D13, M10); // 18:00:00 비교 결과 M10, M11, M12",
+                tip: "목표 시간 도래 여부(M10: 지남, M11: 일치, M12: 도래전)를 비트로 자동 판정합니다."
+            },
+            DUTY: {
+                title: "DUTY (Timing Pulse Generator)",
+                syntax: "DUTY(EN, n1, n2, d);",
+                desc: "지정된 ON 시간(n1)과 1사이클 전체 주기(n2)에 맞추어 주기적인 타이밍 펄스를 출력합니다.",
+                operands: "(n1): ON 시간 / (n2): 전체 주기 / (d): 출력 비트 (M20)",
+                st: "DUTY(SM400, 5, 10, M20); // 5초 ON, 5초 OFF (10초 주기)",
+                tip: "플리커 타이머 대신 한 줄로 듀티비(점멸비)를 손쉽게 구현합니다."
+            },
+            TIMCHK: {
+                title: "TIMCHK (Time Check / Measurement)",
+                syntax: "TIMCHK(EN, s, d);",
+                desc: "기준 신호 발생 이후 경과된 시간을 0.1초(100ms) 단위로 측정하여 레지스터(d)에 저장합니다.",
+                operands: "(s): 기준 데이터 / (d): 경과 시간 저장 (D200, 0.1초 단위)",
+                st: "TIMCHK(M0, D10, D200); // M0 기동 후 경과시간 측정",
+                tip: "센서 감지 구간 또는 실린더 전/후진 이동 시간을 정밀하게 계측합니다."
+            }
+        };
+
+        // 안전한 Lucide 아이콘 렌더링
+        function safeCreateIcons() {
+            if (window.lucide && typeof lucide.createIcons === 'function') {
+                lucide.createIcons();
+            }
+        }
+
+        function selectOp(op) {
+            currentOp = op;
+            document.querySelectorAll('.op-select-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById(`btn-${op}`);
+            if (btn) btn.classList.add('active');
+
+            const status = document.getElementById('status-display');
+            if (status) status.innerText = `${op} 대기 중`;
+
+            const memoTitle = document.getElementById('memo-title');
+            if (memoTitle) memoTitle.innerText = `${op} 메모`;
+
+            const opMemo = document.getElementById('op-memo');
+            if (opMemo) opMemo.value = memoData[op] || '';
+
+            // 버튼 텍스트 설정
+            const execText = document.getElementById('exec-text');
+            if (execText) {
+                if (op === 'DUTY') execText.innerText = isDutyRunning ? "펄스 중지" : "펄스 시작";
+                else if (op === 'TIMCHK') execText.innerText = isTimerRunning ? "타이머 중지" : "타이머 시작";
+                else execText.innerText = "실행";
+            }
+
+            updateHandbook();
+            renderSimulation();
+        }
+
+        // --- 시뮬레이션 영역 렌더링 ---
+        function renderSimulation() {
+            const container = document.getElementById('sim-content');
+            if (!container) return;
+
+            const now = getSimulatedTime();
+            let html = '';
+
+            switch (currentOp) {
+                case 'DATERD':
+                    html = `
+                        <div class="clock-display">
+                            <div class="clock-date">PLC 내장 RTC 실시간 시계</div>
+                            <div id="sim-live-time" class="clock-time text-yellow-400">
+                                ${formatDate(now)}<br/>
+                                <span class="text-3xl text-cyan-400">${formatTime(now)}</span>
+                                <span class="text-lg text-slate-400 ml-2">(${DOW_NAMES[now.getDay()]}요일)</span>
+                            </div>
+                        </div>
+
+                        <div class="p-3 bg-blue-50 border-2 border-dashed border-blue-400 rounded-xl flex items-center justify-between text-xs font-bold text-blue-900">
+                            <span>⬇️ [실행] 버튼 클릭 시 현재 RTC → D10~D16 레지스터로 읽어옵니다.</span>
+                            <span class="bg-blue-600 text-white px-2 py-0.5 rounded">DATERD</span>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-2 px-1">
+                                <span class="text-xs font-black text-slate-500 uppercase">읽기 데이터 레지스터 (D10~D16)</span>
+                                <span class="text-[0.7rem] font-bold text-slate-400">7워드 저장</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3" id="daterd-regs">
+                                ${renderReadOnlyReg(10, '연도 (Year)', rtcMemory.year)}
+                                ${renderReadOnlyReg(13, '시 (Hour)', pad(rtcMemory.hour))}
+                                ${renderReadOnlyReg(11, '월 (Month)', pad(rtcMemory.month))}
+                                ${renderReadOnlyReg(14, '분 (Minute)', pad(rtcMemory.min))}
+                                ${renderReadOnlyReg(12, '일 (Day)', pad(rtcMemory.day))}
+                                ${renderReadOnlyReg(15, '초 (Second)', pad(rtcMemory.sec))}
+                            </div>
+                            <div class="mt-3 p-3 bg-white rounded-xl border-2 border-black flex items-center justify-between">
+                                <span class="text-xs font-black text-slate-600">D16 [요일 (Day of Week)]</span>
+                                <span class="font-mono font-black text-lg text-blue-600">${rtcMemory.dow} (${DOW_NAMES[rtcMemory.dow]}요일)</span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'DATEWR':
+                    html = `
+                        <div class="clock-display">
+                            <div class="clock-date">현재 PLC 내장 RTC 상태</div>
+                            <div id="sim-live-time" class="clock-time text-cyan-400">
+                                ${formatDate(now)}<br/>
+                                <span class="text-3xl">${formatTime(now)}</span>
+                                <span class="text-lg text-slate-400 ml-2">(${DOW_NAMES[now.getDay()]}요일)</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-2 px-1">
+                                <span class="text-xs font-black text-slate-700 uppercase">설정할 시계 데이터 (D20~D25)</span>
+                                <span class="text-[0.7rem] font-bold text-blue-600">▲/▼ 또는 직접 입력</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                ${renderEditableReg(20, '연도 (Year)', editRTC.year, 'year', 'changeEditRTC')}
+                                ${renderEditableReg(23, '시 (Hour)', editRTC.hour, 'hour', 'changeEditRTC')}
+                                ${renderEditableReg(21, '월 (Month)', editRTC.month, 'month', 'changeEditRTC')}
+                                ${renderEditableReg(24, '분 (Minute)', editRTC.min, 'min', 'changeEditRTC')}
+                                ${renderEditableReg(22, '일 (Day)', editRTC.day, 'day', 'changeEditRTC')}
+                                ${renderEditableReg(25, '초 (Second)', editRTC.sec, 'sec', 'changeEditRTC')}
+                            </div>
+                            <div class="mt-3 p-3 bg-emerald-50 border-2 border-emerald-500 rounded-xl text-center">
+                                <span class="text-xs font-black text-emerald-800">
+                                    [실행] 클릭 시 위 설정값이 PLC 내부 시계(RTC)에 즉시 적용됩니다.
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'TIME2SEC':
+                    const totalSec = time2secInput.hour * 3600 + time2secInput.min * 60 + time2secInput.sec;
+                    html = `
+                        <div class="bg-white p-5 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] space-y-4">
+                            <span class="text-xs font-black text-slate-500 uppercase block mb-1">입력 시분초 (D10, D11, D12)</span>
+                            <div class="flex justify-around items-center bg-slate-50 p-4 rounded-xl border-2 border-black">
+                                ${renderInputColumn('HH (시)', time2secInput.hour, 'hour', 'changeTime2Sec')}
+                                <span class="text-3xl font-black text-slate-400">:</span>
+                                ${renderInputColumn('MM (분)', time2secInput.min, 'min', 'changeTime2Sec')}
+                                <span class="text-3xl font-black text-slate-400">:</span>
+                                ${renderInputColumn('SS (초)', time2secInput.sec, 'sec', 'changeTime2Sec')}
+                            </div>
+                            <div class="text-center text-2xl text-blue-500 font-bold">⬇️ (HH×3600) + (MM×60) + SS</div>
+                            <div class="bg-blue-900 p-5 rounded-2xl text-center text-white border-4 border-black shadow-[4px_4px_0px_#000]">
+                                <span class="text-[0.7rem] block uppercase tracking-wider text-blue-300 font-bold">32비트 누적 초 변환 결과 (D40)</span>
+                                <div class="text-4xl font-black text-cyan-300 font-mono mt-1">${totalSec.toLocaleString()} <span class="text-lg text-white">초 (sec)</span></div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'SEC2TIME':
+                    const h = Math.floor(totalSeconds / 3600);
+                    const m = Math.floor((totalSeconds % 3600) / 60);
+                    const s = totalSeconds % 60;
+                    html = `
+                        <div class="bg-white p-5 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] space-y-4">
+                            <div class="bg-indigo-950 p-5 rounded-2xl text-white border-4 border-black shadow-[4px_4px_0px_#000] flex items-center justify-between">
+                                <div class="flex-1 text-center">
+                                    <span class="text-[0.7rem] block uppercase tracking-wider text-indigo-300 font-bold mb-1">입력 누적 초 (D100)</span>
+                                    <input type="number" min="0" value="${totalSeconds}"
+                                        class="bg-transparent text-3xl font-black text-cyan-300 w-full text-center outline-none font-mono"
+                                        onchange="updateTotalSeconds(this.value)">
+                                </div>
+                                <div class="flex flex-col gap-1 ml-4">
+                                    <button type="button" onclick="adjustTotalSeconds(3600)" class="ud-btn !w-14 text-[0.65rem]">+1시간</button>
+                                    <button type="button" onclick="adjustTotalSeconds(60)" class="ud-btn !w-14 text-[0.65rem]">+1분</button>
+                                    <button type="button" onclick="adjustTotalSeconds(-60)" class="ud-btn !w-14 text-[0.65rem]">-1분</button>
+                                </div>
+                            </div>
+                            <div class="text-center text-2xl text-indigo-600 font-bold">⬇️ 시 / 분 / 초 역변환</div>
+                            <div class="flex justify-around text-center bg-slate-50 p-4 rounded-xl border-2 border-black">
+                                <div class="p-2">
+                                    <span class="text-xs font-bold text-slate-500 block uppercase">시 (D10)</span>
+                                    <b class="text-3xl font-mono text-slate-800 font-black">${pad(h)}</b>
+                                </div>
+                                <span class="text-3xl font-black text-slate-300 self-center">:</span>
+                                <div class="p-2">
+                                    <span class="text-xs font-bold text-slate-500 block uppercase">분 (D11)</span>
+                                    <b class="text-3xl font-mono text-slate-800 font-black">${pad(m)}</b>
+                                </div>
+                                <span class="text-3xl font-black text-slate-300 self-center">:</span>
+                                <div class="p-2">
+                                    <span class="text-xs font-bold text-slate-500 block uppercase">초 (D12)</span>
+                                    <b class="text-3xl font-mono text-slate-800 font-black">${pad(s)}</b>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'TCMP':
+                    const nowH = now.getHours();
+                    const nowM = now.getMinutes();
+                    const nowS = now.getSeconds();
+
+                    const targetVal = tcmpTime.hour * 3600 + tcmpTime.min * 60 + tcmpTime.sec;
+                    const currVal = nowH * 3600 + nowM * 60 + nowS;
+
+                    const isLess = targetVal < currVal;
+                    const isEqual = targetVal === currVal;
+                    const isGreater = targetVal > currVal;
+
+                    html = `
+                        <div class="bg-white p-5 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] space-y-4">
+                            <div>
+                                <span class="text-xs font-black text-slate-500 uppercase block mb-1">목표 시각 설정 (s1:시, s2:분, s3:초)</span>
+                                <div class="flex justify-around bg-slate-50 p-4 rounded-xl border-2 border-black">
+                                    ${renderInputColumn('목표 시', tcmpTime.hour, 'hour', 'changeTCMP')}
+                                    <span class="text-3xl font-black text-slate-300">:</span>
+                                    ${renderInputColumn('목표 분', tcmpTime.min, 'min', 'changeTCMP')}
+                                    <span class="text-3xl font-black text-slate-300">:</span>
+                                    ${renderInputColumn('목표 초', tcmpTime.sec, 'sec', 'changeTCMP')}
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-slate-900 rounded-xl text-center border-2 border-black">
+                                <span class="text-[0.65rem] text-slate-400 block uppercase font-bold mb-0.5">PLC 현재 실시간 시각 (RTC)</span>
+                                <div id="tcmp-current-time" class="text-2xl font-black text-yellow-400 font-mono">
+                                    ${formatTime(now)}
+                                </div>
+                            </div>
+
+                            <div class="space-y-2 pt-1">
+                                <span class="text-xs font-black text-slate-500 uppercase block">비교 판정 결과 (d: M10, M11, M12)</span>
+                                <div class="grid grid-cols-3 gap-2">
+                                    <div class="p-3 bg-slate-100 rounded-xl border-2 border-black flex flex-col items-center gap-1.5 text-center">
+                                        <div id="lamp-m10" class="lamp ${isLess ? 'on' : ''}"></div>
+                                        <span class="text-xs font-black">M10</span>
+                                        <span class="text-[0.65rem] text-slate-500 font-bold">목표 &lt; 현재<br/>(지남)</span>
+                                    </div>
+                                    <div class="p-3 bg-slate-100 rounded-xl border-2 border-black flex flex-col items-center gap-1.5 text-center">
+                                        <div id="lamp-m11" class="lamp yellow ${isEqual ? 'on' : ''}"></div>
+                                        <span class="text-xs font-black">M11</span>
+                                        <span class="text-[0.65rem] text-slate-500 font-bold">목표 == 현재<br/>(일치)</span>
+                                    </div>
+                                    <div class="p-3 bg-slate-100 rounded-xl border-2 border-black flex flex-col items-center gap-1.5 text-center">
+                                        <div id="lamp-m12" class="lamp ${isGreater ? 'on' : ''}"></div>
+                                        <span class="text-xs font-black">M12</span>
+                                        <span class="text-[0.65rem] text-slate-500 font-bold">목표 &gt; 현재<br/>(이전)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'DUTY':
+                    const isLampOn = isDutyRunning && dutyPhase < dutySettings.on;
+                    const cyclePct = dutySettings.total > 0 ? (dutyPhase / dutySettings.total) * 100 : 0;
+                    html = `
+                        <div class="bg-white p-5 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] space-y-4">
+                            <div class="flex justify-between items-center bg-slate-900 p-4 rounded-xl border-b-4 border-blue-600">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-xs text-slate-400 uppercase font-black">출력 비트 (d):</span>
+                                    <span class="text-white font-mono font-black text-sm bg-blue-600 px-2.5 py-0.5 rounded">M20</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xs font-bold text-slate-300">${isLampOn ? 'ON' : 'OFF'}</span>
+                                    <div id="duty-lamp" class="lamp ${isLampOn ? 'on' : ''} !w-6 !h-6"></div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="p-3 border-2 border-black rounded-xl flex items-center justify-between bg-slate-50">
+                                    <div>
+                                        <label class="text-[0.65rem] block font-black text-slate-400">ON 시간 (n1, 초)</label>
+                                        <input type="number" min="1" value="${dutySettings.on}"
+                                            class="font-black text-xl w-14 text-center bg-transparent outline-none font-mono"
+                                            onchange="updateDutySetting('on', this.value)">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <button type="button" onclick="adjustDutySetting('on', 1)" class="ud-btn">▲</button>
+                                        <button type="button" onclick="adjustDutySetting('on', -1)" class="ud-btn">▼</button>
+                                    </div>
+                                </div>
+                                <div class="p-3 border-2 border-black rounded-xl flex items-center justify-between bg-slate-50">
+                                    <div>
+                                        <label class="text-[0.65rem] block font-black text-slate-400">전체 주기 (n2, 초)</label>
+                                        <input type="number" min="2" value="${dutySettings.total}"
+                                            class="font-black text-xl w-14 text-center bg-transparent outline-none font-mono"
+                                            onchange="updateDutySetting('total', this.value)">
+                                    </div>
+                                    <div class="flex flex-col gap-1">
+                                        <button type="button" onclick="adjustDutySetting('total', 1)" class="ud-btn">▲</button>
+                                        <button type="button" onclick="adjustDutySetting('total', -1)" class="ud-btn">▼</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pulse-view">
+                                <div id="duty-bar" class="pulse-bar" style="width: ${isDutyRunning ? cyclePct : 0}%"></div>
+                                <span id="duty-phase-text" class="relative z-10 text-xs font-black text-white mix-blend-difference uppercase font-mono">
+                                    주기 진행: ${isDutyRunning ? dutyPhase : 0}s / ${dutySettings.total}s (${isDutyRunning ? (isLampOn ? 'ON 구간' : 'OFF 구간') : '정지'})
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                    break;
+
+                case 'TIMCHK':
+                    html = `
+                        <div class="bg-white p-5 rounded-2xl border-3 border-black shadow-[4px_4px_0px_#000] flex flex-col items-center gap-5">
+                            <div class="text-center">
+                                <span class="text-xs font-black text-slate-400 uppercase tracking-widest block mb-1">경과 시간 (초)</span>
+                                <div class="text-6xl font-black font-mono text-slate-800">
+                                    <span id="timchk-sec-text">${(timchkElapsed / 10).toFixed(1)}</span>
+                                    <span class="text-2xl ml-1 text-slate-400">s</span>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4 w-full">
+                                <div class="flex-1 bg-slate-900 p-4 rounded-xl text-center border-b-4 border-emerald-500 border-2 border-black">
+                                    <span class="text-[0.65rem] text-slate-400 uppercase block font-black mb-1">측정 레지스터 (D200)</span>
+                                    <div class="text-3xl font-black text-emerald-400 font-mono">
+                                        <span id="timchk-d200-text">${timchkElapsed}</span>
+                                        <span class="text-xs text-slate-400 font-bold ml-1">(100ms 단위)</span>
+                                    </div>
+                                </div>
+                                <div class="w-24 flex flex-col items-center justify-center gap-1 bg-slate-100 p-2 rounded-xl border-2 border-black">
+                                    <span class="text-[0.65rem] font-black text-slate-500">${isTimerRunning ? '측정 중' : '정지'}</span>
+                                    <div id="timchk-lamp" class="lamp ${isTimerRunning ? 'on red' : ''} !w-9 !h-9"></div>
+                                </div>
+                            </div>
+
+                            <div class="w-full flex justify-end">
+                                <button type="button" onclick="resetTimchk()" class="text-xs font-bold text-slate-500 hover:text-black underline">
+                                    타이머 리셋 (0으로 초기화)
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+
+            container.innerHTML = html;
+            safeCreateIcons();
+        }
+
+        // --- 헬퍼 렌더러 함수들 ---
+
+        function renderReadOnlyReg(addr, label, val) {
+            return `
+                <div class="bg-white p-3 rounded-xl border-2 border-black flex items-center justify-between shadow-[2px_2px_0px_#000]">
+                    <div class="flex flex-col">
+                        <span class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-tight">D${addr} [${label}]</span>
+                        <span class="text-xl font-black text-slate-800 font-mono">${val}</span>
+                    </div>
+                    <span class="text-[0.6rem] bg-slate-100 text-slate-500 px-2 py-0.5 rounded font-mono font-bold">READ</span>
+                </div>
+            `;
+        }
+
+        function renderEditableReg(addr, label, val, key, funcName) {
+            return `
+                <div class="bg-white p-3 rounded-xl border-2 border-black flex items-center justify-between shadow-[2px_2px_0px_#000]">
+                    <div class="flex flex-col">
+                        <span class="text-[0.65rem] font-bold text-slate-400 uppercase tracking-tight">D${addr} [${label}]</span>
+                        <input type="number" value="${val}"
+                            class="text-xl font-black w-24 bg-transparent outline-none font-mono text-slate-800"
+                            onchange="${funcName}('${key}', this.value)">
+                    </div>
+                    <div class="flex flex-col gap-1">
+                        <button type="button" onclick="${funcName}('${key}', ${val + 1})" class="ud-btn">▲</button>
+                        <button type="button" onclick="${funcName}('${key}', ${val - 1})" class="ud-btn">▼</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderInputColumn(label, val, key, funcName) {
+            return `
+                <div class="flex flex-col items-center gap-1">
+                    <label class="text-[0.65rem] font-bold text-slate-400 uppercase">${label}</label>
+                    <input type="number" value="${val}"
+                        class="text-2xl font-black w-14 text-center bg-transparent outline-none font-mono text-slate-800"
+                        onchange="${funcName}('${key}', this.value)">
+                    <div class="flex gap-1 mt-1">
+                        <button type="button" onclick="${funcName}('${key}', ${val + 1})" class="ud-btn !w-6">▲</button>
+                        <button type="button" onclick="${funcName}('${key}', ${val - 1})" class="ud-btn !w-6">▼</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- 입력 변경 및 상태 조작 함수들 ---
+
+        function changeEditRTC(key, val) {
+            saveHistory();
+            val = parseInt(val) || 0;
+            if (key === 'year') val = Math.max(1990, Math.min(2099, val));
+            if (key === 'month') val = Math.max(1, Math.min(12, val));
+            if (key === 'day') val = Math.max(1, Math.min(31, val));
+            if (key === 'hour') val = Math.max(0, Math.min(23, val));
+            if (key === 'min' || key === 'sec') val = Math.max(0, Math.min(59, val));
+            editRTC[key] = val;
+            renderSimulation();
+        }
+
+        function changeTime2Sec(key, val) {
+            saveHistory();
+            val = parseInt(val) || 0;
+            if (key === 'hour') val = Math.max(0, val);
+            if (key === 'min' || key === 'sec') val = Math.max(0, Math.min(59, val));
+            time2secInput[key] = val;
+            renderSimulation();
+        }
+
+        function updateTotalSeconds(val) {
+            saveHistory();
+            totalSeconds = Math.max(0, parseInt(val) || 0);
+            renderSimulation();
+        }
+
+        function adjustTotalSeconds(delta) {
+            saveHistory();
+            totalSeconds = Math.max(0, totalSeconds + delta);
+            renderSimulation();
+        }
+
+        function changeTCMP(key, val) {
+            saveHistory();
+            val = parseInt(val) || 0;
+            if (key === 'hour') val = Math.max(0, Math.min(23, val));
+            if (key === 'min' || key === 'sec') val = Math.max(0, Math.min(59, val));
+            tcmpTime[key] = val;
+            renderSimulation();
+        }
+
+        function updateDutySetting(key, val) {
+            saveHistory();
+            val = Math.max(1, parseInt(val) || 1);
+            dutySettings[key] = val;
+            if (key === 'on' && dutySettings.on > dutySettings.total) {
+                dutySettings.total = dutySettings.on;
+            }
+            if (key === 'total' && dutySettings.total < dutySettings.on) {
+                dutySettings.on = dutySettings.total;
+            }
+            renderSimulation();
+        }
+
+        function adjustDutySetting(key, delta) {
+            updateDutySetting(key, (dutySettings[key] || 0) + delta);
+        }
+
+        function resetTimchk() {
+            saveHistory();
+            timchkElapsed = 0;
+            if (isTimerRunning) {
+                timchkStart = Date.now();
+            }
+            renderSimulation();
+        }
+
+        // --- 실행 (EXECUTE) 핸들러 ---
+        function executeAction() {
+            const btn = document.getElementById('exec-btn');
+            if (btn) {
+                btn.classList.add('bg-emerald-500');
+                setTimeout(() => btn.classList.remove('bg-emerald-500'), 250);
+            }
+
+            saveHistory();
+            const status = document.getElementById('status-display');
+
+            switch (currentOp) {
+                case 'DATERD': {
+                    // 현재 PLC RTC를 읽어 rtcMemory에 저장
+                    const now = getSimulatedTime();
+                    rtcMemory = {
+                        year: now.getFullYear(),
+                        month: now.getMonth() + 1,
+                        day: now.getDate(),
+                        hour: now.getHours(),
+                        min: now.getMinutes(),
+                        sec: now.getSeconds(),
+                        dow: now.getDay()
+                    };
+                    if (status) status.innerText = `DATERD 실행 완료 (RTC → D10~D16 저장)`;
+                    renderSimulation();
+
+                    // 레지스터 깜빡임 애니메이션 효과
+                    const regs = document.getElementById('daterd-regs');
+                    if (regs) {
+                        regs.classList.add('reg-highlight');
+                        setTimeout(() => regs.classList.remove('reg-highlight'), 1200);
+                    }
+                    break;
+                }
+
+                case 'DATEWR': {
+                    // editRTC 값을 PLC RTC에 강제 쓰기 적용
+                    const targetDate = new Date(editRTC.year, editRTC.month - 1, editRTC.day, editRTC.hour, editRTC.min, editRTC.sec);
+                    clockOffsetMs = targetDate.getTime() - Date.now();
+                    if (status) status.innerText = `DATEWR 실행 완료 (PLC 시계 쓰기 성공!)`;
+                    renderSimulation();
+                    break;
+                }
+
+                case 'TIME2SEC': {
+                    const total = time2secInput.hour * 3600 + time2secInput.min * 60 + time2secInput.sec;
+                    if (status) status.innerText = `TIME2SEC 실행 완료 (D40 = ${total.toLocaleString()}초)`;
+                    renderSimulation();
+                    break;
+                }
+
+                case 'SEC2TIME': {
+                    const h = Math.floor(totalSeconds / 3600);
+                    const m = Math.floor((totalSeconds % 3600) / 60);
+                    const s = totalSeconds % 60;
+                    if (status) status.innerText = `SEC2TIME 실행 완료 (${h}시 ${m}분 ${s}초)`;
+                    renderSimulation();
+                    break;
+                }
+
+                case 'TCMP': {
+                    if (status) status.innerText = `TCMP 시간 비교 실행 완료`;
+                    renderSimulation();
+                    break;
+                }
+
+                case 'DUTY': {
+                    isDutyRunning = !isDutyRunning;
+                    dutyPhase = 0;
+                    const execText = document.getElementById('exec-text');
+                    if (execText) execText.innerText = isDutyRunning ? "펄스 중지" : "펄스 시작";
+                    if (status) status.innerText = isDutyRunning ? "DUTY 펄스 생성 중 (RUN)" : "DUTY 대기 중";
+                    renderSimulation();
+                    break;
+                }
+
+                case 'TIMCHK': {
+                    isTimerRunning = !isTimerRunning;
+                    if (isTimerRunning) {
+                        timchkStart = Date.now() - (timchkElapsed * 100);
+                    }
+                    const execText = document.getElementById('exec-text');
+                    if (execText) execText.innerText = isTimerRunning ? "타이머 중지" : "타이머 시작";
+                    if (status) status.innerText = isTimerRunning ? "TIMCHK 시간 계측 중..." : "TIMCHK 계측 정지";
+                    renderSimulation();
+                    break;
+                }
+            }
+        }
+
+        // --- 히스토리 되돌리기 (UNDO) ---
+        function saveHistory() {
+            history.push({
+                op: currentOp,
+                clockOffsetMs,
+                rtcMemory: { ...rtcMemory },
+                editRTC: { ...editRTC },
+                time2secInput: { ...time2secInput },
+                totalSeconds,
+                tcmpTime: { ...tcmpTime },
+                dutySettings: { ...dutySettings },
+                dutyPhase,
+                timchkElapsed
+            });
+            if (history.length > 25) history.shift();
+        }
+
+        function undo() {
+            if (history.length === 0) return;
+            const prev = history.pop();
+            clockOffsetMs = prev.clockOffsetMs;
+            rtcMemory = prev.rtcMemory;
+            editRTC = prev.editRTC;
+            time2secInput = prev.time2secInput;
+            totalSeconds = prev.totalSeconds;
+            tcmpTime = prev.tcmpTime;
+            dutySettings = prev.dutySettings;
+            dutyPhase = prev.dutyPhase;
+            timchkElapsed = prev.timchkElapsed;
+
+            const status = document.getElementById('status-display');
+            if (status) status.innerText = "이전 상태로 되돌림";
+            renderSimulation();
+        }
+
+        // --- 기술 핸드북 업데이트 ---
+        function updateHandbook() {
+            const data = manual[currentOp];
+            const content = document.getElementById('hb-content');
+            if (!content || !data) return;
+
+            content.innerHTML = `
+                <div class="bg-slate-800/80 p-5 rounded-2xl border-2 border-slate-700 shadow-inner">
+                    <h4 class="text-xl font-black text-blue-400 mb-2">${data.title}</h4>
+                    <div class="st-syntax-large text-emerald-400">${data.syntax}</div>
+                    <p class="text-xs font-bold text-slate-300 leading-relaxed mb-3">${data.desc}</p>
+                    <div class="p-3 bg-black/60 rounded-xl border border-slate-700 text-xs text-slate-300">
+                        <b class="text-blue-400 uppercase">피연산자:</b> ${data.operands}
+                    </div>
+                </div>
+                <div class="p-4 bg-black/60 border border-slate-700 rounded-2xl">
+                    <span class="text-[0.7rem] font-black text-slate-400 uppercase block mb-2 flex items-center gap-1.5">
+                        <i data-lucide="code" size="14"></i> ST 프로그램 예제
+                    </span>
+                    <div class="st-code-box">${data.st}</div>
+                </div>
+            `;
+            const tipEl = document.getElementById('hb-tip');
+            if (tipEl) tipEl.innerText = data.tip;
+            safeCreateIcons();
+        }
+
+        // --- 메모 로컬스토리지 관리 ---
+        function initMemos() {
+            try {
+                const saved = localStorage.getItem('zodd_datetime_manual_v1');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    memoData = Object.assign(memoData, parsed);
+                }
+            } catch (e) {
+                console.warn('메모 데이터 로드 실패:', e);
+            }
+
+            const globalMemo = document.getElementById('global-memo');
+            if (globalMemo) {
+                globalMemo.value = memoData.global || '';
+                globalMemo.oninput = (e) => {
+                    memoData.global = e.target.value;
+                    saveMemos();
+                };
+            }
+
+            const opMemo = document.getElementById('op-memo');
+            if (opMemo) {
+                opMemo.value = memoData[currentOp] || '';
+                opMemo.oninput = (e) => {
+                    memoData[currentOp] = e.target.value;
+                    saveMemos();
+                };
+            }
+        }
+
+        function saveMemos() {
+            try {
+                localStorage.setItem('zodd_datetime_manual_v1', JSON.stringify(memoData));
+                const ind = document.getElementById('save-status');
+                if (ind) {
+                    ind.classList.add('show');
+                    setTimeout(() => ind.classList.remove('show'), 1000);
+                }
+            } catch (e) {
+                console.warn('메모 저장 실패:', e);
+            }
+        }
+
+        // --- 유틸리티 포맷 함수 ---
+        function pad(n) {
+            return String(n).padStart(2, '0');
+        }
+
+        function formatDate(d) {
+            return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
+        }
+
+        function formatTime(d) {
+            return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        }
+
+        // --- 고성능 백그라운드 갱신 루프 (입력 포커스 유지 & 깜빡임 방지) ---
+        let lastSecondLogged = -1;
+
+        setInterval(() => {
+            const now = getSimulatedTime();
+            const currentSecond = now.getSeconds();
+
+            // 1. 100ms 정밀 계측: TIMCHK 타이머 전용 직접 DOM 갱신
+            if (isTimerRunning && currentOp === 'TIMCHK') {
+                timchkElapsed = Math.floor((Date.now() - timchkStart) / 100);
+                const secEl = document.getElementById('timchk-sec-text');
+                const d200El = document.getElementById('timchk-d200-text');
+                if (secEl) secEl.innerText = (timchkElapsed / 10).toFixed(1);
+                if (d200El) d200El.innerText = timchkElapsed;
+            }
+
+            // 2. 1초 주기 갱신
+            if (currentSecond !== lastSecondLogged) {
+                lastSecondLogged = currentSecond;
+
+                // 헤더 RTC 시계
+                const headerClock = document.getElementById('header-clock');
+                if (headerClock) {
+                    headerClock.innerText = `${formatDate(now)} ${formatTime(now)} (${DOW_NAMES[now.getDay()]})`;
+                }
+
+                // DATERD / DATEWR 상단 실시간 RTC 시계
+                const liveEl = document.getElementById('sim-live-time');
+                if (liveEl && (currentOp === 'DATERD' || currentOp === 'DATEWR')) {
+                    const colorClass = currentOp === 'DATERD' ? 'text-yellow-400' : 'text-cyan-400';
+                    liveEl.innerHTML = `
+                        ${formatDate(now)}<br/>
+                        <span class="text-3xl ${colorClass}">${formatTime(now)}</span>
+                        <span class="text-lg text-slate-400 ml-2">(${DOW_NAMES[now.getDay()]}요일)</span>
+                    `;
+                }
+
+                // DUTY 펄스 연산 및 뷰 갱신
+                if (isDutyRunning && currentOp === 'DUTY') {
+                    dutyPhase = (dutyPhase + 1) % (dutySettings.total || 1);
+                    const isLampOn = dutyPhase < dutySettings.on;
+                    const pct = dutySettings.total > 0 ? (dutyPhase / dutySettings.total) * 100 : 0;
+
+                    const bar = document.getElementById('duty-bar');
+                    if (bar) bar.style.width = `${pct}%`;
+
+                    const phaseText = document.getElementById('duty-phase-text');
+                    if (phaseText) {
+                        phaseText.innerText = `주기 진행: ${dutyPhase}s / ${dutySettings.total}s (${isLampOn ? 'ON 구간' : 'OFF 구간'})`;
+                    }
+
+                    const lamp = document.getElementById('duty-lamp');
+                    if (lamp) {
+                        if (isLampOn) lamp.classList.add('on');
+                        else lamp.classList.remove('on');
+                    }
+                }
+
+                // TCMP 현재 시각 및 판정 램프 갱신
+                if (currentOp === 'TCMP') {
+                    const tcmpLive = document.getElementById('tcmp-current-time');
+                    if (tcmpLive) tcmpLive.innerText = formatTime(now);
+
+                    const targetVal = tcmpTime.hour * 3600 + tcmpTime.min * 60 + tcmpTime.sec;
+                    const currVal = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+
+                    const lM10 = document.getElementById('lamp-m10');
+                    const lM11 = document.getElementById('lamp-m11');
+                    const lM12 = document.getElementById('lamp-m12');
+
+                    if (lM10) lM10.className = `lamp ${targetVal < currVal ? 'on' : ''}`;
+                    if (lM11) lM11.className = `lamp yellow ${targetVal === currVal ? 'on' : ''}`;
+                    if (lM12) lM12.className = `lamp ${targetVal > currVal ? 'on' : ''}`;
+                }
+            }
+        }, 100);
+
+        // 초기화
+        window.onload = () => {
+            const now = getSimulatedTime();
+            rtcMemory = {
+                year: now.getFullYear(),
+                month: now.getMonth() + 1,
+                day: now.getDate(),
+                hour: now.getHours(),
+                min: now.getMinutes(),
+                sec: now.getSeconds(),
+                dow: now.getDay()
+            };
+            editRTC = {
+                year: now.getFullYear(),
+                month: now.getMonth() + 1,
+                day: now.getDate(),
+                hour: 12,
+                min: 0,
+                sec: 0
+            };
+
+            initMemos();
+            selectOp('DATERD');
+            safeCreateIcons();
+        };
+    </script>
+</body>
+
+</html>

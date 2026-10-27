@@ -5,8 +5,8 @@
 !*/
 
 # HTML 폴더와 그 안의 모든 파일은 공유 포함
-!HTML/
-!HTML/**
+!20_HTML/
+!20_HTML/**
 
 # .gitignore 파일 자신도 포함
 !.gitignore

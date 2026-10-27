@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<!-- 배포 주소: https://cocoslow.github.io/VS_CODE/20_HTML/50%20%EB%B6%84%EB%A5%98%EB%AF%B8%EC%A0%95/%EC%BB%A8%EB%B2%A0%EC%9D%B4%EC%96%B4%20%EA%B8%B8%EC%9D%B4%EA%B3%84%EC%82%B0.html -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>컨베이어 설계 통합 플래너 Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+    <style>
+        body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(226, 232, 240, 0.8); }
+        .input-group:focus-within label { color: #3b82f6; }
+        .result-card { transition: all 0.3s ease; }
+        .result-card:hover { transform: translateY(-2px); }
+        @keyframes flow {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-40px); }
+        }
+        .belt-animation {
+            background-image: linear-gradient(90deg, #e2e8f0 25%, transparent 25%, transparent 50%, #e2e8f0 50%, #e2e8f0 75%, transparent 75%, transparent 100%);
+            background-size: 40px 100%;
+            animation: flow 2s linear infinite;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-black tracking-tight text-slate-900">컨베이어 <span class="text-blue-600">플래너 Pro</span></h1>
+                <p class="text-slate-500 text-sm">물류 흐름 및 엔지니어링 사양 통합 계산 도구</p>
+            </div>
+            <div class="bg-blue-600 text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg shadow-blue-200">
+                전문가 모드 활성
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <!-- Left: Input Section -->
+            <div class="lg:col-span-4 space-y-6">
+                <section class="glass-panel p-6 rounded-3xl shadow-sm">
+                    <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">1. 공정 타임 라인</h2>
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <label class="block text-xs font-bold mb-2">투입 주기 (택트 타임)</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="feedInterval" value="60" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                                <select id="feedUnit" class="bg-slate-100 border-none rounded-xl px-2 text-xs font-bold" onchange="calculate()">
+                                    <option value="sec">초/EA</option>
+                                    <option value="min">분/EA</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-xs font-bold mb-2">체류 시간 (Retention Time)</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="dwellTime" value="20" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                                <select id="dwellUnit" class="bg-slate-100 border-none rounded-xl px-2 text-xs font-bold" onchange="calculate()">
+                                    <option value="min" selected>분</option>
+                                    <option value="sec">초</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-panel p-6 rounded-3xl shadow-sm">
+                    <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">2. 물리적 사양 (mm)</h2>
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <label class="block text-xs font-bold mb-2">제품 길이 (L)</label>
+                            <input type="number" id="prodLen" value="450" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-xs font-bold mb-2">제품 간격 (G)</label>
+                            <input type="number" id="prodGap" value="50" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        </div>
+                    </div>
+                </section>
+
+                <section class="glass-panel p-6 rounded-3xl shadow-sm">
+                    <h2 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">3. 기계적 여유</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="input-group">
+                            <label class="block text-xs font-bold mb-2">고정 마진 (mm)</label>
+                            <input type="number" id="marginFixed" value="300" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        </div>
+                        <div class="input-group">
+                            <label class="block text-xs font-bold mb-2">안전 계수 (%)</label>
+                            <input type="number" id="safetyFactor" value="10" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right: Calculation & Diagnosis -->
+            <div class="lg:col-span-8 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="result-card bg-slate-900 text-white p-6 rounded-3xl shadow-xl border border-slate-800">
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">최종 설계 길이</p>
+                        <div class="flex items-baseline gap-1 mt-2">
+                            <span id="resFinalLen" class="text-4xl font-black text-blue-400">0.00</span>
+                            <span class="text-slate-500 font-bold">m</span>
+                        </div>
+                    </div>
+                    <div class="result-card bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">동시 체류 수량</p>
+                        <div class="flex items-baseline gap-1 mt-2">
+                            <span id="resQty" class="text-4xl font-black text-slate-800">0</span>
+                            <span class="text-slate-400 font-bold">EA</span>
+                        </div>
+                    </div>
+                    <div class="result-card bg-white p-6 rounded-3xl shadow-sm border border-slate-100">
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">운전 속도</p>
+                        <div class="flex items-baseline gap-1 mt-2">
+                            <span id="resSpeed" class="text-4xl font-black text-emerald-500">0.00</span>
+                            <span class="text-slate-400 font-bold">m/min</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logical Diagnosis (Why this result?) -->
+                <div id="diagPanel" class="bg-blue-50 border border-blue-100 rounded-3xl p-8">
+                    <h3 class="flex items-center gap-2 text-blue-800 font-bold mb-4">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        엔지니어링 계산 근거 및 진단
+                    </h3>
+                    <div id="diagContent" class="space-y-4 text-sm leading-relaxed text-blue-900">
+                        <!-- JS로 채워짐 -->
+                    </div>
+                </div>
+
+                <!-- Visual Simulation -->
+                <div class="relative bg-slate-200 h-40 rounded-3xl overflow-hidden border-4 border-slate-300">
+                    <div class="absolute inset-0 belt-animation opacity-30"></div>
+                    <div id="simContainer" class="absolute inset-0 flex items-center px-10">
+                        <!-- 제품 아이콘들이 생성됨 -->
+                    </div>
+                    <div class="absolute bottom-4 right-6 bg-slate-800/80 backdrop-blur-md text-white text-[10px] px-3 py-1 rounded-full font-mono">
+                        실시간 시뮬레이션 작동 중
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // 입력값 취득
+            const L = parseFloat(document.getElementById('prodLen').value) || 0;
+            const G = parseFloat(document.getElementById('prodGap').value) || 0;
+            const margin = parseFloat(document.getElementById('marginFixed').value) || 0;
+            const safety = parseFloat(document.getElementById('safetyFactor').value) || 0;
+            
+            let t_feed = parseFloat(document.getElementById('feedInterval').value) || 1;
+            let t_dwell = parseFloat(document.getElementById('dwellTime').value) || 0;
+
+            // 단위 환산 (모두 '초'로 통일)
+            const feedInSec = document.getElementById('feedUnit').value === 'min' ? t_feed * 60 : t_feed;
+            const dwellInSec = document.getElementById('dwellUnit').value === 'min' ? t_dwell * 60 : t_dwell;
+
+            if (feedInSec <= 0) return;
+
+            // 1. 체류 수량 (N) 계산: 체류시간 / 투입주기 (올림 처리)
+            const N = Math.ceil(dwellInSec / feedInSec);
+
+            // 2. 피치(Pitch) 및 순수 점유 길이
+            const pitch = L + G;
+            const occupiedLenM = (N * pitch) / 1000;
+
+            // 3. 최종 기계 길이
+            const baseLenM = occupiedLenM + (margin / 1000);
+            const finalLenM = baseLenM * (1 + (safety / 100));
+
+            // 4. 운전 속도 (m/min)
+            // 1분에 이동해야 할 피치 개수 = 60 / feedInSec
+            const speedMmin = (pitch * (60 / feedInSec)) / 1000;
+
+            // 결과 업데이트
+            document.getElementById('resFinalLen').innerText = finalLenM.toFixed(2);
+            document.getElementById('resQty').innerText = N;
+            document.getElementById('resSpeed').innerText = speedMmin.toFixed(3);
+
+            // 진단 메시지 생성
+            updateDiagnosis(N, dwellInSec, feedInSec, L, G, finalLenM, speedMmin);
+            updateSimulation(N, speedMmin);
+        }
+
+        function updateDiagnosis(N, dwell, feed, L, G, finalLen, speed) {
+            const content = document.getElementById('diagContent');
+            let html = "";
+
+            // 로직 설명 1: 수량
+            html += `<div class="bg-white/50 p-4 rounded-2xl border border-blue-200/50">
+                        <p><strong>수량 산출:</strong> ${Math.round(dwell)}초 체류하는 동안 ${Math.round(feed)}초마다 제품이 들어오므로, 벨트 위에는 항상 <strong>최대 ${N}개</strong>의 제품이 있어야 합니다.</p>
+                     </div>`;
+            
+            // 로직 설명 2: 왜 이 길이인가?
+            const pureLen = (N * (L + G)) / 1000;
+            html += `<div class="bg-white/50 p-4 rounded-2xl border border-blue-200/50">
+                        <p><strong>길이 근거:</strong> 제품(${L}mm)과 간격(${G}mm)을 합친 피치가 ${L+G}mm입니다. ${N}개를 수용하기 위한 순수 길이는 ${pureLen.toFixed(2)}m이며, 여기에 기계 마진과 안전율을 더해 <strong>${finalLen.toFixed(2)}m</strong>가 산출되었습니다.</p>
+                     </div>`;
+
+            // 경고 메시지 (엔지니어 팁)
+            if (G === 0) {
+                html += `<p class="text-red-600 font-bold">⚠️ 주의: 제품 간격이 0입니다. 실제 공정에서는 센서 인식 불가 및 제품 충돌 우려가 매우 높습니다.</p>`;
+            }
+            if (speed < 0.1) {
+                html += `<p class="text-orange-600 font-bold">💡 팁: 현재 속도가 ${speed.toFixed(3)} m/min으로 매우 느립니다. 인버터 제어 범위를 확인하거나 소형 감속기 선정이 필요합니다.</p>`;
+            }
+
+            content.innerHTML = html;
+        }
+
+        function updateSimulation(count, speed) {
+            const container = document.getElementById('simContainer');
+            container.innerHTML = "";
+            const displayCount = Math.min(count, 15);
+            
+            for(let i=0; i<displayCount; i++) {
+                const box = document.createElement('div');
+                box.className = "h-12 bg-blue-500 rounded-lg shadow-inner border-b-4 border-blue-700 flex-shrink-0 mr-4 transition-all";
+                box.style.width = "60px";
+                container.appendChild(box);
+            }
+        }
+
+        // 초기 실행 및 이벤트 바인딩
+        const inputs = ['feedInterval', 'dwellTime', 'prodLen', 'prodGap', 'marginFixed', 'safetyFactor'];
+        inputs.forEach(id => document.getElementById(id).addEventListener('input', calculate));
+        
+        window.onload = calculate;
+    </script>
+</body>
+</html>
