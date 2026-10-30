@@ -3,10 +3,9 @@
 ## 파일 구성
 | 경로 | 무엇 | 고칠 때 |
 |---|---|---|
-| `index.html` | **도감 전체 (원본)**. 화면·명령어·시뮬레이터·동기화 코드가 전부 이 파일 하나에 있음 | 대부분 이 파일만 고치면 됨 |
-| `dist/MELSEC도감_오프라인.html` | 회사 PC용. index.html에 Tailwind를 통째로 넣은 버전 (외부 사이트 없이 열림) | index.html을 고친 뒤 다시 만들어야 함 (직접 고치지 말 것) |
+| `GX_명령어_설명.html` | **도감 전체 (원본)**. 화면·명령어·시뮬레이터·동기화 코드가 전부 이 파일 하나에 있음 | 대부분 이 파일만 고치면 됨 |
 | `apps-script/sync-server/Code.gs` | 동기화 서버 코드 (구글 Apps Script "MELSEC 도감 동기화 서버") | 거의 안 고침. 고치면 Apps Script에 붙여 넣고 "배포 관리 > 새 버전"으로 재배포 |
-| `apps-script/host/Code.gs` | 구글 예비 주소용 코드 (Apps Script "MELSEC 도감 (회사용 주소)") | 안 고침. 이 프로젝트의 index.html만 새 내용으로 교체 후 재배포 |
+| `apps-script/host/Code.gs` | 구글 예비 주소용 코드 (Apps Script "MELSEC 도감 (회사용 주소)") | 안 고침. 이 프로젝트의 GX_명령어_설명.html만 새 내용으로 교체 후 재배포 |
 
 ## 주소
 - 기본 (Cloudflare Workers, 이름 melsec-atlas)
@@ -21,10 +20,9 @@
 → 이 폴더를 지우거나 옮겨도 데이터는 안 사라짐.
 
 ## 고친 뒤 반영 순서
-1. `index.html` 수정 → 브라우저로 열어 확인 (파일 더블클릭 또는 VS Code의 Live Server)
-2. Cloudflare: 대시보드 > Workers & Pages > melsec-atlas > New deployment > index.html 업로드 > Deploy
+1. `GX_명령어_설명.html` 수정 → 브라우저로 열어 확인 (파일 더블클릭 또는 VS Code의 Live Server)
+2. Cloudflare: 대시보드 > Workers & Pages > melsec-atlas > New deployment > GX_명령어_설명.html을 index.html이라는 이름으로 업로드 > Deploy
 3. 구글 예비 주소: Apps Script "MELSEC 도감 (회사용 주소)" > index.html 내용 교체 > 저장 > 배포 관리 > 연필 > 버전: 새 버전 > 배포
-4. 회사용 파일: dist/ 오프라인 파일 다시 만들기 (index.html의 `<script src="https://cdn.tailwindcss.com"></script>` 줄을 Tailwind 스크립트 본문으로 교체)
 
 ## 주의
 - 로컬 파일로 열어도 동기화는 됨 (인터넷 연결 필요).
