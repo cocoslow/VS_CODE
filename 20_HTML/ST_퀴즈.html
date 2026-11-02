@@ -5,6 +5,34 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>미쯔비시 PLC ST 풀이</title>
+<script>
+// 구글 앱스 스크립트 동기화: 로드 시 동기(블로킹) 다운로드 후 localStorage 덮어쓰기, setItem 호출 시 1초 디바운스로 업로드
+// shortcut: 동기 XHR이라 응답 느리면 첫 화면이 그만큼 늦게 뜸, GS_URL 미설정 시 동기화 자체를 생략함
+const GS_URL = 'https://script.google.com/macros/s/AKfycbxdLTQTv_csadrCBj-xEMBIqjHu2606gD4MlCHQFJxhpScDV-srzkg2IopWCGqlu2JR/exec';
+(function(){
+  if(!GS_URL || GS_URL.indexOf('http') !== 0) return;
+  try{
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', GS_URL, false);
+    xhr.send(null);
+    if(xhr.status === 200 && xhr.responseText){
+      const data = JSON.parse(xhr.responseText);
+      Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+    }
+  }catch(e){}
+  let t;
+  const orig = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function(k, v){
+    orig(k, v);
+    clearTimeout(t);
+    t = setTimeout(()=>{
+      const data = {};
+      for(let i=0;i<localStorage.length;i++){ const key = localStorage.key(i); data[key] = localStorage.getItem(key); }
+      try{ fetch(GS_URL, {method:'POST', body: JSON.stringify(data)}); }catch(e){}
+    }, 1000);
+  };
+})();
+</script>
 <style>
 :root{--fs:1.1;--bg:#0f1419;--card:#1a2129;--line:#2a3440;--tx:#e6edf3;--sub:#8b98a5;--acc:#4ea1ff;--ok:#3fb950;--ng:#f85149;--warn:#d29922;
 --kw:#ff7b72;--ty:#ffa657;--num:#79c0ff;--cm:#6a9955;--dev:#d2a8ff;--var:#ff8fd0;
