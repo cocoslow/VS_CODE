@@ -950,6 +950,61 @@ async function migrateImgs(){let done=false;try{done=__ls.getItem("gxmig2")}catc
 document.getElementById("imgpick").onchange=e=>{if(pickId&&e.target.files.length)addFiles(pickId,[...e.target.files])};
 openDB().then(loadImgs).then(migrateImgs).then(()=>render());
 </script>
+<script>
+/* ===== 메모·즐겨찾기·내 설정 기기 간 동기화 (Apps Script + Drive 파일 1개) =====
+   키 하나(옵션 하나)의 메모+스샷 단위로 "나중에 고친 쪽"이 이김. 서버: works3_option_data.json */
+const SYNC_URL='https://script.google.com/macros/s/AKfycbyOIQSvd4hPImgah85WZG8BibxLqH5E_9eVFWpe7nb6JmehahhVm3AQtdCN84-GoXPAOg/exec';
+(function(){
+  const TK='gxsync_v1';let st={};try{st=JSON.parse(__ls.getItem(TK)||'{}')}catch(e){}
+  st.sig=st.sig||{};st.t=st.t||{};
+  let busy=false,timer=null,lastRun=0,badge=null;
+  function say(t,bad){if(!badge){badge=document.createElement('div');badge.style.cssText='position:fixed;right:12px;bottom:10px;z-index:99999;font:13px/1.2 sans-serif;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.92);border:1px solid #d6dbe6;color:#445;pointer-events:none';document.body.appendChild(badge)}badge.textContent=t;badge.style.color=bad?'#c0392b':'#445'}
+  const saveSt=()=>{try{__ls.setItem(TK,JSON.stringify(st))}catch(e){}};
+  const sigOf=k=>(memos[k]||'')+'|'+(imgs[k]||[]).map(x=>x.id).join(',');
+  const favSig=()=>JSON.stringify([...favs].sort());
+  const keysLocal=()=>{const s=new Set([...Object.keys(memos),...Object.keys(st.sig)]);Object.keys(imgs).forEach(k=>{if((imgs[k]||[]).length)s.add(k)});return [...s]};
+  function scan(){let ch=false;const now=Date.now();
+    keysLocal().forEach(k=>{const s=sigOf(k);if((st.sig[k]!==undefined?st.sig[k]:'|')!==s){st.sig[k]=s;st.t[k]=now;ch=true}});
+    const ms=JSON.stringify(mine);if((st.msig!==undefined?st.msig:'{}')!==ms){st.msig=ms;st.mt=now;ch=true}
+    const fs2=favSig();if((st.fsig!==undefined?st.fsig:'[]')!==fs2){st.fsig=fs2;st.ft=now;ch=true}
+    if(ch)saveSt();return ch}
+  const entry=k=>({m:memos[k]||null,imgs:(imgs[k]||[]).map(x=>({id:x.id,url:x.url})),t:st.t[k]||0});
+  async function applyKey(k,e){
+    const lu=(imgs[k]||[]).map(x=>x.url).join('\n'),ru=(e.imgs||[]).map(x=>x.url).join('\n');
+    if((memos[k]||null)===(e.m||null)&&lu===ru){st.t[k]=e.t;st.sig[k]=sigOf(k);return false}
+    (imgs[k]||[]).slice().forEach(x=>delImgKey(k,x.id));imgs[k]=[];
+    const map={};
+    for(const ri of (e.imgs||[])){await addImg(k,ri.url);const arr=imgs[k];const nid=arr[arr.length-1].id;sessionAdded.add(nid);map[ri.id]=nid}
+    if(e.m){memos[k]=e.m.replace(/data-iid="([^"]+)"/g,(s,id)=>'data-iid="'+(map[id]!=null?map[id]:id)+'"')}else delete memos[k];
+    st.t[k]=e.t;st.sig[k]=sigOf(k);return true}
+  async function sync(){
+    if(busy)return;if(document.activeElement&&document.activeElement.isContentEditable){schedule(4000);return}
+    busy=true;say('동기화 중…');
+    try{
+      scan();
+      const r=await fetch(SYNC_URL+'?t='+Date.now());const txt=(await r.text()).trim();if(!r.ok||!txt)throw new Error('empty');const rem=JSON.parse(txt)||{};
+      const rk=rem.keys=rem.keys||{};let push=false,chg=false;
+      const all=new Set([...keysLocal(),...Object.keys(rk)]);
+      for(const k of all){const lt=st.t[k]||0,rt=(rk[k]&&rk[k].t)||0;
+        if(rt>lt){if(await applyKey(k,rk[k]))chg=true}
+        else if(lt>rt){rk[k]=entry(k);push=true}}
+      const rmt=(rem.mine&&rem.mine.t)||0;
+      if(rmt>(st.mt||0)){mine=rem.mine.v||{};st.msig=JSON.stringify(mine);st.mt=rmt;try{__ls.setItem('gxmine',JSON.stringify(mine))}catch(e){}chg=true}
+      else if((st.mt||0)>rmt){rem.mine={v:mine,t:st.mt};push=true}
+      const rft=(rem.fav&&rem.fav.t)||0;
+      if(rft>(st.ft||0)){favs=new Set(rem.fav.v||[]);st.fsig=favSig();st.ft=rft;try{__ls.setItem('gxfav',JSON.stringify([...favs]))}catch(e){}chg=true}
+      else if((st.ft||0)>rft){rem.fav={v:[...favs],t:st.ft};push=true}
+      if(chg){persistMemos();render()}
+      if(push){rem.v=1;await fetch(SYNC_URL,{method:'POST',body:JSON.stringify(rem)})}
+      saveSt();lastRun=Date.now();say('동기화됨 '+new Date().toTimeString().slice(0,5))
+    }catch(e){say('동기화 실패(오프라인?)',true)}
+    busy=false}
+  function schedule(ms){clearTimeout(timer);timer=setTimeout(sync,ms)}
+  setTimeout(()=>{sync();setInterval(()=>{if(scan())schedule(2500)},2000);setInterval(()=>{if(!document.hidden)sync()},60000)},2500);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&Date.now()-lastRun>20000)sync()});
+  window.gxSyncNow=sync;
+})();
+</script>
 </body>
 
 </html>
