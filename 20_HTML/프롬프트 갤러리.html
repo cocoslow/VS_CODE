@@ -885,7 +885,7 @@ function openDetail(id) {
           <div style="margin-top:10px;display:flex;justify-content:flex-end"><button class="btn primary sm" id="dFill">채워서 복사</button></div></div>` : ''}
       </div>
       ${c.code ? `<div class="sec2"><h4>결과 코드 <span class="sp"></span><button class="btn sm" id="dPrev">결과 화면 보기</button><button class="btn sm" id="dCode">코드 복사</button></h4>
-        <pre class="box" style="max-height:200px">${esc(c.code)}</pre></div>` : ''}
+        <pre class="box" style="max-height:200px;overflow:auto">${esc(c.code)}</pre></div>` : ''}
       ${c.memo ? `<div class="sec2"><h4>메모</h4><div class="memo">${esc(c.memo)}</div></div>` : ''}
     </div>
   </div>`;
