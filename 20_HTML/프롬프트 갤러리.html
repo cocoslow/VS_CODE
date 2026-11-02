@@ -206,7 +206,8 @@ pre.box mark{background:var(--mark);color:var(--markfg);border-radius:4px;paddin
 .varbox label{display:block;font-size:12.5px;color:var(--varlabel);font-weight:700;margin:8px 0 4px}
 .varbox label:first-child{margin-top:0}
 .field{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;background:var(--field)}
-textarea.field{resize:vertical;min-height:90px;line-height:1.55}
+textarea.field{resize:none;overflow:hidden;min-height:90px;line-height:1.55}
+textarea.field[data-var]{min-height:0}
 textarea.mono{font:13px/1.6 "Consolas","D2Coding",monospace}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form .fl{display:block;font-size:13px;font-weight:700;margin:16px 0 6px}
@@ -885,7 +886,7 @@ function openDetail(id) {
           <div style="margin-top:10px;display:flex;justify-content:flex-end"><button class="btn primary sm" id="dFill">채워서 복사</button></div></div>` : ''}
       </div>
       ${c.code ? `<div class="sec2"><h4>결과 코드 <span class="sp"></span><button class="btn sm" id="dPrev">결과 화면 보기</button><button class="btn sm" id="dCode">코드 복사</button></h4>
-        <pre class="box" style="max-height:200px;overflow:auto">${esc(c.code)}</pre></div>` : ''}
+        <pre class="box">${esc(c.code)}</pre></div>` : ''}
       ${c.memo ? `<div class="sec2"><h4>메모</h4><div class="memo">${esc(c.memo)}</div></div>` : ''}
     </div>
   </div>`;
@@ -1416,6 +1417,15 @@ async function checkLegacy() {
   await refresh(true);
   const again = () => { if (document.visibilityState === 'visible' && Date.now() - lastLoad > 20000) refresh(false); };
   document.addEventListener('visibilitychange', again); window.addEventListener('focus', again);
+})();
+</script>
+<script>
+/* 입력창 자동 높이: 내용 길이에 맞춰 늘어남, 스크롤 없음 */
+(function(){
+  function fit(t){ if(!t.offsetParent) return; t.style.height='auto'; t.style.height=(t.scrollHeight+2)+'px'; }
+  function all(){ document.querySelectorAll('textarea.field:not(#nMd)').forEach(fit); }
+  document.addEventListener('input', function(e){ if(e.target.matches && e.target.matches('textarea.field:not(#nMd)')) fit(e.target); });
+  setInterval(all, 300);
 })();
 </script>
 </body>
