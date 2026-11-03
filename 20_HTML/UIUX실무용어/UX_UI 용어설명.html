@@ -2459,10 +2459,10 @@ MV({id:"confetti",cat:"화면과 마우스",ko:"컨페티",en:"Confetti",sum:"�
    ===================================================== */
 let viewMode=(()=>{try{return localStorage.getItem('uiView')||'card'}catch(e){return 'card'}})();
 let activeCat='전체',activeSet=(()=>{try{return localStorage.getItem('uiSet')||'real'}catch(e){return 'real'}})();
-const cur=s=>TERMS.filter(t=>(t.set||'real')===(s||activeSet));
+const cur=s=>TERMS.filter(t=>(t.set||'real')===(s||activeSet)).sort((a,b)=>{const h=x=>/^[가-힣]/.test(x.ko)?0:1;return h(a)-h(b)||a.ko.localeCompare(b.ko,'ko')});
 const HERO={real:['보면서 <span>이해하는</span> 실무 용어.','회의에서 쓰는 찐 실무 용어, 그림으로 먼저 익혀요.'],vibe:['이름을 알면 <span>AI에게</span> 정확히 말해요.','바이브코딩에서 쓰는 UI·모션 용어 48개, 움직이는 화면과 요청 문장으로 익혀요.']};
 function renderList(){
-  const cats=['전체',...new Set(cur().map(t=>t.cat))];if(!cats.includes(activeCat))activeCat='전체';
+  const cats=['전체',...new Set(TERMS.filter(t=>(t.set||'real')===activeSet).map(t=>t.cat))];if(!cats.includes(activeCat))activeCat='전체';
   $('#hh').innerHTML=HERO[activeSet][0];$('#hp').innerHTML=HERO[activeSet][1]+(activeSet!=='real'?'<button class="cheatbtn" id="ch">치트시트 보기</button>':'');
   document.querySelectorAll('#ptabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===activeSet));$('#n1').textContent=cur('real').length;$('#n2').textContent=cur('vibe').length;
   const chb=$('#ch');if(chb)chb.onclick=()=>{location.hash='#/cheatsheet'};
@@ -2511,7 +2511,7 @@ function renderDetail(t){
   t.demo($('#pg'));
   const cp=$('#cp');if(cp)cp.onclick=()=>{const txt=t.prompt;const done=()=>{cp.textContent='복사됨';setTimeout(()=>cp.textContent='복사',1200)};if(navigator.clipboard)navigator.clipboard.writeText(txt).then(done,done);else done()};
 }
-function renderCheat(){const groups=[...new Set(cur().map(x=>x.cat))];let h='<div class="top" style="padding-bottom:0"><button class="back" id="back">← 목록</button><span class="pill">치트시트</span></div><div class="dhead"><h1>치트시트<small>한눈에 보는 '+cur().length+'개</small></h1><div class="leadrow"><p>필요할 때 찾아서, 요청 문장을 바로 복사해 쓰세요.</p></div></div><table class="cheat">';for(const g of groups){h+=`<tr class="grp"><td colspan="3">${g}</td></tr>`;for(const t of cur().filter(x=>x.cat===g))h+=`<tr><td>${esc(t.ko)}<small>${esc(t.en)}</small></td><td>${esc(t.prompt)}</td><td><button data-id="${t.id}">복사</button></td></tr>`}h+='</table>';$('#detailView').innerHTML=h;$('#back').onclick=()=>{location.hash='#/'};$('#detailView').onclick=e=>{const b=e.target.closest('button[data-id]');if(!b)return;const t=TERMS.find(x=>x.id===b.dataset.id);const d=()=>{b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1200)};if(navigator.clipboard)navigator.clipboard.writeText(t.prompt).then(d,d);else d()}}
+function renderCheat(){const groups=[...new Set(TERMS.filter(x=>(x.set||'real')===activeSet).map(x=>x.cat))];let h='<div class="top" style="padding-bottom:0"><button class="back" id="back">← 목록</button><span class="pill">치트시트</span></div><div class="dhead"><h1>치트시트<small>한눈에 보는 '+cur().length+'개</small></h1><div class="leadrow"><p>필요할 때 찾아서, 요청 문장을 바로 복사해 쓰세요.</p></div></div><table class="cheat">';for(const g of groups){h+=`<tr class="grp"><td colspan="3">${g}</td></tr>`;for(const t of cur().filter(x=>x.cat===g))h+=`<tr><td>${esc(t.ko)}<small>${esc(t.en)}</small></td><td>${esc(t.prompt)}</td><td><button data-id="${t.id}">복사</button></td></tr>`}h+='</table>';$('#detailView').innerHTML=h;$('#back').onclick=()=>{location.hash='#/'};$('#detailView').onclick=e=>{const b=e.target.closest('button[data-id]');if(!b)return;const t=TERMS.find(x=>x.id===b.dataset.id);const d=()=>{b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1200)};if(navigator.clipboard)navigator.clipboard.writeText(t.prompt).then(d,d);else d()}}
 function route(){
   const id=location.hash.replace('#/','');
   if(id==='cheatsheet'){$('#listView').hidden=true;$('#detailView').hidden=false;renderCheat();scrollTo(0,0);return}
