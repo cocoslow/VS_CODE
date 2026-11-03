@@ -1108,6 +1108,29 @@ textarea::placeholder{color:#6b6b80}
 .card:hover .mt-cf i{animation:mtConf 1.6s cubic-bezier(.1,.7,.3,1) infinite}
 @keyframes mtConf{from{transform:translate(0,0) rotate(0) scale(.3);opacity:1}to{transform:translate(var(--x),calc(var(--y) + 30px)) rotate(var(--r));opacity:.2}}
 
+
+/* --- 모션 탭: 리스트형 목록 --- */
+.cards.list{display:flex;flex-direction:column;gap:8px}
+.cards.list .lgrp{display:flex;align-items:baseline;gap:8px;margin:18px 4px 4px;font-size:14px}
+.cards.list .lgrp:first-child{margin-top:0}
+.cards.list .lgrp b{color:var(--text)}.cards.list .lgrp span{color:var(--sub);font-size:12px}
+.cards.list .card.lrow{display:flex;align-items:center;gap:18px;padding:8px 18px 8px 10px;border-radius:16px}
+.cards.list .card.lrow:hover{transform:translateX(4px);box-shadow:0 14px 30px -18px rgba(139,123,255,.45)}
+.lrow .lno{width:26px;flex:none;color:var(--sub);font-size:13px;font-variant-numeric:tabular-nums;text-align:right}
+.lrow .thumb{width:128px;height:74px;flex:none;padding:0;border-radius:12px}
+.lrow .thumb .fill{transform:scale(.52);transform-origin:center}
+.lrow .lt{flex:0 0 250px;min-width:0}
+.lrow .lpr{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;padding-left:18px;border-left:1px solid var(--line)}
+.lrow .lpr small{font-size:11px;color:var(--sub)}
+.lrow .lpr span{font-size:13.5px;color:#cfcfdc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow h2{margin:0;font-size:18px;letter-spacing:-.03em;display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.lrow h2 small{font-size:12px;color:var(--sub);font-weight:500;letter-spacing:0}
+.lrow p{margin:3px 0 0;color:var(--sub);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow .lcat{width:110px;flex:none;text-align:right}
+.lrow .lst{width:76px;flex:none;font-size:12px;text-align:right}
+.lrow .arrow{flex:none;width:32px;height:32px;font-size:15px}
+@media(max-width:1100px){.lrow .lpr{display:none}.lrow .lt{flex:1}}
+@media(max-width:760px){.lrow .lcat,.lrow .lst{display:none}.lrow .thumb{width:110px;height:72px}.lrow .thumb .fill{transform:scale(.48)}.lrow h2 small{display:none}}
 </style>
 </head>
 <body>
@@ -1115,7 +1138,7 @@ textarea::placeholder{color:#6b6b80}
   <div class="top"><div class="logo"><i></i>UX/UI 용어 도감</div><span class="pill" id="count">용어 24개</span></div>
   <section id="listView">
     <div class="hero">
-      <div class="ptabs" id="ptabs"><button data-s="real">찐 실무 용어<small id="n1"></small></button><button data-s="vibe">바이브코딩 용어<small id="n2"></small></button></div>
+      <div class="ptabs" id="ptabs"><button data-s="real">찐 실무 용어<small id="n1"></small></button><button data-s="vibe">바이브코딩 용어<small id="n2"></small></button><button data-s="motion">모션 용어<small id="n3"></small></button></div>
       <h1 id="hh">이름을 알면 <span>AI에게</span> 정확히 말해요.</h1>
       <p id="hp">바이브코딩에서 쓰는 UI 용어 24개, 움직이는 화면과 요청 문장으로 익혀요.<button class="cheatbtn" id="ch">치트시트 보기</button></p>
     </div>
@@ -1932,8 +1955,8 @@ const SORTKEY={abtest:'에이비 테스트'};
 TERMS.sort((a,b)=>{const sa=a.set==='vibe',sb=b.set==='vibe';if(sa!==sb)return sa-sb;if(sa)return 0;return (SORTKEY[a.id]||a.ko).localeCompare(SORTKEY[b.id]||b.ko,'ko')});
 
 
-/* ===== 탭2 추가: 모션 용어 24 (코드깎는노인 「바이브코더가 반드시 알아야 할 필수 용어 24가지 2탄」) ===== */
-const MV=o=>TERMS.push(Object.assign({set:'vibe'},o));
+/* ===== 탭3: 모션 용어 24, 리스트형 목록 (코드깎는노인 「바이브코더가 반드시 알아야 할 필수 용어 24가지 2탄」) ===== */
+const MV=o=>TERMS.push(Object.assign({set:'motion'},o));
 const live=el=>!!(el&&el.isConnected);
 const mpage=()=>`<div class="m-page">${ln('42%',14,'#3a3a50')}${ln('92%',8)}${ln('80%',8)}<div class="m-blk"></div>${ln('70%',8)}${ln('55%',8)}</div>`;
 const EZ={linear:'linear',in:'cubic-bezier(.55,0,1,.45)',out:'cubic-bezier(0,.55,.45,1)',inout:'cubic-bezier(.65,0,.35,1)'};
@@ -2427,14 +2450,19 @@ MV({id:"confetti",cat:"화면과 마우스",ko:"컨페티",en:"Confetti",sum:"�
    ===================================================== */
 let activeCat='전체',activeSet=(()=>{try{return localStorage.getItem('uiSet')||'real'}catch(e){return 'real'}})();
 const cur=s=>TERMS.filter(t=>(t.set||'real')===(s||activeSet));
-const HERO={real:['보면서 <span>이해하는</span> 실무 용어.','회의에서 쓰는 찐 실무 용어, 그림으로 먼저 익혀요.'],vibe:['이름을 알면 <span>AI에게</span> 정확히 말해요.','바이브코딩에서 쓰는 UI·모션 용어 48개, 움직이는 화면과 요청 문장으로 익혀요.']};
+const HERO={real:['보면서 <span>이해하는</span> 실무 용어.','회의에서 쓰는 찐 실무 용어, 그림으로 먼저 익혀요.'],vibe:['이름을 알면 <span>AI에게</span> 정확히 말해요.','바이브코딩에서 쓰는 UI 용어 24개, 움직이는 화면과 요청 문장으로 익혀요.'],motion:['뿅 대신 <span>이름으로</span> 부탁해요.','바이브코딩 모션 용어 24개. 효과 이름 + 속도 + 시작 조건으로 말해요.']};
 function renderList(){
   const cats=['전체',...new Set(cur().map(t=>t.cat))];if(!cats.includes(activeCat))activeCat='전체';
   $('#hh').innerHTML=HERO[activeSet][0];$('#hp').innerHTML=HERO[activeSet][1]+(activeSet!=='real'?'<button class="cheatbtn" id="ch">치트시트 보기</button>':'');
-  document.querySelectorAll('#ptabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===activeSet));$('#n1').textContent=cur('real').length;$('#n2').textContent=cur('vibe').length;
+  document.querySelectorAll('#ptabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===activeSet));$('#n1').textContent=cur('real').length;$('#n2').textContent=cur('vibe').length;$('#n3').textContent=cur('motion').length;
   const chb=$('#ch');if(chb)chb.onclick=()=>{location.hash='#/cheatsheet'};
   $('#filters').innerHTML=cats.map(c=>`<button class="${c===activeCat?'on':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('');
   const list=cur().filter(t=>activeCat==='전체'||t.cat===activeCat);
+  const LM=activeSet==='motion';$('#cards').classList.toggle('list',LM);
+  if(LM){const row=t=>{const d=load(t.id),no=String(cur().indexOf(t)+1).padStart(2,'0');return `<button class="card lrow" data-id="${t.id}"><span class="lno">${no}</span><div class="thumb"><div class="fill">${t.thumb()}</div></div><div class="lt"><h2>${esc(t.ko)}<small>${esc(t.en)}</small></h2><p>${esc(t.sum)}</p></div><div class="lpr"><small>AI 요청 문장</small><span>${esc(t.prompt)}</span></div><span class="tag lcat">${esc(t.cat)}</span><span class="lst">${d.done?'<span class="state">학습 완료</span>':d.memo?'<span class="state">메모 있음</span>':''}</span><span class="arrow">→</span></button>`};
+    const gs=activeCat==='전체'?[...new Set(list.map(t=>t.cat))]:[activeCat];
+    $('#cards').innerHTML=gs.map(g=>{const L=list.filter(t=>t.cat===g);return `<div class="lgrp"><b>${esc(g)}</b><span>${L.length}</span></div>`+L.map(row).join('')}).join('');
+  }else
   $('#cards').innerHTML=list.map(t=>{const d=load(t.id);
     return `<button class="card" data-id="${t.id}"><div class="thumb"><div class="fill">${t.thumb()}</div></div>
     <div class="cbody"><span class="tag">${esc(t.cat)}</span>${t.extra?'<span class="extra-tag">영상 외 보충</span>':''}<h2>${esc(t.ko)}<small>${esc(t.en)}</small></h2><p>${esc(t.sum)}</p>
