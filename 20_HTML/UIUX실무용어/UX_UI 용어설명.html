@@ -875,6 +875,239 @@ textarea::placeholder{color:#6b6b80}
 .savb{min-width:130px;height:52px;border-radius:14px;border:0;background:var(--lime);color:#111;font-weight:800;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.3s}
 .savb.ok{background:#35d07f}
 
+
+/* ===== 탭3: 모션 용어 (코드깎는노인 2탄) ===== */
+.mstage{position:relative;width:100%;max-width:680px;height:290px;background:#17171f;border:1px solid var(--line2);border-radius:16px;overflow:hidden}
+.m-page{position:absolute;inset:0;padding:22px;display:flex;flex-direction:column;gap:10px}
+.m-blk{height:70px;border-radius:12px;background:#232331}
+.m-dim{position:absolute;inset:0;background:rgba(0,0,0,.62);opacity:0;pointer-events:none}
+.m-modal{position:absolute;left:50%;top:50%;width:250px;margin:-62px 0 0 -125px;background:#23232f;border:1px solid var(--line2);border-radius:16px;padding:16px 18px;opacity:0;pointer-events:none}
+.m-modal p{margin:6px 0 12px;font-size:13px;color:var(--sub)}
+.m-card{position:absolute;width:200px;padding:14px;border-radius:14px;background:#262634;border:1px solid var(--line2);display:flex;gap:10px;align-items:center}
+.m-card i{width:34px;height:34px;border-radius:10px;flex:none;background:linear-gradient(135deg,#8b7bff,#ff6b9a)}
+.m-card b{font-size:13px}.m-card p{margin:0;font-size:12px;color:var(--sub)}
+.m-cart{position:relative;width:76px;height:76px;border-radius:22px;background:#262634;border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:30px}
+.m-badge{position:absolute;right:-8px;top:-8px;min-width:28px;height:28px;padding:0 7px;border-radius:99px;background:#ff6b9a;color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.m-lanes{width:100%;max-width:680px}
+.m-lane{display:flex;align-items:center;gap:14px;margin:10px 0}
+.m-lane>span{width:120px;font-size:13px;color:var(--sub);flex:none}
+.m-lane>span b{display:block;color:var(--text);font-size:14px}
+.m-trk{flex:1;height:40px;border-radius:99px;background:#232331;position:relative}
+.m-ball{position:absolute;left:5px;top:5px;width:30px;height:30px;border-radius:50%}
+.m-graph{width:100%;max-width:680px;height:110px;background:#17171f;border:1px solid var(--line2);border-radius:14px;margin-top:12px}
+.m-floor{position:absolute;left:0;right:0;bottom:0;height:46px;background:#1f1f2b;border-top:2px solid #3a3a4a}
+.m-chk{position:absolute;left:50%;width:60px;height:60px;margin-left:-30px;border-radius:50%;background:var(--green);color:#111;font-weight:900;font-size:30px;display:flex;align-items:center;justify-content:center}
+.m-tl{width:100%;max-width:680px;margin-top:14px;font-size:12px;color:var(--sub)}
+.m-tlr{display:flex;align-items:center;gap:10px;margin:6px 0}
+.m-tlr>span{width:56px;flex:none}
+.m-tlt{flex:1;height:18px;border-radius:6px;background:#1f1f2b;position:relative;overflow:hidden}
+.m-tlt i{position:absolute;top:0;bottom:0;border-radius:6px;display:block}
+.m-tlt .dl{background:repeating-linear-gradient(45deg,rgba(255,200,87,.35) 0 6px,transparent 6px 12px)}
+.m-ph{position:absolute;top:0;bottom:-40px;width:2px;background:#fff;left:0;opacity:0}
+.m-hero{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:30px 36px}
+.m-hero h4{margin:0;font-size:30px;letter-spacing:-.03em}
+.m-hero p{margin:8px 0 0;color:var(--sub);font-size:15px}
+@keyframes mFloat{from{transform:translateY(-10px)}to{transform:translateY(10px)}}
+@keyframes mSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes mBlink{50%{opacity:0}}
+.m-blob{width:150px;height:150px;border-radius:42% 58% 55% 45%/50% 45% 55% 50%;background:linear-gradient(135deg,#8b7bff,#ff6b9a);box-shadow:0 30px 60px rgba(139,123,255,.35)}
+.m-mini{position:absolute;width:30px;height:30px;border-radius:9px}
+.m-type{font-size:clamp(22px,4vw,34px);font-weight:800;letter-spacing:-.02em;min-height:1.4em;padding:0 20px;text-align:center}
+.m-caret{display:inline-block;width:3px;height:1em;background:var(--lime);margin-left:4px;vertical-align:-.12em;animation:mBlink 1s steps(1) infinite}
+.m-scr{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:clamp(24px,4.4vw,40px);font-weight:800;letter-spacing:.04em;padding:0 20px;text-align:center}
+.m-scr .u{color:#8b7bff;opacity:.75}
+.m-split{font-size:clamp(24px,4.4vw,40px);font-weight:800;letter-spacing:-.03em;text-align:center;padding:0 20px;line-height:1.3}
+.m-split .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:4px}
+.m-split .w>i{display:inline-block;font-style:normal}
+.m-stats{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.m-stat{width:180px;padding:20px;border-radius:16px;background:#232331;border:1px solid var(--line)}
+.m-stat b{display:block;font-size:32px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.m-stat span{font-size:13px;color:var(--sub)}
+.m-svg{width:100%;max-width:560px;height:240px}
+.m-burger{width:76px;height:76px;border-radius:20px;background:#262634;border:1px solid var(--line2);position:relative;cursor:pointer}
+.m-burger i{position:absolute;left:20px;right:20px;height:5px;border-radius:9px;background:#fff;display:block}
+.m-burger i:nth-child(1){top:24px}.m-burger i:nth-child(2){top:36px}.m-burger i:nth-child(3){top:48px}
+.m-burger.x i:nth-child(1){transform:translateY(12px) rotate(45deg)}
+.m-burger.x i:nth-child(2){opacity:0;transform:scaleX(.2)}
+.m-burger.x i:nth-child(3){transform:translateY(-12px) rotate(-45deg)}
+.m-menu{position:absolute;right:16px;top:16px;bottom:16px;width:190px;border-radius:14px;background:#232331;border:1px solid var(--line2);padding:16px;display:flex;flex-direction:column;gap:12px;transform:translateX(120%)}
+.m-menu.on{transform:none}
+.m-shape{width:90px;height:90px;background:linear-gradient(135deg,#c6ff4d,#35d07f)}
+.m-mq{width:100%;max-width:680px;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+.m-mqt{display:flex;gap:14px;width:max-content;padding:8px 0}
+.m-mq.hp:hover .m-mqt{animation-play-state:paused}
+.m-logo{padding:14px 22px;border-radius:14px;background:#232331;border:1px solid var(--line);font-weight:800;white-space:nowrap;font-size:15px}
+.m-rv{padding:12px 18px;border-radius:14px;background:#1d1d27;border:1px solid var(--line);white-space:nowrap;font-size:13px;color:#cfcfdc}
+@keyframes mMq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.m-prod{position:absolute;left:30px;bottom:30px;width:150px;padding:12px;border-radius:16px;background:#262634;border:1px solid var(--line2)}
+.m-prod .im{height:76px;border-radius:10px;background:linear-gradient(135deg,#ffc857,#ff6b9a);margin-bottom:8px}
+.m-fly{position:absolute;left:0;top:0;width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#ffc857,#ff6b9a);offset-anchor:50% 50%;offset-rotate:0deg;pointer-events:none;opacity:0}
+.m-cartt{position:absolute;right:34px;top:30px}
+.m-pathsvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.m-br{position:absolute;inset:0;display:flex;flex-direction:column}
+.m-brbar{height:40px;flex:none;background:#20202b;display:flex;align-items:center;gap:6px;padding:0 14px;border-bottom:1px solid var(--line)}
+.m-brbar a{font-size:13px;padding:5px 12px;border-radius:99px;color:var(--sub);cursor:pointer}
+.m-brbar a.on{background:var(--text);color:#111;font-weight:700}
+.m-view{flex:1;position:relative;overflow:hidden}
+.m-pg{position:absolute;inset:0;padding:20px 24px;display:flex;flex-direction:column;gap:10px}
+.m-pg .hb{height:96px;border-radius:14px}
+.m-wipe{position:absolute;inset:0;transform:translateX(-101%);background:var(--lime);z-index:3}
+.m-grid{position:absolute;inset:0;padding:18px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.m-it{border-radius:14px;background:#232331;border:1px solid var(--line);padding:10px;cursor:pointer}
+.m-it .im{height:120px;border-radius:10px}
+.m-it b{display:block;font-size:13px;margin-top:8px}
+.m-det{position:absolute;inset:0;padding:18px;display:flex;gap:16px}
+.m-det .im{width:48%;height:100%;border-radius:14px;flex:none}
+.m-det .tx{flex:1;display:flex;flex-direction:column;gap:10px;padding-top:6px}
+.m-scroll{position:absolute;inset:0;overflow-y:auto;overscroll-behavior:contain}
+.m-scroll::-webkit-scrollbar{width:8px}.m-scroll::-webkit-scrollbar-thumb{background:#3a3a4a;border-radius:9px}
+.m-hint{height:110px;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:14px}
+.m-pinw{position:relative}
+.m-pin{position:sticky;top:0;height:288px;display:flex;align-items:center;gap:24px;padding:0 30px}
+.m-scene{width:46%;height:200px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:900;color:#111;transition:background .35s,transform .35s}
+.m-steps{flex:1;display:flex;flex-direction:column;gap:10px}
+.m-step{padding:12px 14px;border-radius:12px;border:1px solid var(--line);color:var(--sub);transition:.3s;font-size:14px}
+.m-step.on{border-color:var(--lime);color:var(--text);background:rgba(198,255,77,.07)}
+.m-step b{display:block;font-size:15px}
+.m-hpin{position:sticky;top:0;height:288px;overflow:hidden;display:flex;flex-direction:column;justify-content:center}
+.m-htr{display:flex;gap:16px;padding:0 30px;width:max-content}
+.m-hc{width:220px;height:170px;border-radius:18px;padding:16px;display:flex;flex-direction:column;justify-content:flex-end;color:#111;font-weight:800;flex:none}
+.m-hpg{height:4px;margin:16px 30px 0;border-radius:9px;background:#2a2a38;overflow:hidden}
+.m-hpg i{display:block;height:100%;width:0;background:var(--lime)}
+.m-mag{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.m-magb{padding:18px 34px;border-radius:99px;background:var(--lime);color:#111;font-weight:800;font-size:17px;border:0;cursor:pointer;transition:transform .45s cubic-bezier(.2,1.4,.4,1)}
+.m-magb span{display:inline-block;transition:transform .45s cubic-bezier(.2,1.4,.4,1)}
+.m-magr{position:absolute;border:1px dashed rgba(255,255,255,.18);border-radius:50%;pointer-events:none}
+.m-cur{position:absolute;inset:0;cursor:none;display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;padding:30px}
+.m-cur.off{cursor:auto}
+.m-cur .lk{padding:12px 20px;border-radius:12px;background:#232331;border:1px solid var(--line);font-weight:700}
+.m-dot,.m-ring{position:absolute;left:0;top:0;border-radius:50%;pointer-events:none;z-index:5}
+.m-dot{width:8px;height:8px;margin:-4px 0 0 -4px;background:var(--lime)}
+.m-ring{width:36px;height:36px;margin:-18px 0 0 -18px;border:2px solid var(--lime);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#111;transition:width .25s,height .25s,margin .25s,background .25s}
+.m-ring.big{width:74px;height:74px;margin:-37px 0 0 -37px;background:var(--lime)}
+.m-tiltw{perspective:900px}
+.m-tilt{width:250px;padding:22px;border-radius:22px;background:linear-gradient(160deg,#2b2b3d,#1b1b26);border:1px solid var(--line2);position:relative;overflow:hidden;transition:transform .18s ease-out;transform-style:preserve-3d}
+.m-tilt h5{margin:0;font-size:14px;color:var(--sub)}
+.m-tilt b{display:block;font-size:34px;margin:4px 0 12px}
+.m-tilt li{font-size:13px;color:#cfcfdc;list-style:none;margin:6px 0}
+.m-tilt ul{padding:0;margin:0 0 14px}
+.m-glare{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .2s}
+.m-cv{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.m-pay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.m-pay .ok{font-size:20px;font-weight:800}
+/* --- 모션 썸네일 (카드에 마우스를 올리면 움직임) --- */
+.mt-win{width:150px;height:104px;border-radius:12px;background:#262634;position:relative;overflow:hidden;border:2px solid #3a3a4a}
+.mt-dim{position:absolute;inset:0;background:rgba(0,0,0,.55)}
+.mt-modal{position:absolute;left:24px;right:24px;top:28px;height:44px;border-radius:9px;background:#8b7bff;padding:9px}
+.card:hover .mt-fade{animation:mtFade 1.8s ease-in-out infinite}
+@keyframes mtFade{0%,100%{opacity:0}40%,75%{opacity:1}}
+.mt-ban{position:absolute;left:10px;right:10px;top:8px;height:24px;border-radius:7px;background:#c6ff4d;padding:8px}
+.card:hover .mt-slide{animation:mtSlide 1.8s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes mtSlide{0%{transform:translateY(-150%)}30%,70%{transform:none}100%{transform:translateY(-150%)}}
+.mt-cart{position:relative;width:70px;height:70px;border-radius:20px;background:#262634;border:2px solid #3a3a4a;display:flex;align-items:center;justify-content:center;font-size:28px}
+.mt-badge{position:absolute;right:-9px;top:-9px;width:28px;height:28px;border-radius:50%;background:#ff6b9a;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.card:hover .mt-pop{animation:mtPop 1.4s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes mtPop{0%{transform:scale(0)}25%{transform:scale(1.35)}40%,100%{transform:scale(1)}}
+.mt-lane{width:150px;height:22px;border-radius:99px;background:#262634;position:relative;margin:8px 0}
+.mt-lane i{position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;display:block}
+.card:hover .mt-l1{animation:mtMove 1.6s linear infinite alternate}
+.card:hover .mt-l2{animation:mtMove 1.6s cubic-bezier(.1,.9,.2,1) infinite alternate}
+@keyframes mtMove{to{transform:translateX(125px)}}
+.mt-box{width:74px;height:74px;border-radius:18px;background:linear-gradient(135deg,#8b7bff,#ff6b9a)}
+.card:hover .mt-spring{animation:mtSpring 1.6s linear infinite}
+@keyframes mtSpring{0%{transform:scale(.55)}30%{transform:scale(1.18)}45%{transform:scale(.93)}60%{transform:scale(1.05)}72%{transform:scale(.98)}85%,100%{transform:scale(1)}}
+.mt-flr{position:absolute;left:0;right:0;bottom:0;height:16px;background:#3a3a4a}
+.mt-ball{position:absolute;left:50%;bottom:16px;width:30px;height:30px;margin-left:-15px;border-radius:50%;background:#35d07f}
+.card:hover .mt-bounce{animation:mtBounce 1.6s infinite}
+@keyframes mtBounce{0%{transform:translateY(-58px);animation-timing-function:ease-in}28%{transform:none;animation-timing-function:ease-out}44%{transform:translateY(-26px);animation-timing-function:ease-in}58%{transform:none;animation-timing-function:ease-out}68%{transform:translateY(-9px);animation-timing-function:ease-in}76%,100%{transform:none}}
+.mt-tl{width:150px}
+.mt-tl div{height:18px;border-radius:6px;background:#262634;margin:10px 0;position:relative;overflow:hidden}
+.mt-tl i{position:absolute;top:0;bottom:0;border-radius:6px;display:block}
+.mt-tl .d{left:0;width:40%;background:repeating-linear-gradient(45deg,rgba(255,200,87,.45) 0 5px,transparent 5px 10px)}
+.card:hover .mt-grow{animation:mtGrow 1.8s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes mtGrow{from{transform:scaleX(0)}60%,to{transform:scaleX(1)}}
+.mt-grow{transform-origin:left}
+.card:hover .mt-float{animation:mFloat 1.2s ease-in-out infinite alternate}
+.mt-mono{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:800;font-size:22px;color:#fff;white-space:nowrap}
+.mt-type{display:inline-block;overflow:hidden;vertical-align:bottom;border-right:3px solid #c6ff4d}
+.card:hover .mt-type{animation:mtType 2s steps(7) infinite}
+@keyframes mtType{from{width:0}70%,to{width:7.2ch}}
+.mt-scr{display:flex;gap:2px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:800;font-size:26px}
+.mt-scr span{display:block;height:1.2em;line-height:1.2em;overflow:hidden;width:.75em;text-align:center}
+.mt-scr i{display:block;font-style:normal;transform:translateY(-4.8em)}
+.card:hover .mt-scr i{animation:mtScr 1.6s infinite}
+@keyframes mtScr{0%{transform:translateY(0);animation-timing-function:steps(4,end)}60%,100%{transform:translateY(-4.8em)}}
+.mt-spl{display:flex;font-weight:900;font-size:30px;letter-spacing:-.02em;overflow:hidden;padding-bottom:4px}
+.mt-spl i{display:block;font-style:normal}
+.card:hover .mt-spl i{animation:mtRise 1.8s cubic-bezier(.2,.8,.2,1) infinite both}
+@keyframes mtRise{0%{transform:translateY(110%)}35%,100%{transform:none}}
+.mt-odo{display:flex;font-weight:900;font-size:34px;height:1.1em;line-height:1.1em;overflow:hidden;font-variant-numeric:tabular-nums;color:#c6ff4d}
+.mt-odo span{display:block;width:.62em;text-align:center}
+.mt-odo span b{display:block;transform:translateY(calc(var(--d) * -1.1em))}
+.mt-odo span b i{display:block;font-style:normal;height:1.1em}
+.card:hover .mt-odo span b{animation:mtOdo 2s cubic-bezier(.2,.8,.2,1) infinite}
+@keyframes mtOdo{from{transform:translateY(0)}60%,to{transform:translateY(calc(var(--d) * -1.1em))}}
+.mt-draw{stroke-dasharray:1;stroke-dashoffset:0}
+.card:hover .mt-draw{animation:mtDraw 2s ease-in-out infinite}
+@keyframes mtDraw{from{stroke-dashoffset:1}65%,to{stroke-dashoffset:0}}
+.mt-bg{width:70px;height:70px;border-radius:18px;background:#262634;border:2px solid #3a3a4a;position:relative}
+.mt-bg i{position:absolute;left:17px;right:17px;height:5px;border-radius:9px;background:#fff;display:block;transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.mt-bg i:nth-child(1){top:21px}.mt-bg i:nth-child(2){top:31px}.mt-bg i:nth-child(3){top:41px}
+.card:hover .mt-bg i:nth-child(1){transform:translateY(10px) rotate(45deg)}
+.card:hover .mt-bg i:nth-child(2){opacity:0}
+.card:hover .mt-bg i:nth-child(3){transform:translateY(-10px) rotate(-45deg)}
+.mt-sq{width:56px;height:56px;border-radius:50%;background:#c6ff4d;transition:border-radius .5s,transform .5s,background .5s}
+.card:hover .mt-sq{border-radius:14px;transform:rotate(90deg);background:#8b7bff}
+.mt-mq{width:100%;overflow:hidden}
+.mt-mq>div{display:flex;gap:8px;width:max-content}
+.mt-mq span{padding:8px 12px;border-radius:9px;background:#262634;border:1px solid #3a3a4a;font-weight:800;font-size:12px;color:#cfcfdc}
+.card:hover .mt-mq>div{animation:mMq 3s linear infinite}
+.mt-mp{position:relative;width:150px;height:100px}
+.mt-dotp{position:absolute;left:0;top:0;width:18px;height:18px;border-radius:5px;background:#ffc857;offset-path:path('M14 84 Q 70 -20 134 30');offset-anchor:50% 50%;offset-rotate:0deg;offset-distance:100%}
+.card:hover .mt-dotp{animation:mtPath 1.6s cubic-bezier(.4,0,.2,1) infinite}
+@keyframes mtPath{from{offset-distance:0%}70%,to{offset-distance:100%}}
+.mt-pa,.mt-pb{position:absolute;inset:0;padding:10px;display:flex;flex-direction:column;gap:6px}
+.mt-pb{opacity:0;background:#262634}
+.mt-wp{position:absolute;inset:0;background:#c6ff4d;transform:translateX(-101%)}
+.card:hover .mt-wp{animation:mtWipe 2s cubic-bezier(.7,0,.3,1) infinite}
+.card:hover .mt-pb{animation:mtSwap 2s steps(1) infinite}
+@keyframes mtWipe{0%{transform:translateX(-101%)}35%{transform:none}65%{transform:translateX(101%)}100%{transform:translateX(101%)}}
+@keyframes mtSwap{0%{opacity:0}35%,100%{opacity:1}}
+.mt-sh{position:absolute;border-radius:7px;background:linear-gradient(135deg,#8b7bff,#ff6b9a);transition:all .55s cubic-bezier(.2,.8,.2,1)}
+.mt-shg{position:absolute;border-radius:7px;background:#34344a}
+.card:hover .mt-sh{left:8px!important;top:8px!important;width:130px!important;height:58px!important}
+.mt-col{position:absolute;left:10px;top:0;width:58px;display:flex;flex-direction:column;gap:10px;padding-top:10px}
+.card:hover .mt-col{animation:mtCol 2.4s linear infinite}
+@keyframes mtCol{from{transform:translateY(0)}to{transform:translateY(-60px)}}
+.mt-pinp{position:absolute;right:10px;top:12px;width:62px;height:76px;border-radius:10px;background:#8b7bff}
+.card:hover .mt-pinp{animation:mtPinc 2.4s steps(1) infinite}
+@keyframes mtPinc{0%{background:#8b7bff}33%{background:#c6ff4d}66%{background:#ff6b9a}}
+.mt-hs{display:flex;gap:8px;position:absolute;left:10px;top:24px}
+.mt-hs i{width:48px;height:52px;border-radius:9px;display:block;flex:none}
+.card:hover .mt-hs{animation:mtHs 2.4s cubic-bezier(.4,0,.2,1) infinite alternate}
+@keyframes mtHs{to{transform:translateX(-130px)}}
+.mt-magb{padding:12px 22px;border-radius:99px;background:#c6ff4d;color:#111;font-weight:800;font-size:13px}
+.mt-ptr{position:absolute;font-size:22px;left:50%;top:50%;transform:translate(46px,30px);color:#fff}
+.card:hover .mt-magb{animation:mtMag 1.8s cubic-bezier(.2,1.4,.4,1) infinite}
+.card:hover .mt-ptr{animation:mtPtr 1.8s ease-in-out infinite}
+@keyframes mtMag{0%,20%{transform:none}50%,75%{transform:translate(10px,6px)}100%{transform:none}}
+@keyframes mtPtr{0%{transform:translate(70px,46px)}50%,75%{transform:translate(30px,14px)}100%{transform:translate(70px,46px)}}
+.mt-cdot,.mt-cring{position:absolute;left:50%;top:50%;border-radius:50%}
+.mt-cdot{width:8px;height:8px;margin:-4px;background:#c6ff4d}
+.mt-cring{width:30px;height:30px;margin:-15px;border:2px solid #c6ff4d}
+.card:hover .mt-cdot,.card:hover .mt-cring{animation:mtCur 2.2s ease-in-out infinite}
+.card:hover .mt-cring{animation-delay:.12s}
+@keyframes mtCur{0%,100%{transform:translate(-40px,-20px)}33%{transform:translate(42px,-8px)}66%{transform:translate(-6px,26px)}}
+.mt-tw{perspective:400px}
+.mt-tc{width:96px;height:120px;border-radius:14px;background:linear-gradient(160deg,#3a3a52,#20202c);border:1px solid #4a4a60;position:relative;overflow:hidden;transition:transform .5s cubic-bezier(.2,.8,.2,1);padding:12px;display:flex;flex-direction:column;gap:6px}
+.mt-tc::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 80% 10%,rgba(255,255,255,.35),transparent 55%);opacity:0;transition:opacity .4s}
+.card:hover .mt-tc{transform:rotateY(18deg) rotateX(10deg)}
+.card:hover .mt-tc::after{opacity:1}
+.mt-cf{position:relative;width:10px;height:10px}
+.mt-cf i{position:absolute;left:0;top:0;width:9px;height:14px;border-radius:2px;display:block;transform:translate(var(--x),var(--y)) rotate(var(--r))}
+.card:hover .mt-cf i{animation:mtConf 1.6s cubic-bezier(.1,.7,.3,1) infinite}
+@keyframes mtConf{from{transform:translate(0,0) rotate(0) scale(.3);opacity:1}to{transform:translate(var(--x),calc(var(--y) + 30px)) rotate(var(--r));opacity:.2}}
+
 </style>
 </head>
 <body>
@@ -882,7 +1115,7 @@ textarea::placeholder{color:#6b6b80}
   <div class="top"><div class="logo"><i></i>UX/UI 용어 도감</div><span class="pill" id="count">용어 24개</span></div>
   <section id="listView">
     <div class="hero">
-      <div class="ptabs" id="ptabs"><button data-s="real">찐 실무 용어<small id="n1">14</small></button><button data-s="vibe" class="on">바이브코딩 용어<small id="n2">24</small></button></div>
+      <div class="ptabs" id="ptabs"><button data-s="real">찐 실무 용어<small id="n1"></small></button><button data-s="vibe">바이브코딩 용어<small id="n2"></small></button></div>
       <h1 id="hh">이름을 알면 <span>AI에게</span> 정확히 말해요.</h1>
       <p id="hp">바이브코딩에서 쓰는 UI 용어 24개, 움직이는 화면과 요청 문장으로 익혀요.<button class="cheatbtn" id="ch">치트시트 보기</button></p>
     </div>
@@ -1417,6 +1650,7 @@ VB({id:"stickyheader",cat:"레이아웃",ko:"스티키 헤더",en:"Sticky Header
     pg.querySelector('#sk').checked=true;pg.querySelector('#sk').onchange=e=>{st=e.target.checked;r()};r()}});
 
 /* 7. 스플릿 레이아웃 */
+const splitArt=()=>`<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;display:block"><defs><linearGradient id="saSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#23285e"/><stop offset="1" stop-color="#5d54c9"/></linearGradient><radialGradient id="saSun" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffd88a"/><stop offset="1" stop-color="#ffd88a" stop-opacity="0"/></radialGradient><filter id="saSh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#0b0b2a" flood-opacity=".45"/></filter></defs><rect width="400" height="300" fill="url(#saSky)"/><circle cx="330" cy="70" r="90" fill="url(#saSun)" opacity=".55"/><circle cx="330" cy="70" r="26" fill="#ffd88a"/><g fill="#fff" opacity=".7"><circle cx="60" cy="40" r="1.6"/><circle cx="120" cy="24" r="1.2"/><circle cx="200" cy="50" r="1.4"/><circle cx="250" cy="22" r="1"/></g><path d="M0 230 Q 90 170 190 215 T 400 200 V300 H0Z" fill="#3d3797"/><path d="M0 260 Q 120 215 230 250 T 400 240 V300 H0Z" fill="#2c2775"/><rect x="96" y="72" width="216" height="168" rx="16" fill="#0b0b2a" opacity=".35"/><rect x="92" y="62" width="216" height="168" rx="16" fill="#f6f6fb"/><rect x="92" y="62" width="216" height="34" rx="16" fill="#ecebfa"/><rect x="92" y="80" width="216" height="16" fill="#ecebfa"/><text x="108" y="85" font-size="14" font-weight="800" fill="#23285e" font-family="sans-serif">11월</text><circle cx="276" cy="79" r="4" fill="#c9c7e6"/><circle cx="290" cy="79" r="4" fill="#8b7bff"/>${Array.from({length:28},(_,i)=>`<rect x="${104+(i%7)*28}" y="${106+Math.floor(i/7)*30}" width="22" height="24" rx="5" fill="#e7e6f3"/>`).join('')}<rect x="132" y="106" width="78" height="24" rx="6" fill="#8b7bff"/><rect x="216" y="136" width="50" height="24" rx="6" fill="#c6ff4d"/><rect x="104" y="166" width="50" height="24" rx="6" fill="#ffc857"/><rect x="188" y="196" width="78" height="24" rx="6" fill="#50c8ff"/><circle cx="304" cy="226" r="18" fill="#35d07f"/><path d="M295 226 l6 6 l11 -12" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><g transform="translate(44 196)"><path d="M14 0 C 4 -30 30 -44 22 -10 C 34 -40 52 -26 30 0Z" fill="#35d07f"/><path d="M10 4 C -8 -16 6 -30 18 -2Z" fill="#2bb36c"/><path d="M2 2 H40 L35 34 H7Z" fill="#ff8a5b"/><rect x="0" y="0" width="42" height="7" rx="3" fill="#ff9f73"/></g></svg>`;
 VB({id:"split",cat:"레이아웃",ko:"스플릿 레이아웃",en:"Split Layout",sum:"화면을 좌우로 나눠 배치",
   lead:"이미지와 글을 좌우로 나누는 레이아웃. 화면이 좁아지면 위아래로 쌓여요.",
   video:"이미지와 글을 좌우로 나누는 레이아웃을 스플릿 레이아웃이라고 해요. 제품 소개나 기능 설명에서 아주 자주 쓰여요. 화면이 좁아지면 위아래로 쌓이게 만드는 게 보통이에요.",
@@ -1426,11 +1660,11 @@ VB({id:"split",cat:"레이아웃",ko:"스플릿 레이아웃",en:"Split Layout",
   mistakes:["모바일에서도 좌우 분할을 유지해 글씨가 좁아짐","좌우 높이가 맞지 않아 어색함","한쪽이 너무 비어 있음"],
   related:["히어로 섹션","반응형 레이아웃","카드 레이아웃"],
   prompt:"데스크톱에서는 이미지와 설명을 좌우 50대 50 스플릿 레이아웃으로 배치하고, 모바일에서는 세로로 쌓아 줘.",
-  thumb:()=>`<div class="center"><div style="width:140px;height:96px;display:flex;gap:6px">${bx('flex:1;border-radius:10px;background:linear-gradient(135deg,#8b7bff,#ff6b9a)','lf','')}${bx('flex:1;border-radius:10px;background:#262634;padding:10px;display:flex;flex-direction:column;gap:7px','rt',`${ln('90%',8,'#cfcfdc')}${ln('70%',6,'#6b6b80')}${ln('80%',6,'#6b6b80')}`)}</div></div>`,
+  thumb:()=>`<div class="center"><div style="width:190px;height:110px;display:flex;gap:6px">${bx('flex:1.5;border-radius:10px;overflow:hidden','lf',splitArt())}${bx('flex:1;border-radius:10px;background:#262634;padding:10px;display:flex;flex-direction:column;gap:7px','rt',`${ln('90%',8,'#cfcfdc')}${ln('70%',6,'#6b6b80')}${ln('80%',6,'#6b6b80')}`)}</div></div>`,
   demo(pg){let rt='50',rev=false,mob=false;
     pg.innerHTML=`<div class="bar">${seg('rt',[['50','50:50'],['40','40:60'],['60','60:40']])}${tgl('rv','좌우 바꾸기',false)}${tgl('mb','모바일(좁은 화면)',false)}</div><div class="stage"><div class="vbox spl4" id="sp"></div></div><div class="note" id="nt"></div>`;
     const r=()=>{const s=pg.querySelector('#sp');s.style.width=mob?'260px':'100%';s.style.flexDirection=mob?'column':(rev?'row-reverse':'row');
-      s.innerHTML=`<div class="sI" style="${mob?'height:130px':`flex:0 0 ${rt}%`}">★</div><div class="sT"><h4>한눈에 보이는 일정</h4><p>왼쪽엔 이미지, 오른쪽엔 설명을 둬요.</p><button class="solid">자세히 보기</button></div>`;
+      s.innerHTML=`<div class="sI" style="background:#23285e;overflow:hidden;${mob?'height:130px':`flex:0 0 ${rt}%`}">${splitArt()}</div><div class="sT"><h4>한눈에 보이는 일정</h4><p>왼쪽엔 이미지, 오른쪽엔 설명을 둬요.</p><button class="solid">자세히 보기</button></div>`;
       pg.querySelector('#nt').innerHTML=mob?'좁은 화면에서는 <b>위아래로 쌓여요.</b>':'넓은 화면에서는 <b>좌우로 나눠요.</b> 비율을 바꿔 보세요.'};
     wireSeg(pg,'rt',v=>{rt=v;r()},'50');pg.querySelector('#rv').onchange=e=>{rev=e.target.checked;r()};pg.querySelector('#mb').onchange=e=>{mob=e.target.checked;r()}}});
 
@@ -1697,15 +1931,506 @@ VB({id:"microinteraction",cat:"효과",ko:"마이크로 인터랙션",en:"Micro-
 const SORTKEY={abtest:'에이비 테스트'};
 TERMS.sort((a,b)=>{const sa=a.set==='vibe',sb=b.set==='vibe';if(sa!==sb)return sa-sb;if(sa)return 0;return (SORTKEY[a.id]||a.ko).localeCompare(SORTKEY[b.id]||b.ko,'ko')});
 
+
+/* ===== 탭2 추가: 모션 용어 24 (코드깎는노인 「바이브코더가 반드시 알아야 할 필수 용어 24가지 2탄」) ===== */
+const MV=o=>TERMS.push(Object.assign({set:'vibe'},o));
+const live=el=>!!(el&&el.isConnected);
+const mpage=()=>`<div class="m-page">${ln('42%',14,'#3a3a50')}${ln('92%',8)}${ln('80%',8)}<div class="m-blk"></div>${ln('70%',8)}${ln('55%',8)}</div>`;
+const EZ={linear:'linear',in:'cubic-bezier(.55,0,1,.45)',out:'cubic-bezier(0,.55,.45,1)',inout:'cubic-bezier(.65,0,.35,1)'};
+const C8=['#8b7bff','#c6ff4d','#ff6b9a','#ffc857','#50c8ff','#35d07f','#b79bff','#ffa94d'];
+
+/* 1. 페이드 */
+MV({id:"fade",cat:"움직임의 기본",ko:"페이드",en:"Fade In · Out",sum:"스르륵 진해지며 나타남",
+  lead:"투명했던 요소가 서서히 진해지며 나타나고, 서서히 옅어지며 사라지는 가장 기본 움직임.",
+  video:"투명했던 요소가 스르륵 진해지면서 나타나는 효과예요. 나타날 때는 페이드 인, 사라질 때는 페이드 아웃이라고 해요. 가장 기본이면서 어디에서도 크게 튀지 않는 움직임이에요.",
+  tip:"모달 배경, 토스트처럼 조용히 나타나야 하는 곳에 0.2초 안팎으로 쓰세요.",
+  parts:[["페이드 인","투명 → 불투명으로 나타남","#c6ff4d"],["페이드 아웃","불투명 → 투명으로 사라짐","#8b7bff"],["시간","보통 0.2~0.3초","#ffc857"]],
+  say:["모달 배경은 페이드 인으로 깔아 주세요.","닫을 때도 페이드 아웃을 넣어요.","페이드가 너무 느려서 답답해요."],
+  mistakes:["나타날 때만 넣고 사라질 때는 뚝 끊김","1초 넘게 느려서 기다리게 됨","모든 요소에 페이드만 걸어 밋밋함"],
+  related:["슬라이드","모달","페이지 트랜지션"],
+  prompt:"모달이 열릴 때는 뒤 배경이 0.2초 동안 페이드 인, 닫힐 때는 페이드 아웃되게 해 줘.",
+  thumb:()=>`<div class="center"><div class="mt-win"><div style="padding:10px;display:flex;flex-direction:column;gap:6px">${ln('60%',7,'#4a4a60')}${ln('85%',5)}${ln('70%',5)}</div><div class="mt-dim mt-fade"></div><div class="mt-modal mt-fade">${ln('70%',6,'#fff')}${ln('45%',5,'#ffffffaa','margin-top:6px')}</div></div></div>`,
+  demo(pg){let ms=200,open=false;
+    pg.innerHTML=`<div class="bar">${rng('du','시간',0,1500,200,'ms')}<button class="solid" id="tg">모달 열기</button></div><div class="stage"><div class="mstage">${mpage()}<div class="m-dim" id="dm"></div><div class="m-modal" id="md"><b>알림</b><p>배경과 함께 페이드로 나타난 모달이에요.</p><button class="ghost" id="cl">닫기</button></div></div></div><div class="note" id="nt"></div>`;
+    const r=()=>{[pg.querySelector('#dm'),pg.querySelector('#md')].forEach(e=>{e.style.transition=`opacity ${ms}ms ease`;e.style.opacity=open?1:0;e.style.pointerEvents=open?'auto':'none'});
+      pg.querySelector('#tg').textContent=open?'모달 닫기':'모달 열기';
+      pg.querySelector('#nt').innerHTML=ms===0?'시간이 0이면 페이드 없이 <b>뚝 나타나고 뚝 사라져요.</b>':ms>700?`<b>${ms}ms</b>는 느려요. 기다리는 느낌이 들어요.`:`<b>${ms}ms</b> 동안 ${open?'페이드 인':'페이드 아웃'}돼요. 열고 닫아 보세요.`};
+    wireRng(pg,'du',v=>{ms=v;r()},'ms');pg.querySelector('#tg').onclick=()=>{open=!open;r()};pg.querySelector('#cl').onclick=()=>{open=false;r()};r()}});
+
+/* 2. 슬라이드 */
+MV({id:"slide",cat:"움직임의 기본",ko:"슬라이드",en:"Slide",sum:"화면 밖에서 슉 들어옴",
+  lead:"화면 밖이나 옆에서 미끄러지듯 들어오는 움직임. 어느 방향에서 오는지가 핵심이에요.",
+  video:"화면 밖에서 슉 미끄러져 들어오는 움직임이에요. 슬라이드는 방향이 핵심이라서 위, 아래, 옆 중 어느 쪽에서 들어올지까지 말해 주세요. 실제로는 페이드와 섞어서 아래에서 살짝 올라오며 나타나게 하는 조합을 정말 많이 써요.",
+  tip:"가장 많이 쓰는 조합은 '아래에서 살짝(20px 정도) + 페이드'예요.",
+  parts:[["방향","위·아래·왼쪽·오른쪽","#c6ff4d"],["거리","화면 밖 또는 살짝","#8b7bff"],["페이드 조합","나타나며 진해지기","#ffc857"]],
+  say:["알림 배너는 위에서 슬라이드 다운으로 내려와요.","카드는 아래에서 살짝 올라오게 해 주세요.","슬라이드 방향을 오른쪽으로 바꿔요."],
+  mistakes:["방향을 말하지 않아 엉뚱한 쪽에서 들어옴","이동 거리가 너무 커서 정신없음","들어온 방향과 나가는 방향이 제각각"],
+  related:["페이드","드로어","이징"],
+  prompt:"알림 배너가 화면 위쪽에서 슬라이드 다운으로 내려오고, 3초 뒤에 다시 올라가게 해 줘.",
+  thumb:()=>`<div class="center"><div class="mt-win"><div class="mt-ban mt-slide">${ln('60%',6,'#111')}</div><div style="padding:44px 10px 0;display:flex;flex-direction:column;gap:6px">${ln('85%',5)}${ln('70%',5)}</div></div></div>`,
+  demo(pg){let dir='top',far=true,fade=false,tm;
+    pg.innerHTML=`<div class="bar">${seg('dr',[['top','위에서'],['bottom','아래에서'],['left','왼쪽에서'],['right','오른쪽에서']])}${seg('ds',[['far','화면 밖'],['near','살짝']])}${tgl('fd','페이드 섞기',false)}<button class="solid" id="pl">재생</button></div><div class="stage"><div class="mstage">${mpage()}<div class="m-card" id="bn" style="left:50%;top:50%;margin:-31px 0 0 -100px"><i></i><div><b>새 알림</b><p>3초 뒤 다시 들어가요</p></div></div></div></div><div class="note" id="nt"></div>`;
+    const play=()=>{const b=pg.querySelector('#bn');clearTimeout(tm);
+      const d=far?{top:'translateY(-200px)',bottom:'translateY(200px)',left:'translateX(-420px)',right:'translateX(420px)'}[dir]:{top:'translateY(-24px)',bottom:'translateY(24px)',left:'translateX(-24px)',right:'translateX(24px)'}[dir];
+      const k=[{transform:d,opacity:fade?0:1},{transform:'none',opacity:1}];
+      b.animate(k,{duration:450,easing:EZ.out,fill:'both'});tm=setTimeout(()=>{if(live(b))b.animate(k.slice().reverse(),{duration:350,easing:EZ.in,fill:'both'})},3000);
+      pg.querySelector('#nt').innerHTML=`<b>${{top:'위',bottom:'아래',left:'왼쪽',right:'오른쪽'}[dir]}에서 ${far?'화면 밖부터':'살짝'}</b> 미끄러져 들어와요${fade?' + 페이드':''}. 3초 뒤 같은 방향으로 돌아가요.${!far&&fade&&dir==='bottom'?' 이게 가장 많이 쓰는 조합이에요.':''}`};
+    wireSeg(pg,'dr',v=>{dir=v},'top');wireSeg(pg,'ds',v=>{far=v==='far'},'far');pg.querySelector('#fd').onchange=e=>{fade=e.target.checked};pg.querySelector('#pl').onclick=play;play()}});
+
+/* 3. 스케일 · 팝 */
+MV({id:"scale",cat:"움직임의 기본",ko:"스케일 · 팝",en:"Scale · Pop",sum:"작게 시작해 뿅 커짐",
+  lead:"크기를 바꾸는 움직임. 살짝 크게 커졌다가 제자리로 돌아오면 톡 튀어나오는 팝 효과가 돼요.",
+  video:"작게 시작해서 뿅 하고 커지며 나타나는 효과, 크기를 바꾸는 이 움직임을 스케일이라고 해요. 살짝 크게 커졌다가 제자리로 돌아오면 톡 튀어나오는 느낌이 나서 팝 효과라고도 불러요.",
+  tip:"팝은 110~130% 정도만 넘쳤다가 돌아와도 충분해요.",
+  parts:[["시작 크기","0 또는 작게","#c6ff4d"],["넘침(오버슈트)","살짝 크게 커졌다가","#8b7bff"],["제자리","100%로 돌아옴","#ffc857"]],
+  say:["숫자 배지는 팝 효과로 톡 튀어나오게 해 주세요.","스케일이 너무 커서 튀어요.","눌렀을 때 살짝 작아졌다 돌아오게 해요."],
+  mistakes:["150% 넘게 커져서 요란함","여러 요소가 동시에 팝 되어 산만함","크기 변화 때문에 주변 레이아웃이 밀림"],
+  related:["스프링 애니메이션","바운스","마이크로 인터랙션"],
+  prompt:"장바구니에 담으면 숫자 배지가 스케일 팝 효과로 톡 튀어나오게 해 줘.",
+  thumb:()=>`<div class="center"><div class="mt-cart">🛒<span class="mt-badge mt-pop">3</span></div></div>`,
+  demo(pg){let mode='pop',n=0;
+    pg.innerHTML=`<div class="bar">${seg('md',[['none','효과 없음'],['scale','커지기만'],['pop','팝(살짝 넘침)']])}${rng('ov','넘침',100,160,125,'%')}<button class="solid" id="pl">장바구니 담기</button></div><div class="stage"><div class="m-cart">🛒<span class="m-badge" id="bd" style="transform:scale(0)">0</span></div></div><div class="note" id="nt"></div>`;
+    const ov=pg.querySelector('#ov');
+    const play=()=>{n++;const b=pg.querySelector('#bd');b.textContent=n;const o=+ov.value/100;
+      const k=mode==='none'?[{transform:'scale(1)'},{transform:'scale(1)'}]:mode==='scale'?[{transform:'scale(0)'},{transform:'scale(1)'}]:[{transform:'scale(0)'},{transform:`scale(${o})`,offset:.55},{transform:'scale(1)'}];
+      b.animate(k,{duration:mode==='none'?1:420,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+      pg.querySelector('#nt').innerHTML=mode==='none'?'효과가 없으면 숫자가 바뀐 걸 <b>놓치기 쉬워요.</b>':mode==='scale'?'0에서 100%로 <b>커지기만</b> 해요. 단정한 느낌이에요.':`${Math.round(o*100)}%까지 넘쳤다가 돌아와서 <b>톡 튀어나오는</b> 느낌이에요.`};
+    wireSeg(pg,'md',v=>{mode=v},'pop');wireRng(pg,'ov',()=>{},'%');pg.querySelector('#pl').onclick=play;play()}});
+
+/* 4. 이징 */
+MV({id:"easing",cat:"움직임의 기본",ko:"이징",en:"Easing",sum:"움직이는 동안의 속도 변화",
+  lead:"같은 거리, 같은 시간이어도 속도가 어떻게 변하느냐에 따라 느낌이 완전히 달라져요.",
+  video:"같은 거리를 같은 시간 동안 움직이는데도 느낌이 다르죠. 처음부터 끝까지 같은 속도인 것과, 빠르게 출발해서 끝에서 부드럽게 멈추는 것. 이렇게 움직이는 동안 속도가 변하는 방식을 이징이라고 해요. 끝에서 느려지는 이즈 아웃, 천천히 출발하는 이즈 인, 둘을 합친 이즈 인 아웃이 기본이에요. 화면에 들어오는 건 이즈 아웃, 나가는 건 이즈 인을 쓰면 대부분 자연스러워요.",
+  tip:"들어올 때는 ease-out, 나갈 때는 ease-in. 이것만 기억해도 대부분 자연스러워요.",
+  parts:[["이즈 아웃","빠르게 출발, 끝에서 느려짐","#c6ff4d"],["이즈 인","천천히 출발, 끝에서 빨라짐","#8b7bff"],["이즈 인 아웃","천천히-빠르게-천천히","#ffc857"]],
+  say:["메뉴가 열릴 때는 이즈 아웃으로 해 주세요.","리니어라서 기계 같아요.","닫힐 때는 이즈 인으로 빠지게 해요."],
+  mistakes:["모든 움직임을 linear로 둬서 딱딱함","들어오는 요소에 ease-in을 써서 굼뜸","커스텀 곡선을 과하게 꺾어 어색함"],
+  related:["듀레이션 · 딜레이","스프링 애니메이션","스무스 트랜지션"],
+  prompt:"메뉴가 열릴 때는 이즈 아웃, 닫힐 때는 이즈 인으로 0.3초 동안 움직이게 해 줘.",
+  thumb:()=>`<div class="center" style="flex-direction:column;gap:0"><div class="mt-lane"><i class="mt-l1" style="background:#8b7bff"></i></div><div class="mt-lane"><i class="mt-l2" style="background:#c6ff4d"></i></div></div>`,
+  demo(pg){let ms=1200,at=false;
+    const L=[['linear','리니어','일정한 속도','#9a9aaf'],['in','이즈 인','나갈 때','#8b7bff'],['out','이즈 아웃','들어올 때','#c6ff4d'],['inout','이즈 인 아웃','기본','#ffc857']];
+    pg.innerHTML=`<div class="bar">${rng('du','시간',200,3000,1200,'ms')}<button class="solid" id="pl">재생</button></div><div class="stage" style="flex-direction:column"><div class="m-lanes">${L.map(l=>`<div class="m-lane"><span><b>${l[1]}</b>${l[2]}</span><div class="m-trk"><div class="m-ball" data-e="${l[0]}" style="background:${l[3]}"></div></div></div>`).join('')}</div></div><div class="note" id="nt"></div>`;
+    const play=()=>{at=!at;pg.querySelectorAll('.m-ball').forEach(b=>{const w=b.parentNode.clientWidth-40;b.style.transition=`transform ${ms}ms ${EZ[b.dataset.e]}`;b.style.transform=at?`translateX(${w}px)`:'none'});
+      pg.querySelector('#nt').innerHTML=`네 공 모두 <b>${ms}ms</b> 동안 같은 거리를 가요. 출발과 도착의 <b>속도 변화</b>만 달라요.`};
+    wireRng(pg,'du',v=>{ms=v},'ms');pg.querySelector('#pl').onclick=play;setTimeout(()=>{if(live(pg))play()},150)}});
+
+/* 5. 스프링 애니메이션 */
+MV({id:"spring",cat:"움직임의 기본",ko:"스프링 애니메이션",en:"Spring",sum:"살짝 지나쳤다 띠용 복귀",
+  lead:"목표 지점을 살짝 지나쳤다가 되돌아와 자리를 잡는, 용수철처럼 탄력 있는 움직임.",
+  video:"목표 지점을 살짝 지나쳤다가 띠용 하고 되돌아와 자리를 잡는 움직임이에요. 용수철처럼 탄력이 있어서 쫀득하고 살아 있는 느낌을 줘요. 얼마나 출렁일지는 보통 단단함과 감쇠, 영어로 스티프니스와 댐핑으로 조절해요.",
+  tip:"출렁임은 한 번만 보이게 약하게. 여러 번 출렁이면 장난스러워져요.",
+  parts:[["스티프니스","단단함, 높을수록 빠르게 튐","#c6ff4d"],["댐핑","감쇠, 높을수록 빨리 멈춤","#8b7bff"],["오버슈트","목표를 지나치는 정도","#ffc857"]],
+  say:["카드는 스프링으로 살짝 커지게 해 주세요.","스프링 댐핑을 높여서 덜 출렁이게 해요.","스프링이 너무 통통 튀어요."],
+  mistakes:["댐핑이 낮아 계속 출렁거림","모든 버튼에 스프링을 넣어 산만함","시간(duration)만 말하고 탄력 정도는 안 말함"],
+  related:["바운스","이징","스케일 · 팝"],
+  prompt:"카드를 누르면 스프링 애니메이션으로 살짝 커지게 하고, 출렁임은 한 번만 보이게 약하게 해 줘.",
+  thumb:()=>`<div class="center"><div class="mt-box mt-spring"></div></div>`,
+  demo(pg){let k=180,c=12,rid=0;
+    pg.innerHTML=`<div class="bar">${rng('kk','스티프니스',40,400,180)}${rng('cc','댐핑',3,40,12)}<button class="solid" id="pl">재생</button></div><div class="stage" style="flex-direction:column;gap:0"><div class="m-lanes"><div class="m-lane"><span><b>스프링</b>목표 = 오른쪽 끝</span><div class="m-trk"><div class="m-ball" id="sb" style="background:#8b7bff"></div><i style="position:absolute;right:20px;top:-6px;bottom:-6px;width:2px;background:#c6ff4d;display:block"></i></div></div></div><svg class="m-graph" id="gr" viewBox="0 0 600 110" preserveAspectRatio="none"></svg></div><div class="note" id="nt"></div>`;
+    const sim=()=>{let x=0,v=0;const P=[];for(let i=0;i<150;i++){for(let s=0;s<4;s++){const a=-k*(x-1)-c*v;v+=a/240;x+=v/240}P.push(x)}return P};
+    const play=()=>{cancelAnimationFrame(rid);const P=sim(),b=pg.querySelector('#sb'),w=b.parentNode.clientWidth-60;
+      const mx=Math.max(...P),os=Math.max(0,(mx-1)*100);let cr=0;for(let i=1;i<P.length;i++)if((P[i-1]-1)*(P[i]-1)<0&&Math.abs(P[i]-1)>.004)cr++;
+      const y=v=>100-v*70;pg.querySelector('#gr').innerHTML=`<line x1="0" x2="600" y1="${y(1)}" y2="${y(1)}" stroke="#c6ff4d" stroke-dasharray="4 4" opacity=".6"/><polyline fill="none" stroke="#8b7bff" stroke-width="3" points="${P.map((p,i)=>`${i*4},${y(p)}`).join(' ')}"/>`;
+      const t0=performance.now();const f=t=>{if(!live(b))return;const i=Math.min(P.length-1,Math.floor((t-t0)/16.7));b.style.transform=`translateX(${P[Math.max(0,i)]*w}px)`;if(i<P.length-1)rid=requestAnimationFrame(f)};rid=requestAnimationFrame(f);
+      pg.querySelector('#nt').innerHTML=os<.5?'댐핑이 높아서 <b>넘치지 않고</b> 부드럽게 멈춰요.':`목표를 <b>${os.toFixed(0)}%</b> 지나쳤다가 돌아와요. 출렁임 <b>${Math.ceil(cr/2)}번</b>. ${cr>3?'너무 출렁여요. 댐핑을 올려 보세요.':'딱 쫀득한 정도예요.'}`};
+    wireRng(pg,'kk',v=>{k=v;play()});wireRng(pg,'cc',v=>{c=v;play()});pg.querySelector('#pl').onclick=play;setTimeout(()=>{if(live(pg))play()},150)}});
+
+/* 6. 바운스 */
+MV({id:"bounce",cat:"움직임의 기본",ko:"바운스",en:"Bounce",sum:"바닥에 통통 튀다 멈춤",
+  lead:"공이 바닥에 떨어져 통통 튀다가 멈추는 움직임. 스프링과 달리 바닥에 부딪혀 튕겨 올라요.",
+  video:"공이 바닥에 떨어져 통통 튀다가 멈추는 움직임이에요. 스프링이 목표를 지나쳤다가 돌아온다면, 바운스는 바닥에 부딪혀서 튕겨 오르는 느낌이에요. 많이 튈수록 장난스러워 보이니까 귀여운 포인트에만 쓰는 게 좋아요.",
+  tip:"두 번 정도만 튀고 멈추면 귀엽고, 그 이상은 장난스러워져요.",
+  parts:[["낙하","위에서 아래로 가속","#c6ff4d"],["튕김","바닥에 닿으면 튀어 오름","#8b7bff"],["멈춤","튀는 높이가 줄며 정지","#ffc857"]],
+  say:["체크 아이콘이 떨어지면서 두 번쯤 바운스하게 해 주세요.","바운스를 한 번으로 줄여요.","이건 스프링 말고 바운스 느낌이에요."],
+  mistakes:["진지한 화면에서 바운스를 써서 가벼워 보임","너무 많이 튀어 기다리게 됨","스프링과 바운스를 섞어 말해 결과가 달라짐"],
+  related:["스프링 애니메이션","스케일 · 팝","컨페티"],
+  prompt:"결제 완료 체크 아이콘이 위에서 떨어지면서 두 번 정도 바운스하고 멈추게 해 줘.",
+  thumb:()=>`<div class="center"><div style="position:relative;width:120px;height:110px"><div class="mt-ball mt-bounce"></div><div class="mt-flr"></div></div></div>`,
+  demo(pg){let e=45,rid=0;
+    pg.innerHTML=`<div class="bar">${rng('ee','탄성',0,80,45,'%')}<button class="solid" id="pl">떨어뜨리기</button></div><div class="stage"><div class="mstage"><div class="m-chk" id="ck">✓</div><div class="m-floor"></div></div></div><div class="note" id="nt"></div>`;
+    const play=()=>{cancelAnimationFrame(rid);const ck=pg.querySelector('#ck'),H=pg.querySelector('.mstage').clientHeight-46-60;let y=0,v=0,n=0;const g=2600,r=e/100;let last=performance.now();
+      const f=t=>{if(!live(ck))return;const dt=Math.min(.032,(t-last)/1000);last=t;v+=g*dt;y+=v*dt;if(y>=H){y=H;if(v>120&&r>0){v=-v*r;n++}else v=0}
+        ck.style.top=y+'px';if(!(y>=H&&v===0))rid=requestAnimationFrame(f);else pg.querySelector('#nt').innerHTML=n===0?'탄성이 0이면 <b>튀지 않고 툭</b> 멈춰요.':`바닥에 닿아 <b>${n}번</b> 튀고 멈췄어요. ${n>3?'좀 장난스러워요.':n<=2?'귀여운 정도예요.':''}`};
+      ck.style.top='0px';rid=requestAnimationFrame(f);pg.querySelector('#nt').textContent='떨어지는 중...'};
+    wireRng(pg,'ee',v=>{e=v},'%');pg.querySelector('#pl').onclick=play;setTimeout(()=>{if(live(pg))play()},150)}});
+
+/* 7. 듀레이션 · 딜레이 */
+MV({id:"duration",cat:"움직임의 기본",ko:"듀레이션·딜레이",en:"Duration·Delay",sum:"걸리는 시간과 기다리는 시간",
+  lead:"듀레이션은 움직이는 데 걸리는 시간, 딜레이는 움직이기 전에 기다리는 시간이에요.",
+  video:"'빠르게 해 줘', '천천히 해 줘'라고 하는데 얼마나 빨라야 할까요? 움직이는 데 걸리는 시간을 듀레이션, 움직이기 전에 기다리는 시간을 딜레이라고 해요. 버튼 같은 작은 반응은 0.1~0.2초, 화면에 큰 요소가 들어올 때는 0.3~0.5초 정도가 무난해요. 지난 영상의 스태거도 이 딜레이를 차례로 조금씩 준 거예요.",
+  tip:"작은 반응 0.1~0.2초, 큰 요소 등장 0.3~0.5초. 숫자로 말하세요.",
+  parts:[["듀레이션","움직이는 데 걸리는 시간","#c6ff4d"],["딜레이","시작 전 기다리는 시간","#ffc857"],["스태거","딜레이를 차례로 늘린 것","#8b7bff"]],
+  say:["버튼 반응 듀레이션은 0.15초로 해 주세요.","설명은 0.2초 딜레이 뒤에 나오게 해요.","큰 이미지는 0.4초로 조금 느리게요."],
+  mistakes:["'빠르게', '천천히'처럼 숫자 없이 요청함","딜레이가 길어 화면이 멈춘 것 같음","작은 버튼에 0.5초 이상을 써서 굼뜸"],
+  related:["스태거 애니메이션","이징","페이드"],
+  prompt:"제목은 바로, 설명은 0.2초 딜레이 뒤에, 둘 다 0.4초 듀레이션으로 나타나게 해 줘.",
+  thumb:()=>`<div class="center"><div class="mt-tl"><div><i class="mt-grow" style="left:0;width:60%;background:#c6ff4d"></i></div><div><i class="d"></i><i class="mt-grow" style="left:40%;width:60%;background:#8b7bff;animation-delay:.25s"></i></div></div></div>`,
+  demo(pg){let du=400,dl=200;
+    pg.innerHTML=`<div class="bar">${rng('du','듀레이션',0,1500,400,'ms')}${rng('dl','설명 딜레이',0,1500,200,'ms')}<button class="solid" id="pl">재생</button></div><div class="stage" style="flex-direction:column;gap:0"><div class="mstage" style="height:200px"><div class="m-hero"><h4 id="t1">이름을 알면 부탁이 달라져요</h4><p id="t2">무엇이, 어떻게, 얼마나 빨리, 언제 움직일지.</p></div></div><div class="m-tl" id="tl"></div></div><div class="note" id="nt"></div>`;
+    const tl=()=>{const T=Math.max(1000,du+dl+200),p=v=>v/T*100;pg.querySelector('#tl').innerHTML=`<div class="m-tlr"><span>제목</span><div class="m-tlt"><i style="left:0;width:${p(du)}%;background:#c6ff4d"></i><div class="m-ph"></div></div></div><div class="m-tlr"><span>설명</span><div class="m-tlt"><i class="dl" style="left:0;width:${p(dl)}%"></i><i style="left:${p(dl)}%;width:${p(du)}%;background:#8b7bff"></i><div class="m-ph"></div></div></div><div class="m-tlr"><span></span><div style="flex:1;display:flex;justify-content:space-between"><b>0초</b><b>${(T/1000).toFixed(1)}초</b></div></div>`;return T};
+    const play=()=>{const T=tl(),k=[{opacity:0,transform:'translateY(16px)'},{opacity:1,transform:'none'}];
+      pg.querySelector('#t1').animate(k,{duration:du||1,easing:EZ.out,fill:'both'});pg.querySelector('#t2').animate(k,{duration:du||1,delay:dl,easing:EZ.out,fill:'both'});
+      pg.querySelectorAll('.m-ph').forEach(h=>h.animate([{left:'0%',opacity:1},{left:'100%',opacity:1}],{duration:T,easing:'linear'}));
+      pg.querySelector('#nt').innerHTML=`제목은 <b>바로</b>, 설명은 <b>${dl}ms</b> 기다렸다가, 둘 다 <b>${du}ms</b> 동안 나타나요. 빗금이 딜레이예요.`};
+    wireRng(pg,'du',v=>{du=v;tl()},'ms');wireRng(pg,'dl',v=>{dl=v;tl()},'ms');pg.querySelector('#pl').onclick=play;play()}});
+
+/* 8. 루프 · 플로팅 */
+MV({id:"loop",cat:"움직임의 기본",ko:"루프 · 플로팅",en:"Loop · Floating",sum:"멈추지 않고 계속 반복",
+  lead:"멈추지 않고 계속 반복되는 움직임. 둥실둥실 떠 있는 효과는 플로팅이라고도 불러요.",
+  video:"멈추지 않고 계속 반복되는 움직임, 루프 애니메이션이에요. 아이콘이 둥실둥실 떠 있는 효과는 떠 있다는 뜻으로 플로팅이라고도 해요. 시선을 끌기엔 좋지만 여러 개가 계속 움직이면 산만해지니까 꼭 필요한 한두 곳에만 쓰세요.",
+  tip:"한 화면에 한두 곳만. 한 번 오르내리는 데 3~5초로 아주 천천히요.",
+  parts:[["반복","끝나면 처음부터 다시","#c6ff4d"],["주기","한 번 오르내리는 시간","#8b7bff"],["범위","움직이는 거리, 작게","#ffc857"]],
+  say:["히어로 일러스트에 플로팅 루프를 넣어 주세요.","루프 속도를 더 천천히 해요.","루프가 너무 많아서 정신없어요."],
+  mistakes:["여러 요소가 동시에 계속 움직여 산만함","주기가 짧아 덜덜 떨리는 느낌","모션 감소 설정에서도 계속 움직임"],
+  related:["히어로 섹션","이징","마퀴"],
+  prompt:"히어로 일러스트가 위아래로 아주 천천히 떠 있는 플로팅 루프를 넣어 줘. 한 번 오르내리는 데 4초 정도로.",
+  thumb:()=>`<div class="center"><div class="m-blob mt-float" style="width:80px;height:80px"></div></div>`,
+  demo(pg){let per=4,many=false,on=true;
+    pg.innerHTML=`<div class="bar">${tgl('on','루프 켜기',true)}${rng('pr','한 번 오르내리기',1,8,4,'초')}${seg('mn',[['one','하나만'],['many','여러 개']])}</div><div class="stage"><div class="mstage" id="st" style="display:flex;align-items:center;justify-content:center"><div class="m-blob" id="bl"></div></div></div><div class="note" id="nt"></div>`;
+    const r=()=>{const st=pg.querySelector('#st'),bl=pg.querySelector('#bl');st.querySelectorAll('.m-mini').forEach(x=>x.remove());
+      bl.style.animation=on?`mFloat ${per/2}s ease-in-out infinite alternate`:'none';
+      if(many)for(let i=0;i<9;i++){const m=document.createElement('i');m.className='m-mini';m.style.cssText=`left:${8+((i*37)%84)}%;top:${10+((i*53)%75)}%;background:${C8[i%8]};animation:${i%2?'mSpin':'mFloat'} ${0.6+(i%4)*0.35}s ${i%2?'linear':'ease-in-out'} infinite ${i%2?'':'alternate'}`;if(!on)m.style.animation='none';st.appendChild(m)}
+      pg.querySelector('#nt').innerHTML=!on?'루프를 끄면 <b>멈춰 있어요.</b> 모션 감소 설정에서는 이렇게 둬요.':many?'움직이는 게 많으면 <b>어디를 봐야 할지</b> 모르겠죠. 한두 곳만 쓰세요.':`<b>${per}초</b>에 한 번 둥실 오르내려요. ${per<2?'너무 빨라서 떨리는 느낌이에요.':'은은하게 시선을 끌어요.'}`};
+    pg.querySelector('#on').onchange=e=>{on=e.target.checked;r()};wireRng(pg,'pr',v=>{per=v;r()},'초');wireSeg(pg,'mn',v=>{many=v==='many';r()},'one');r()}});
+
+/* 9. 타이프라이터 */
+MV({id:"typewriter",cat:"글자와 그림",ko:"타이프라이터",en:"Typewriter",sum:"한 글자씩 타닥타닥 입력",
+  lead:"타자기로 치듯 글자가 한 글자씩 나타나는 효과. 끝에 깜빡이는 커서를 붙이면 더 실감 나요.",
+  video:"타자기로 치듯 글자가 한 글자씩 타닥타닥 나타나는 효과예요. 끝에 깜빡이는 커서까지 붙이면 지금 누군가 입력하는 것 같은 느낌이 나요.",
+  tip:"짧은 제목에만 쓰세요. 긴 문장은 다 나올 때까지 기다리기 힘들어요.",
+  parts:[["입력 속도","글자 하나당 시간","#c6ff4d"],["커서","끝에서 깜빡이는 막대","#8b7bff"],["문구","짧고 강한 한 줄","#ffc857"]],
+  say:["히어로 제목을 타이프라이터로 입력되게 해 주세요.","타이핑 속도를 조금 빠르게요.","끝에 커서도 깜빡이게 해요."],
+  mistakes:["긴 문단에 써서 한참 기다림","속도가 일정해서 기계 같음(살짝 랜덤이 자연스러움)","다 쓴 뒤에도 커서가 시선을 뺏음"],
+  related:["텍스트 스크램블","스플릿 텍스트","히어로 섹션"],
+  prompt:"히어로 제목을 타이프라이터 효과로 한 글자씩 입력되게 하고, 끝에 커서를 깜빡여 줘.",
+  thumb:()=>`<div class="center"><span class="mt-mono"><span class="mt-type">Hello!</span></span></div>`,
+  demo(pg){let sp=80,cur=true,tk=0;const TXT='이름을 알면 AI에게 정확히 말해요.';
+    pg.innerHTML=`<div class="bar">${rng('sp','글자당',20,300,80,'ms')}${tgl('cu','커서',true)}<button class="solid" id="pl">다시 입력</button></div><div class="stage"><div class="m-type"><span id="tx"></span><span class="m-caret" id="ca"></span></div></div><div class="note" id="nt"></div>`;
+    const play=()=>{const my=++tk,tx=pg.querySelector('#tx');tx.textContent='';let i=0;
+      const step=()=>{if(!live(tx)||my!==tk)return;tx.textContent=TXT.slice(0,++i);if(i<TXT.length)setTimeout(step,sp*(0.6+Math.random()*0.8))};setTimeout(step,300);
+      pg.querySelector('#nt').innerHTML=`글자 하나에 약 <b>${sp}ms</b>, 전체 약 <b>${(TXT.length*sp/1000).toFixed(1)}초</b> 걸려요. 속도를 살짝 랜덤하게 하면 사람이 치는 것 같아요.`};
+    wireRng(pg,'sp',v=>{sp=v},'ms');pg.querySelector('#cu').onchange=e=>{pg.querySelector('#ca').style.display=e.target.checked?'':'none'};pg.querySelector('#pl').onclick=play;play()}});
+
+/* 10. 텍스트 스크램블 */
+MV({id:"scramble",cat:"글자와 그림",ko:"텍스트 스크램블",en:"Text Scramble",sum:"섞이던 글자가 단어로 완성",
+  lead:"무작위 글자들이 촤르륵 섞이다가 하나씩 제자리를 찾아 단어가 되는 효과.",
+  video:"무작위 글자들이 촤르륵 섞이다가 하나씩 제자리를 찾아 단어가 되는 효과예요. 영화 속 해커 화면처럼 기술적인 분위기를 낼 때 잘 어울려요.",
+  tip:"영문·숫자 제목에서 가장 멋있어요. 1초 안팎이 적당해요.",
+  parts:[["랜덤 글자","!#%&, 영문, 숫자","#8b7bff"],["확정 순서","한 글자씩 제자리로","#c6ff4d"],["시간","전체가 완성되는 시간","#ffc857"]],
+  say:["섹션 제목에 텍스트 스크램블 넣어 주세요.","스크램블 시간을 1초로 줄여요.","화면에 들어올 때 한 번만 실행해요."],
+  mistakes:["너무 오래 섞여서 읽을 수가 없음","본문처럼 긴 글에 적용함","스크롤할 때마다 계속 반복 실행됨"],
+  related:["타이프라이터","스플릿 텍스트","스크롤 리빌"],
+  prompt:"섹션 제목이 화면에 들어오면 텍스트 스크램블로 1초 동안 섞이다가 완성되게 해 줘.",
+  thumb:()=>`<div class="center"><div class="mt-scr">${[['#','7','%','K','V'],['@','2','&','Q','I'],['!','9','$','X','B'],['%','4','#','M','E']].map((c,i)=>`<span><i style="animation-delay:${i*.08}s">${c.map(x=>`<b style="display:block;height:1.2em">${x}</b>`).join('')}</i></span>`).join('')}</div></div>`,
+  demo(pg){let du=1000,word='ACCESS GRANTED',rid=0;const G='!<>-_\\/[]{}=+*^?#%&$@ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+    pg.innerHTML=`<div class="bar">${rng('du','시간',200,3000,1000,'ms')}${seg('wd',[['ACCESS GRANTED','ACCESS GRANTED'],['MOTION 24','MOTION 24'],['VIBE CODING','VIBE CODING']])}<button class="solid" id="pl">재생</button></div><div class="stage"><div class="m-scr" id="sc"></div></div><div class="note" id="nt"></div>`;
+    const play=()=>{cancelAnimationFrame(rid);const sc=pg.querySelector('#sc'),T=[...word].map((ch,i)=>ch===' '?0:du*(0.3+0.7*(i/word.length))*(0.8+Math.random()*0.4));const t0=performance.now();
+      const f=t=>{if(!live(sc))return;const e=t-t0;let done=true;sc.innerHTML=[...word].map((ch,i)=>{if(ch===' ')return ' ';if(e>=T[i])return esc(ch);done=false;return `<span class="u">${esc(G[Math.random()*G.length|0])}</span>`}).join('');if(!done)rid=requestAnimationFrame(f)};rid=requestAnimationFrame(f);
+      pg.querySelector('#nt').innerHTML=`<b>${du}ms</b> 동안 섞이다가 앞 글자부터 하나씩 <b>제자리</b>를 찾아요.`};
+    wireRng(pg,'du',v=>{du=v},'ms');wireSeg(pg,'wd',v=>{word=v;if(live(pg.querySelector('#sc')))play()},'ACCESS GRANTED');pg.querySelector('#pl').onclick=play}});
+
+/* 11. 스플릿 텍스트 */
+MV({id:"splittext",cat:"글자와 그림",ko:"스플릿 텍스트",en:"Split Text",sum:"글자나 단어로 쪼개 등장",
+  lead:"제목을 글자나 단어 단위로 쪼개서 차르르 올라오게 하는 효과. 텍스트 리빌이라고도 해요.",
+  video:"제목이 글자나 단어 단위로 쪼개져서 차르르 올라오죠. 스플릿 텍스트 애니메이션이에요. 숨어 있던 글자가 드러난다고 해서 텍스트 리빌이라고도 불러요. 글자 하나하나에 스태거를 건 셈이에요.",
+  tip:"한국어는 글자보다 단어 단위가 더 자연스럽게 읽혀요.",
+  parts:[["쪼개는 단위","글자 / 단어 / 줄","#c6ff4d"],["가림 영역","아래에 숨어 있다가 올라옴","#8b7bff"],["간격","조각 사이 딜레이(스태거)","#ffc857"]],
+  say:["메인 제목을 단어 단위 스플릿 텍스트로 보여 주세요.","텍스트 리빌 간격을 줄여요.","글자 단위는 정신없으니 단어 단위로 가요."],
+  mistakes:["긴 문장을 글자 단위로 쪼개 한참 걸림","간격이 너무 커서 읽기 전에 지루함","스크린 리더가 글자를 하나씩 읽게 됨"],
+  related:["스태거 애니메이션","타이프라이터","스크롤 리빌"],
+  prompt:"메인 제목을 단어 단위로 나눠서 아래에서 하나씩 올라오는 스플릿 텍스트 리빌로 보여 줘.",
+  thumb:()=>`<div class="center"><div class="mt-spl">${[...'SPLIT'].map((c,i)=>`<i style="animation-delay:${i*.08}s;color:${i%2?'#c6ff4d':'#fff'}">${c}</i>`).join('')}</div></div>`,
+  demo(pg){let unit='word',gap=80;const TXT='이름을 알면 부탁이 달라진다';
+    pg.innerHTML=`<div class="bar">${seg('un',[['word','단어 단위'],['char','글자 단위']])}${rng('gp','간격',0,250,80,'ms')}<button class="solid" id="pl">재생</button></div><div class="stage"><div class="m-split" id="sp"></div></div><div class="note" id="nt"></div>`;
+    const play=()=>{const sp=pg.querySelector('#sp');const parts=unit==='word'?TXT.split(' '):[...TXT];
+      sp.innerHTML=parts.map(p=>p===' '?' ':`<span class="w"><i>${esc(p)}</i></span>`).join(unit==='word'?' ':'');
+      sp.querySelectorAll('.w>i').forEach((e,i)=>e.animate([{transform:'translateY(110%)'},{transform:'none'}],{duration:600,delay:i*gap,easing:EZ.out,fill:'both'}));
+      const n=sp.querySelectorAll('.w').length;pg.querySelector('#nt').innerHTML=`<b>${n}조각</b>을 <b>${gap}ms</b> 간격으로 올려요. 끝날 때까지 약 ${((n-1)*gap+600)/1000}초.`};
+    wireSeg(pg,'un',v=>{unit=v;if(live(pg.querySelector('#sp')))play()},'word');wireRng(pg,'gp',v=>{gap=v},'ms');pg.querySelector('#pl').onclick=play;play()}});
+
+/* 12. 카운트업 */
+MV({id:"countup",cat:"글자와 그림",ko:"카운트업",en:"Count-up",sum:"0부터 숫자가 촤라락",
+  lead:"0에서 시작한 숫자가 촤라락 올라가서 목표값에 멈추는 효과. 자랑하고 싶은 숫자에 써요.",
+  video:"0에서 시작한 숫자가 촤라락 올라가서 멈추는 효과, 카운트업이에요. 가입자 수나 누적 다운로드처럼 자랑하고 싶은 숫자가 있을 때 그냥 보여 주는 것보다 훨씬 눈에 들어와요.",
+  tip:"끝으로 갈수록 느려지게(ease-out) 하면 숫자가 착 멈추는 느낌이 나요.",
+  parts:[["시작값 → 목표값","0부터 실제 숫자까지","#c6ff4d"],["시간","보통 1.5~2초","#8b7bff"],["이징","끝에서 느려지게","#ffc857"]],
+  say:["통계 숫자는 카운트업으로 보여 주세요.","카운트업이 끝에서 천천히 멈추게 해요.","화면에 보일 때 한 번만 올라가게 해요."],
+  mistakes:["페이지 열자마자 실행돼 안 보이는 곳에서 끝남","일정한 속도라 끝이 뚝 끊김","자릿수가 바뀌며 글자 폭이 흔들림(고정폭 숫자 필요)"],
+  related:["스크롤 리빌","이징","듀레이션 · 딜레이"],
+  prompt:"통계 섹션이 보이면 숫자가 0부터 목표값까지 2초 동안 카운트업되게 해 줘. 끝으로 갈수록 느려지게.",
+  thumb:()=>`<div class="center"><div class="mt-odo">${[1,2,4,8,0].map(d=>`<span><b style="--d:${d}">${[0,1,2,3,4,5,6,7,8,9].map(n=>`<i>${n}</i>`).join('')}</b></span>`).join('')}</div></div>`,
+  demo(pg){let du=2000,ez='out',rid=0;const S=[[128400,'누적 가입자','명'],[98,'재구매율','%'],[4.9,'평균 별점','']];
+    pg.innerHTML=`<div class="bar">${rng('du','시간',300,4000,2000,'ms')}${seg('ez',[['linear','일정하게'],['out','끝에서 느리게']])}<button class="solid" id="pl">재생</button></div><div class="stage"><div class="m-stats">${S.map((s,i)=>`<div class="m-stat"><b id="v${i}">0</b><span>${s[1]}</span></div>`).join('')}</div></div><div class="note" id="nt"></div>`;
+    const play=()=>{cancelAnimationFrame(rid);const t0=performance.now(),el=S.map((s,i)=>pg.querySelector('#v'+i));
+      const f=t=>{if(!live(el[0]))return;const p=Math.min(1,(t-t0)/du),q=ez==='out'?1-Math.pow(1-p,3):p;
+        S.forEach((s,i)=>{const v=s[0]*q;el[i].textContent=(s[0]%1?v.toFixed(1):Math.round(v).toLocaleString('ko-KR'))+s[2]});if(p<1)rid=requestAnimationFrame(f)};rid=requestAnimationFrame(f);
+      pg.querySelector('#nt').innerHTML=`<b>${(du/1000).toFixed(1)}초</b> 동안 ${ez==='out'?'빠르게 오르다 <b>끝에서 착 멈춰요.</b>':'<b>일정하게</b> 올라서 끝이 뚝 끊겨요.'}`};
+    wireRng(pg,'du',v=>{du=v},'ms');wireSeg(pg,'ez',v=>{ez=v},'out');pg.querySelector('#pl').onclick=play;play()}});
+
+/* 13. 라인 드로잉 */
+MV({id:"linedraw",cat:"글자와 그림",ko:"라인 드로잉",en:"Line Drawing",sum:"펜으로 그리듯 선이 그려짐",
+  lead:"보이지 않던 선이 펜으로 그리듯 쓱쓱 그려지는 효과. 로고, 아이콘, 그래프의 SVG 선에 써요.",
+  video:"보이지 않던 선이 펜으로 그리듯 쓱쓱 그려지는 효과, 라인 드로잉이에요. 로고나 아이콘, 그래프처럼 확대해도 깨지지 않는 SVG 그림의 선에 주로 쓰여요.",
+  tip:"SVG 선(stroke)이어야 해요. 이미지(PNG)로는 이 효과를 만들 수 없어요.",
+  parts:[["SVG 선","확대해도 안 깨지는 벡터 선","#c6ff4d"],["그리는 방향","시작점 → 끝점","#8b7bff"],["시간","보통 1~2초","#ffc857"]],
+  say:["그래프 선이 왼쪽부터 그려지게 해 주세요.","로고에 라인 드로잉을 넣어요.","선이 다 그려지고 나서 색이 채워지게 해요."],
+  mistakes:["PNG 이미지에 적용하려고 함","너무 느려서 끝까지 안 봄","스크롤할 때마다 처음부터 다시 그려짐"],
+  related:["모핑","카운트업","모션 패스"],
+  prompt:"그래프가 보이면 선이 왼쪽부터 1.5초 동안 그려지는 라인 드로잉 애니메이션을 넣어 줘.",
+  thumb:()=>`<div class="center"><svg width="150" height="100" viewBox="0 0 150 100"><path d="M8 90 H142 M8 90 V8" stroke="#3a3a4a" stroke-width="2" fill="none"/><path class="mt-draw" pathLength="1" d="M10 80 L40 58 L64 66 L92 32 L118 42 L140 14" stroke="#c6ff4d" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`,
+  demo(pg){let du=1500,sh='graph';
+    const P={graph:'M30 200 L120 150 L190 170 L280 90 L360 110 L450 50 L530 70',heart:'M280 210 C 120 120 150 30 230 50 C 260 58 275 80 280 95 C 285 80 300 58 330 50 C 410 30 440 120 280 210 Z',sign:'M40 170 C 80 60 120 60 110 160 C 105 200 150 90 190 110 C 220 125 200 170 240 150 C 290 120 300 80 340 120 C 370 150 400 90 440 100 C 470 108 490 150 530 120'};
+    pg.innerHTML=`<div class="bar">${seg('sh',[['graph','그래프'],['heart','아이콘'],['sign','서명']])}${rng('du','시간',300,4000,1500,'ms')}<button class="solid" id="pl">재생</button></div><div class="stage"><svg class="m-svg" viewBox="0 0 560 240" id="sv"></svg></div><div class="note" id="nt"></div>`;
+    const play=()=>{const sv=pg.querySelector('#sv');sv.innerHTML=(sh==='graph'?'<path d="M20 220 H545 M20 220 V20" stroke="#3a3a4a" stroke-width="2" fill="none"/>':'')+`<path id="ph" pathLength="1" d="${P[sh]}" stroke="${sh==='heart'?'#ff6b9a':'#c6ff4d'}" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" style="stroke-dasharray:1;stroke-dashoffset:1"/>`;
+      sv.querySelector('#ph').animate([{strokeDashoffset:1},{strokeDashoffset:0}],{duration:du,easing:EZ.inout,fill:'both'});
+      pg.querySelector('#nt').innerHTML=`선의 <b>시작점부터 끝점까지</b> ${(du/1000).toFixed(1)}초 동안 그려져요. 원리는 점선 간격(stroke-dasharray)을 밀어내는 거예요.`};
+    wireSeg(pg,'sh',v=>{sh=v;if(live(pg.querySelector('#sv')))play()},'graph');wireRng(pg,'du',v=>{du=v},'ms');pg.querySelector('#pl').onclick=play}});
+
+/* 14. 모핑 */
+MV({id:"morphing",cat:"글자와 그림",ko:"모핑",en:"Morphing",sum:"한 모양이 다른 모양으로",
+  lead:"하나의 모양이 다른 모양으로 스르륵 변신하는 효과. 햄버거 메뉴가 X로 바뀌는 게 대표적이에요.",
+  video:"하나의 모양이 다른 모양으로 스르륵 변신하는 효과, 모핑이에요. 흔히 햄버거 메뉴라고 부르는 세 줄 아이콘이 X로 바뀌는 것처럼요. 바뀌기 전과 후가 이어져 보여서 상태가 바뀌었다는 걸 자연스럽게 알려 줘요.",
+  tip:"상태가 바뀌는 아이콘(메뉴↔닫기, 재생↔정지)에 쓰면 설명 없이도 이해돼요.",
+  parts:[["시작 모양","세 줄(메뉴)","#c6ff4d"],["끝 모양","X(닫기)","#ff6b9a"],["이어짐","중간 과정이 보임","#8b7bff"]],
+  say:["햄버거 아이콘은 X로 모핑되게 해 주세요.","재생 버튼이 정지로 모핑되게 해요.","아이콘이 뚝 바뀌지 않게 해 주세요."],
+  mistakes:["아이콘이 뚝 바뀌어 상태 변화를 놓침","모양 차이가 너무 커서 엉킨 듯 보임","전환이 느려 버튼 반응이 굼뜸"],
+  related:["라인 드로잉","드로어","마이크로 인터랙션"],
+  prompt:"햄버거 메뉴 아이콘을 누르면 세 줄이 X 모양으로 모핑되면서 메뉴가 열리게 해 줘.",
+  thumb:()=>`<div class="center"><div class="mt-bg"><i></i><i></i><i></i></div><div class="mt-sq"></div></div>`,
+  demo(pg){let on=true,ms=350,open=false,si=0;const SH=[['50%','동그라미'],['18px','둥근 사각형'],['0','사각형']];
+    pg.innerHTML=`<div class="bar">${tgl('mo','모핑',true)}${rng('du','시간',0,1000,350,'ms')}<button class="ghost" id="sb">모양 바꾸기</button></div><div class="stage"><div class="mstage" style="display:flex;align-items:center;justify-content:center;gap:40px"><div class="m-burger" id="bg"><i></i><i></i><i></i></div><div class="m-shape" id="sh" style="border-radius:50%"></div><div class="m-menu" id="mn"><b>메뉴</b>${ln('80%',8)}${ln('60%',8)}${ln('70%',8)}</div></div></div><div class="note" id="nt"></div>`;
+    const T=()=>on?`${ms}ms cubic-bezier(.2,.8,.2,1)`:'0ms';
+    const r=()=>{const bg=pg.querySelector('#bg');bg.querySelectorAll('i').forEach(i=>i.style.transition=`transform ${T()},opacity ${T()}`);bg.classList.toggle('x',open);
+      const mn=pg.querySelector('#mn');mn.style.transition=`transform ${on?ms:0}ms cubic-bezier(.2,.8,.2,1)`;mn.classList.toggle('on',open);
+      const s=pg.querySelector('#sh');s.style.transition=`border-radius ${T()},transform ${T()}`;s.style.borderRadius=SH[si][0];s.style.transform=`rotate(${si*45}deg)`;
+      pg.querySelector('#nt').innerHTML=on?`<b>${ms}ms</b> 동안 이어지며 바뀌어서 상태가 바뀐 게 <b>자연스럽게</b> 보여요. 아이콘을 눌러 보세요.`:'모핑을 끄면 모양이 <b>뚝 바뀌어서</b> 무슨 일이 일어났는지 덜 느껴져요.'};
+    pg.querySelector('#bg').onclick=()=>{open=!open;r()};pg.querySelector('#sb').onclick=()=>{si=(si+1)%3;r()};pg.querySelector('#mo').onchange=e=>{on=e.target.checked;r()};wireRng(pg,'du',v=>{ms=v;r()},'ms');r()}});
+
+/* 15. 마퀴 */
+MV({id:"marquee",cat:"글자와 그림",ko:"마퀴",en:"Marquee",sum:"띠처럼 끝없이 흘러감",
+  lead:"로고나 문구가 띠처럼 옆으로 끝없이 흘러가는 효과. 좁은 공간에 많은 걸 보여 줄 때 좋아요.",
+  video:"로고나 문구가 띠처럼 옆으로 끝없이 줄줄 흘러가는 효과를 마퀴라고 해요. 좁은 공간에 고객사 로고나 짧은 후기를 많이 보여 줄 때 좋아요. 마우스를 올리면 멈추게 해 두면 읽기도 편해요.",
+  tip:"마우스를 올리면 멈추게. 이 한 줄만 붙여도 쓰기 편해져요.",
+  parts:[["반복 띠","같은 내용을 이어 붙여 끊김 없이","#c6ff4d"],["속도","천천히 흐르게","#8b7bff"],["호버 정지","읽고 싶을 때 멈춤","#ffc857"]],
+  say:["고객사 로고는 마퀴로 흘려 주세요.","후기 줄은 반대 방향으로 흐르게 해요.","마우스 올리면 멈추게 해 주세요."],
+  mistakes:["너무 빨라서 읽을 수 없음","끝에서 뚝 끊기고 처음으로 점프함","멈출 방법이 없어 클릭하기 어려움"],
+  related:["캐러셀","루프 · 플로팅","가로 스크롤"],
+  prompt:"고객사 로고를 끝없이 흘러가는 마퀴로 보여 주고, 마우스를 올리면 멈추게 해 줘.",
+  thumb:()=>`<div class="center"><div class="mt-mq"><div>${['ACME','NOVA','ORBIT','PIXEL','ACME','NOVA','ORBIT','PIXEL'].map(x=>`<span>${x}</span>`).join('')}</div></div></div>`,
+  demo(pg){let sp=60,hp=true;const LG=['ACME','NOVA','ORBIT','PIXEL','LUMEN','KITE','ZEPHYR','MONO'],RV=['“설정이 정말 쉬워요”','“팀 전체가 쓰고 있어요”','“고객 응대가 빨라졌어요”','“디자인이 깔끔해요”','“가격 대비 최고”'];
+    pg.innerHTML=`<div class="bar">${rng('sp','속도',10,200,60,'px/초')}${tgl('hp','마우스 올리면 멈춤',true)}</div><div class="stage" style="flex-direction:column;gap:14px"><div class="m-mq hp" id="q1"><div class="m-mqt">${[...LG,...LG].map(x=>`<div class="m-logo">${x}</div>`).join('')}</div></div><div class="m-mq hp" id="q2"><div class="m-mqt">${[...RV,...RV].map(x=>`<div class="m-rv">${x}</div>`).join('')}</div></div></div><div class="note" id="nt"></div>`;
+    const r=()=>{['q1','q2'].forEach((q,i)=>{const m=pg.querySelector('#'+q),t=m.querySelector('.m-mqt');const w=t.scrollWidth/2;t.style.animation=`mMq ${(w/sp).toFixed(1)}s linear infinite ${i?'reverse':''}`;m.classList.toggle('hp',hp)});
+      pg.querySelector('#nt').innerHTML=`초당 <b>${sp}px</b>로 흘러요. 같은 목록을 두 번 이어 붙여서 <b>끊김 없이</b> 돌아요.${hp?' 마우스를 올려 보세요.':' 지금은 멈출 수 없어요.'}`};
+    wireRng(pg,'sp',v=>{sp=v;r()},'px/초');pg.querySelector('#hp').onchange=e=>{hp=e.target.checked;r()};setTimeout(()=>{if(live(pg))r()},50)}});
+
+/* 16. 모션 패스 */
+MV({id:"motionpath",cat:"글자와 그림",ko:"모션 패스",en:"Motion Path",sum:"정해둔 곡선 길을 따라 이동",
+  lead:"직선이 아니라 정해 둔 곡선 길을 따라 날아가는 움직임. 어디서 어디로 갔는지 눈으로 따라가요.",
+  video:"직선이 아니라 정해 둔 곡선 길을 따라 슝 날아가는 움직임, 모션 패스예요. 상품이 포물선을 그리며 장바구니로 날아가면 어디서 어디로 갔는지 눈으로 따라갈 수 있어요.",
+  tip:"출발지와 도착지를 같이 말하세요. '상품 이미지 → 장바구니 아이콘'처럼요.",
+  parts:[["출발점","상품 이미지","#ffc857"],["경로","포물선 같은 곡선","#8b7bff"],["도착점","장바구니 아이콘","#c6ff4d"]],
+  say:["담기 누르면 상품이 장바구니로 날아가게 해 주세요.","직선 말고 포물선으로요.","도착하면 장바구니 배지가 팝 되게 해요."],
+  mistakes:["경로가 너무 길고 느려서 답답함","도착 후 아무 반응이 없어 끝난 줄 모름","모바일에서 도착점이 화면 밖에 있음"],
+  related:["스케일 · 팝","이징","쉐어드 엘리먼트 트랜지션"],
+  prompt:"담기 버튼을 누르면 상품 이미지가 곡선 경로를 따라 장바구니 아이콘으로 날아가게 해 줘.",
+  thumb:()=>`<div class="center"><div class="mt-mp"><svg width="150" height="100" style="position:absolute;inset:0"><path d="M14 84 Q 70 -20 134 30" stroke="#5a5a70" stroke-width="2" stroke-dasharray="4 5" fill="none"/></svg><span style="position:absolute;right:0;top:14px;font-size:22px">🛒</span><i class="mt-dotp"></i></div></div>`,
+  demo(pg){let cv=true,ms=800,n=0;
+    pg.innerHTML=`<div class="bar">${seg('cv',[['1','곡선 경로'],['0','직선']])}${rng('du','시간',200,2000,800,'ms')}</div><div class="stage"><div class="mstage" id="st"><svg class="m-pathsvg" id="ps"></svg><div class="m-prod" id="pd"><div class="im"></div><b style="font-size:13px">무선 이어폰</b><button class="solid" id="pl" style="margin-top:8px;width:100%;padding:7px">담기</button></div><div class="m-cart m-cartt" id="ct">🛒<span class="m-badge" id="bd">0</span></div><div class="m-fly" id="fl"></div></div></div><div class="note" id="nt"></div>`;
+    const path=()=>{const st=pg.querySelector('#st').getBoundingClientRect(),a=pg.querySelector('#pd .im').getBoundingClientRect(),b=pg.querySelector('#ct').getBoundingClientRect();
+      const x1=a.left-st.left+a.width/2,y1=a.top-st.top+a.height/2,x2=b.left-st.left+b.width/2,y2=b.top-st.top+b.height/2;
+      const d=cv?`M${x1} ${y1} Q ${(x1+x2)/2} ${Math.min(y1,y2)-110} ${x2} ${y2}`:`M${x1} ${y1} L ${x2} ${y2}`;pg.querySelector('#ps').innerHTML=`<path d="${d}" stroke="#5a5a70" stroke-width="2" stroke-dasharray="5 6" fill="none"/>`;return d};
+    const play=()=>{const fl=pg.querySelector('#fl'),d=path();fl.style.offsetPath=`path('${d}')`;
+      const an=fl.animate([{offsetDistance:'0%',transform:'scale(1)',opacity:1},{offsetDistance:'100%',transform:'scale(.35)',opacity:.9}],{duration:ms,easing:EZ.inout});
+      an.onfinish=()=>{if(!live(fl))return;fl.style.opacity=0;const bd=pg.querySelector('#bd');bd.textContent=++n;bd.animate([{transform:'scale(0)'},{transform:'scale(1.3)',offset:.6},{transform:'scale(1)'}],{duration:380,easing:'cubic-bezier(.2,.8,.2,1)'})};
+      pg.querySelector('#nt').innerHTML=cv?'<b>포물선</b>을 따라 날아가서 어디로 갔는지 눈으로 따라가져요. 도착하면 배지가 팝!':'직선은 빠르지만 <b>날아가는 느낌</b>이 약해요.'};
+    wireSeg(pg,'cv',v=>{cv=v==='1';if(live(pg.querySelector('#ps')))path()},'1');wireRng(pg,'du',v=>{ms=v},'ms');pg.querySelector('#pl').onclick=play;setTimeout(()=>{if(live(pg))path()},60);pg._redraw=path}});
+
+/* 17. 페이지 트랜지션 */
+MV({id:"pagetransition",cat:"화면과 마우스",ko:"페이지 트랜지션",en:"Page Transition",sum:"페이지가 바뀔 때의 전환",
+  lead:"링크를 눌렀을 때 화면이 뚝 바뀌는 대신 덮였다가 새 페이지가 나타나는 전환. 쓸고 지나가면 와이프.",
+  video:"링크를 누르면 화면이 뚝 바뀌는 대신 휙 덮였다가 새 페이지가 나타나죠. 페이지 트랜지션이에요. 앞에서 본 페이드나 슬라이드를 페이지 단위로 쓰는 거예요. 화면을 쓸고 지나가면 와이프라고 불러요.",
+  tip:"0.3초 안팎이 좋아요. 페이지 이동은 자주 하니까 길면 금방 답답해져요.",
+  parts:[["나가는 페이지","페이드 아웃 등으로 퇴장","#8b7bff"],["들어오는 페이지","아래에서 살짝 올라오며 등장","#c6ff4d"],["와이프","화면을 쓸고 지나가는 막","#ffc857"]],
+  say:["페이지 이동에 페이드 트랜지션 넣어 주세요.","와이프로 화면을 쓸고 지나가게 해요.","트랜지션이 길어서 답답해요. 0.3초로요."],
+  mistakes:["전환이 길어 페이지 이동이 느리게 느껴짐","나가는 것만 있고 들어오는 효과가 없음","뒤로 가기에도 같은 방향이라 어색함"],
+  related:["페이드","슬라이드","쉐어드 엘리먼트 트랜지션"],
+  prompt:"페이지를 이동할 때 화면이 0.3초 동안 페이드 아웃됐다가, 새 페이지가 아래에서 살짝 올라오는 페이지 트랜지션을 넣어 줘.",
+  thumb:()=>`<div class="center"><div class="mt-win"><div class="mt-pa">${ln('50%',8,'#8b7bff')}${ln('85%',5)}${ln('70%',5)}</div><div class="mt-pb">${ln('60%',8,'#ff6b9a')}${ln('80%',5)}${ln('60%',5)}</div><div class="mt-wp"></div></div></div>`,
+  demo(pg){let fx='fadeup',ms=300,cur=0,busy=false;const PG=[['홈','#8b7bff','이름을 알면 부탁이 달라져요'],['소개','#ff6b9a','움직임 24개를 모았어요'],['가격','#c6ff4d','무료로 시작하세요']];
+    const html=i=>`<div class="m-pg"><div class="hb" style="background:linear-gradient(135deg,${PG[i][1]},#262634)"></div><b style="font-size:18px">${PG[i][2]}</b>${ln('85%',8)}${ln('70%',8)}</div>`;
+    pg.innerHTML=`<div class="bar">${seg('fx',[['none','없음'],['fade','페이드'],['fadeup','페이드+올라오기'],['wipe','와이프']])}${rng('du','시간',100,1200,300,'ms')}</div><div class="stage"><div class="mstage"><div class="m-br"><div class="m-brbar" id="nv">${PG.map((p,i)=>`<a data-i="${i}" class="${i?'':'on'}">${p[0]}</a>`).join('')}</div><div class="m-view" id="vw">${html(0)}<div class="m-wipe" id="wp"></div></div></div></div></div><div class="note" id="nt"></div>`;
+    const nt=()=>pg.querySelector('#nt').innerHTML={none:'효과가 없으면 화면이 <b>뚝</b> 바뀌어요.',fade:`<b>${ms}ms</b> 동안 페이드 아웃 → 페이드 인.`,fadeup:`<b>${ms}ms</b> 페이드 아웃 뒤 새 페이지가 <b>아래에서 살짝 올라와요.</b> 영상의 예시 그대로예요.`,wipe:'색 막이 <b>화면을 쓸고 지나가면서</b> 페이지가 바뀌어요. 이게 와이프예요.'}[fx]+' 위 메뉴를 눌러 보세요.';
+    const go=async i=>{if(busy||i===cur)return;busy=true;const vw=pg.querySelector('#vw'),old=vw.querySelector('.m-pg'),wp=pg.querySelector('#wp');pg.querySelectorAll('#nv a').forEach(a=>a.classList.toggle('on',+a.dataset.i===i));
+      const swap=()=>{old.remove();vw.insertAdjacentHTML('afterbegin',html(i));return vw.querySelector('.m-pg')};
+      if(fx==='none')swap();
+      else if(fx==='wipe'){await wp.animate([{transform:'translateX(-101%)'},{transform:'none'}],{duration:ms,easing:EZ.inout,fill:'forwards'}).finished;if(!live(vw))return;swap();await wp.animate([{transform:'none'},{transform:'translateX(101%)'}],{duration:ms,easing:EZ.inout,fill:'forwards'}).finished}
+      else{await old.animate([{opacity:1},{opacity:0}],{duration:ms,easing:EZ.in,fill:'forwards'}).finished;if(!live(vw))return;const n=swap();await n.animate(fx==='fadeup'?[{opacity:0,transform:'translateY(24px)'},{opacity:1,transform:'none'}]:[{opacity:0},{opacity:1}],{duration:ms,easing:EZ.out,fill:'both'}).finished}
+      cur=i;busy=false};
+    pg.querySelector('#nv').onclick=e=>{const a=e.target.closest('a');if(a)go(+a.dataset.i)};wireSeg(pg,'fx',v=>{fx=v;nt()},'fadeup');wireRng(pg,'du',v=>{ms=v;nt()},'ms');nt()}});
+
+/* 18. 쉐어드 엘리먼트 트랜지션 */
+MV({id:"sharedelement",cat:"화면과 마우스",ko:"쉐어드 엘리먼트",en:"Shared Element",sum:"누른 카드가 그대로 상세로",
+  lead:"목록에서 누른 카드가 그대로 커지면서 상세 화면이 되는 전환. 두 화면이 같은 요소를 공유해요.",
+  video:"목록에서 카드를 누르면 그 카드가 그대로 쭉 커지면서 상세 화면이 되죠. 두 화면이 같은 요소를 공유한다고 해서 쉐어드 엘리먼트 트랜지션이라고 해요. 내가 누른 게 어디로 갔는지 놓치지 않으니까 두 화면이 끊기지 않고 이어져요. 웹에서는 뷰 트랜지션이라는 브라우저 기능으로 만들 수 있어요.",
+  tip:"웹에서는 'View Transitions API로 만들어 줘'라고 덧붙이면 정확해요.",
+  parts:[["공유 요소","목록과 상세에 같이 있는 이미지","#c6ff4d"],["출발 위치","목록 속 카드 자리","#8b7bff"],["도착 위치","상세 화면의 큰 이미지 자리","#ffc857"]],
+  say:["상품 카드는 쉐어드 엘리먼트로 상세까지 이어 주세요.","뷰 트랜지션으로 만들어 주세요.","뒤로 갈 때도 원래 자리로 돌아가게 해요."],
+  mistakes:["뒤로 가기에서는 효과가 없어 어색함","이미지 비율이 달라 늘어나 보임","전환 중에 다른 요소가 깜빡임"],
+  related:["페이지 트랜지션","카드 레이아웃","모션 패스"],
+  prompt:"상품 카드를 누르면 카드 이미지가 그대로 커지면서 상세 페이지로 이어지는 쉐어드 엘리먼트 트랜지션으로 만들어 줘.",
+  thumb:()=>`<div class="center"><div class="mt-win"><div class="mt-shg" style="left:8px;top:8px;width:40px;height:40px"></div><div class="mt-shg" style="left:100px;top:8px;width:40px;height:40px"></div><div class="mt-shg" style="left:8px;top:54px;width:40px;height:40px"></div><div class="mt-shg" style="left:100px;top:54px;width:40px;height:40px"></div><div class="mt-sh" style="left:54px;top:8px;width:40px;height:40px"></div></div></div>`,
+  demo(pg){let on=true,ms=450,busy=false;const IT=[['무선 이어폰','#8b7bff,#ff6b9a','89,000원'],['스마트 워치','#c6ff4d,#35d07f','159,000원'],['블루투스 스피커','#ffc857,#ff6b9a','69,000원']];
+    pg.innerHTML=`<div class="bar">${tgl('on','쉐어드 엘리먼트 전환',true)}${rng('du','시간',150,1200,450,'ms')}</div><div class="stage"><div class="mstage" id="st"></div></div><div class="note" id="nt"></div>`;
+    const st=pg.querySelector('#st');
+    const list=()=>{st.innerHTML=`<div class="m-grid">${IT.map((t,i)=>`<div class="m-it" data-i="${i}"><div class="im" style="background:linear-gradient(135deg,${t[1]})"></div><b>${t[0]}</b></div>`).join('')}</div>`};
+    const det=i=>{const t=IT[i];st.innerHTML=`<div class="m-det"><div class="im" style="background:linear-gradient(135deg,${t[1]})"></div><div class="tx"><button class="ghost" id="bk" style="align-self:flex-start">← 목록</button><b style="font-size:22px">${t[0]}</b><b style="color:var(--lime)">${t[2]}</b>${ln('90%',8)}${ln('75%',8)}${ln('60%',8)}</div></div>`};
+    const flip=(a,b)=>{const dx=a.left-b.left,dy=a.top-b.top,sx=a.width/b.width,sy=a.height/b.height;return [{transformOrigin:'0 0',transform:`translate(${dx}px,${dy}px) scale(${sx},${sy})`},{transformOrigin:'0 0',transform:'none'}]};
+    let curI=-1;
+    st.onclick=e=>{if(busy)return;const c=e.target.closest('.m-it'),bk=e.target.closest('#bk');
+      if(c){const i=+c.dataset.i,a=c.querySelector('.im').getBoundingClientRect();det(i);curI=i;if(on){busy=true;const im=st.querySelector('.m-det .im');im.animate(flip(a,im.getBoundingClientRect()),{duration:ms,easing:EZ.inout}).onfinish=()=>busy=false;st.querySelector('.tx').animate([{opacity:0,transform:'translateY(12px)'},{opacity:1,transform:'none'}],{duration:ms,delay:ms*.4,easing:EZ.out,fill:'both'})}}
+      else if(bk){const a=st.querySelector('.m-det .im').getBoundingClientRect();list();if(on){busy=true;const im=st.querySelector(`.m-it[data-i="${curI}"] .im`);im.style.position='relative';im.style.zIndex=2;im.animate(flip(a,im.getBoundingClientRect()),{duration:ms,easing:EZ.inout}).onfinish=()=>busy=false}}};
+    const nt=()=>pg.querySelector('#nt').innerHTML=on?`카드를 눌러 보세요. 누른 이미지가 <b>그대로 커지며</b> 상세가 돼요(${ms}ms). 뒤로 가면 제자리로 돌아가요.`:'끄면 화면이 <b>뚝 바뀌어서</b> 내가 누른 게 어디로 갔는지 놓쳐요.';
+    pg.querySelector('#on').onchange=e=>{on=e.target.checked;nt()};wireRng(pg,'du',v=>{ms=v;nt()},'ms');list();nt()}});
+
+/* 19. 핀 · 스크롤리텔링 */
+MV({id:"pin",cat:"화면과 마우스",ko:"핀 · 스크롤리텔링",en:"Pinning",sum:"화면은 고정, 장면만 바뀜",
+  lead:"스크롤을 내려도 화면은 그 자리에 고정되고 안의 장면만 바뀌어요. 이야기를 풀면 스크롤리텔링.",
+  video:"스크롤을 내리는데 화면은 그 자리에 붙잡혀 있고 안에 장면만 착착 바뀌죠. 이렇게 화면을 고정해 두는 걸 핀 또는 피닝이라고 해요. 핀으로 스크롤에 따라 이야기를 풀어가는 페이지는 스크롤과 스토리텔링을 합쳐 스크롤리텔링이라고 불러요.",
+  tip:"장면 수는 3~5개가 적당해요. 너무 많으면 스크롤이 끝나지 않는 느낌이 들어요.",
+  parts:[["핀(고정)","스크롤해도 제자리에 붙어 있음","#c6ff4d"],["장면 전환","스크롤 위치에 따라 바뀜","#8b7bff"],["진행 표시","지금 몇 번째 장면인지","#ffc857"]],
+  say:["기능 소개 섹션은 핀으로 고정해 주세요.","스크롤할 때마다 기능이 하나씩 바뀌게 해요.","스크롤리텔링 장면을 3개로 줄여요."],
+  mistakes:["장면이 너무 많아 스크롤이 끝나지 않음","모바일에서 고정 영역이 화면을 다 덮음","진행 표시가 없어 얼마나 남았는지 모름"],
+  related:["스티키 헤더","가로 스크롤","스크롤 리빌"],
+  prompt:"기능 소개 섹션을 화면에 핀으로 고정하고, 스크롤할 때마다 세 가지 기능이 차례로 바뀌는 스크롤리텔링으로 만들어 줘.",
+  thumb:()=>`<div class="center"><div class="mt-win"><div class="mt-col">${[0,1,2,3,4].map(i=>`<div style="height:24px;border-radius:6px;background:${i%3===0?'#4a4a60':'#34344a'}"></div>`).join('')}</div><div class="mt-pinp"></div></div></div>`,
+  demo(pg){let on=true;const SC=[['빠른 검색','#8b7bff','🔍','원하는 걸 1초 만에'],['자동 정리','#c6ff4d','🗂️','알아서 폴더별로'],['한 번에 공유','#ff6b9a','🔗','링크 하나로 끝']];
+    pg.innerHTML=`<div class="bar">${tgl('on','핀(고정)',true)}<span class="ctl">상자 안을 스크롤해 보세요</span></div><div class="stage"><div class="mstage"><div class="m-scroll" id="sc"></div></div></div><div class="note" id="nt"></div>`;
+    const sc=pg.querySelector('#sc');
+    const build=()=>{sc.scrollTop=0;sc.innerHTML=on?`<div class="m-hint">↓ 아래로 스크롤</div><div class="m-pinw" style="height:${288+SC.length*240}px"><div class="m-pin"><div class="m-scene" id="sn"></div><div class="m-steps">${SC.map((s,i)=>`<div class="m-step" data-i="${i}"><b>${i+1}. ${s[0]}</b>${s[3]}</div>`).join('')}</div></div></div><div class="m-hint">끝! 고정이 풀리고 다음 섹션으로</div>`
+        :`<div class="m-hint">↓ 아래로 스크롤</div>${SC.map((s,i)=>`<div class="m-pin" style="position:relative"><div class="m-scene" style="background:${s[1]}">${s[2]}</div><div class="m-steps"><div class="m-step on"><b>${i+1}. ${s[0]}</b>${s[3]}</div></div></div>`).join('')}<div class="m-hint">끝</div>`;upd()};
+    const upd=()=>{if(!on){pg.querySelector('#nt').innerHTML='핀을 끄면 장면이 <b>그냥 위로 지나가요.</b> 평범한 긴 페이지예요.';return}
+      const w=sc.querySelector('.m-pinw'),p=Math.max(0,sc.scrollTop-w.offsetTop),i=Math.min(SC.length-1,Math.floor(p/240));const sn=sc.querySelector('#sn');sn.style.background=SC[i][1];sn.textContent=SC[i][2];
+      sc.querySelectorAll('.m-step').forEach(s=>s.classList.toggle('on',+s.dataset.i===i));
+      const pinned=sc.scrollTop>=w.offsetTop&&sc.scrollTop<=w.offsetTop+w.offsetHeight-288;
+      pg.querySelector('#nt').innerHTML=pinned?`화면이 <b>고정된 채</b> 장면 ${i+1}/${SC.length}로 바뀌었어요.`:sc.scrollTop<w.offsetTop?'스크롤을 내리면 섹션이 <b>화면에 붙잡혀요.</b>':'마지막 장면이 끝나면 <b>고정이 풀려요.</b>'};
+    sc.onscroll=upd;pg.querySelector('#on').onchange=e=>{on=e.target.checked;build()};build()}});
+
+/* 20. 가로 스크롤 */
+MV({id:"horizontalscroll",cat:"화면과 마우스",ko:"가로 스크롤",en:"Horizontal Scroll",sum:"세로로 내리면 옆으로 지나감",
+  lead:"마우스 휠은 아래로 굴리는데 화면은 옆으로 지나가는 섹션. 핀을 응용한 거예요.",
+  video:"마우스 휠은 아래로 굴리는데 화면은 옆으로 스르륵 지나가요. 가로 스크롤 섹션이에요. 앞에서 본 핀의 응용으로, 섹션을 고정해 두고 내린 만큼 안쪽 내용을 옆으로 미는 거예요. 모바일에서는 세로 목록으로 바꾸는 게 좋아요.",
+  tip:"모바일에서는 세로 목록으로 바꿔 달라고 꼭 같이 말하세요.",
+  parts:[["핀(고정)","섹션을 화면에 붙잡음","#c6ff4d"],["가로 이동","내린 만큼 옆으로 밀기","#8b7bff"],["모바일 대안","세로 목록으로 전환","#ffc857"]],
+  say:["작업 사례 섹션은 가로 스크롤로 해 주세요.","모바일에서는 세로 목록으로 바꿔요.","가로 진행 바도 보여 주세요."],
+  mistakes:["모바일에서도 가로 스크롤이라 조작이 어려움","카드가 많아 한참 내려야 함","진행 표시가 없어 끝이 어딘지 모름"],
+  related:["핀 · 스크롤리텔링","스크롤 스냅","캐러셀"],
+  prompt:"작업 사례 섹션을 고정하고 세로로 스크롤하면 카드들이 옆으로 지나가는 가로 스크롤로 만들어 줘. 모바일에서는 세로 목록으로.",
+  thumb:()=>`<div class="center"><div class="mt-win"><div class="mt-hs">${C8.slice(0,6).map(c=>`<i style="background:${c}"></i>`).join('')}</div></div></div>`,
+  demo(pg){let dev='pc';const CD=['브랜딩','웹사이트','앱 UI','패키지','모션','3D'];
+    pg.innerHTML=`<div class="bar">${seg('dv',[['pc','데스크톱'],['mo','모바일']])}<span class="ctl">상자 안을 세로로 스크롤해 보세요</span></div><div class="stage"><div class="mstage" id="ms"><div class="m-scroll" id="sc"></div></div></div><div class="note" id="nt"></div>`;
+    const sc=pg.querySelector('#sc');
+    const build=()=>{sc.scrollTop=0;const ms=pg.querySelector('#ms');ms.style.maxWidth=dev==='mo'?'300px':'680px';
+      sc.innerHTML=dev==='pc'?`<div class="m-hint">↓ 아래로 스크롤</div><div class="m-pinw" id="hw" style="height:1100px"><div class="m-hpin"><div class="m-htr" id="tr">${CD.map((c,i)=>`<div class="m-hc" style="background:${C8[i]}">${String(i+1).padStart(2,'0')}<br>${c}</div>`).join('')}</div><div class="m-hpg"><i id="pb"></i></div></div></div><div class="m-hint">다음 섹션</div>`
+        :`<div class="m-hint">↓ 세로 목록</div><div style="display:flex;flex-direction:column;gap:12px;padding:0 16px 20px">${CD.map((c,i)=>`<div class="m-hc" style="width:auto;height:110px;background:${C8[i]}">${String(i+1).padStart(2,'0')} ${c}</div>`).join('')}</div>`;upd()};
+    const upd=()=>{if(dev!=='pc'){pg.querySelector('#nt').innerHTML='모바일에서는 가로 스크롤 대신 <b>평범한 세로 목록</b>이 편해요.';return}
+      const w=sc.querySelector('#hw'),tr=sc.querySelector('#tr'),rng=w.offsetHeight-288,p=Math.min(1,Math.max(0,(sc.scrollTop-w.offsetTop)/rng)),max=tr.scrollWidth-sc.clientWidth;
+      tr.style.transform=`translateX(${-p*Math.max(0,max)}px)`;sc.querySelector('#pb').style.width=(p*100)+'%';
+      pg.querySelector('#nt').innerHTML=p<=0?'아래로 내리면 섹션이 고정되고 <b>카드가 옆으로</b> 지나가요.':p>=1?'끝까지 가면 고정이 풀리고 <b>다음 섹션</b>으로 내려가요.':`세로로 내린 만큼 옆으로 <b>${Math.round(p*100)}%</b> 이동했어요.`};
+    sc.onscroll=upd;wireSeg(pg,'dv',v=>{dev=v;build()},'pc');pg._redraw=upd}});
+
+/* 21. 마그네틱 버튼 */
+MV({id:"magnetic",cat:"화면과 마우스",ko:"마그네틱 버튼",en:"Magnetic Button",sum:"커서에 자석처럼 끌려옴",
+  lead:"커서가 가까이 다가가면 버튼이 자석에 끌리듯 따라오는 효과. 누르기 전부터 반응해요.",
+  video:"커서가 가까이 다가가면 버튼이 자석에 끌리듯 착 와요. 마그네틱 버튼이에요. 누르기 전부터 반응해서 재미있지만 너무 많이 따라오면 오히려 누르기 어려우니 살짝만 쓰는 게 좋아요.",
+  tip:"최대 10px 정도만. 메인 CTA 한 곳에만 쓰세요.",
+  parts:[["감지 반경","이 안에 들어오면 반응","#8b7bff"],["끌림 세기","최대 이동 거리","#c6ff4d"],["복귀","멀어지면 제자리로","#ffc857"]],
+  say:["메인 CTA에 마그네틱 효과 넣어 주세요.","끌림은 최대 10px만요.","버튼 안 글자는 조금 더 따라오게 해요."],
+  mistakes:["너무 많이 따라와서 오히려 누르기 어려움","모든 버튼에 넣어 산만함","모바일(터치)에서는 의미가 없는데 그대로 둠"],
+  related:["호버 이펙트","커스텀 커서","마이크로 인터랙션"],
+  prompt:"메인 CTA 버튼에 마그네틱 효과를 넣어 줘. 커서가 가까이 오면 최대 10픽셀 정도만 끌려오게.",
+  thumb:()=>`<div class="center" style="position:relative"><div class="mt-magb">시작하기</div><span class="mt-ptr">➤</span></div>`,
+  demo(pg){let s=10;const R=150;
+    pg.innerHTML=`<div class="bar">${rng('ss','끌림 세기',0,60,10,'px')}<span class="ctl">버튼 근처로 마우스를 가져가 보세요</span></div><div class="stage"><div class="mstage" id="st"><div class="m-mag"><div class="m-magr" style="width:${R*2}px;height:${R*2}px"></div><button class="m-magb" id="mb"><span>무료로 시작하기</span></button></div></div></div><div class="note" id="nt"></div>`;
+    const st=pg.querySelector('#st'),mb=pg.querySelector('#mb'),sp=mb.querySelector('span');
+    st.onpointermove=e=>{const r=mb.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),d=Math.hypot(dx,dy);
+      if(d<R){const k=s/R;mb.style.transform=`translate(${dx*k}px,${dy*k}px)`;sp.style.transform=`translate(${dx*k*.5}px,${dy*k*.5}px)`;pg.querySelector('#nt').innerHTML=s>25?'너무 많이 따라와서 <b>오히려 누르기 어려워요.</b>':`반경 안에 들어와서 최대 <b>${s}px</b>만 끌려와요.`}
+      else{mb.style.transform=sp.style.transform='none';pg.querySelector('#nt').innerHTML='점선 원 안으로 들어오면 버튼이 <b>커서 쪽으로</b> 끌려와요.'}};
+    st.onpointerleave=()=>{mb.style.transform=sp.style.transform='none'};
+    wireRng(pg,'ss',v=>{s=v},'px');pg.querySelector('#nt').innerHTML='점선 원 안으로 들어오면 버튼이 <b>커서 쪽으로</b> 끌려와요.'}});
+
+/* 22. 커스텀 커서 */
+MV({id:"customcursor",cat:"화면과 마우스",ko:"커스텀 커서",en:"Custom Cursor",sum:"작은 원이 마우스를 따라다님",
+  lead:"기본 화살표 대신 작은 원이 마우스를 졸졸 따라다니는 효과. 커서 팔로우라고도 해요.",
+  video:"기본 화살표 대신 작은 원이 마우스를 졸졸 따라다니죠. 커스텀 커서 또는 커서 팔로우라고 해요. 링크 위에서는 원이 커지거나 글자가 들어가기도 해요. 다만 터치 화면에는 커서가 없으니 모바일에서는 꺼두는 게 기본이에요.",
+  tip:"데스크톱에서만 켜고, 모바일·터치에서는 끄라고 꼭 같이 말하세요.",
+  parts:[["점","마우스 위치에 바로 붙음","#c6ff4d"],["원(링)","살짝 늦게 따라옴","#8b7bff"],["링크 반응","링크 위에서 커짐","#ffc857"]],
+  say:["데스크톱에서만 커스텀 커서 써 주세요.","원이 조금 늦게 따라오게 해요.","링크 위에서는 원을 키워 주세요."],
+  mistakes:["모바일에서도 켜져 있어 이상한 원이 남음","너무 늦게 따라와 조작이 답답함","글자 입력칸에서도 커서가 바뀌어 불편함"],
+  related:["마그네틱 버튼","호버 이펙트","3D 틸트"],
+  prompt:"데스크톱에서만 작은 원형 커서가 마우스를 살짝 늦게 따라오게 하고, 링크 위에서는 원이 커지게 해 줘.",
+  thumb:()=>`<div class="center" style="position:relative"><span style="padding:10px 16px;border-radius:10px;background:#262634;border:1px solid #3a3a4a;font-weight:800;font-size:12px;color:#cfcfdc">LINK</span><i class="mt-cring"></i><i class="mt-cdot"></i></div>`,
+  demo(pg){let lag=18,touch=false,rid=0,mx=0,my=0,rx=0,ry=0,inside=false;
+    pg.innerHTML=`<div class="bar">${rng('lg','따라오는 속도',4,100,18,'%')}${tgl('tc','모바일(터치) 화면',false)}</div><div class="stage"><div class="mstage"><div class="m-cur" id="ar"><span class="lk">작업 보기</span><span class="lk">소개</span><span class="lk">연락하기</span><div class="m-ring" id="rg"></div><div class="m-dot" id="dt"></div></div></div></div><div class="note" id="nt"></div>`;
+    const ar=pg.querySelector('#ar'),rg=pg.querySelector('#rg'),dt=pg.querySelector('#dt');
+    const nt=()=>pg.querySelector('#nt').innerHTML=touch?'터치 화면에는 커서가 없어서 <b>꺼 두는 게 기본</b>이에요.':`상자 안에서 마우스를 움직여 보세요. 원이 <b>${lag}%씩</b> 따라와서 살짝 늦게 붙어요. 링크 위에서는 커져요.`;
+    const loop=()=>{if(!live(ar))return;rx+=(mx-rx)*lag/100;ry+=(my-ry)*lag/100;dt.style.transform=`translate(${mx}px,${my}px)`;rg.style.transform=`translate(${rx}px,${ry}px)`;rid=requestAnimationFrame(loop)};
+    ar.onpointermove=e=>{const r=ar.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;if(!inside){inside=true;rx=mx;ry=my}const lk=e.target.closest('.lk');rg.classList.toggle('big',!!lk);rg.textContent=lk?'보기':''};
+    ar.onpointerleave=()=>{inside=false};
+    const vis=()=>{ar.classList.toggle('off',touch);rg.style.display=dt.style.display=touch?'none':'';nt()};
+    wireRng(pg,'lg',v=>{lag=v;nt()},'%');pg.querySelector('#tc').onchange=e=>{touch=e.target.checked;vis()};mx=rx=ar.clientWidth/2;my=ry=ar.clientHeight-40;vis();loop()}});
+
+/* 23. 3D 틸트 */
+MV({id:"tilt",cat:"화면과 마우스",ko:"3D 틸트",en:"3D Tilt",sum:"마우스 쪽으로 갸우뚱 기울어짐",
+  lead:"카드 위에서 마우스를 움직이면 그 방향으로 카드가 기울어지는 효과. 반사광을 더하면 입체감이 살아요.",
+  video:"카드 위에서 마우스를 움직이면 카드가 그 방향으로 갸우뚱 기울어져요. 3D 틸트 효과예요. 반사광까지 같이 움직이면 진짜 카드를 이리저리 비춰 보는 것 같은 입체감이 생겨요.",
+  tip:"최대 10도 안팎이 고급스러워요. 20도를 넘으면 장난감 같아요.",
+  parts:[["기울기","마우스 위치 → 회전 각도","#c6ff4d"],["원근감","perspective로 입체감","#8b7bff"],["반사광","빛이 비치는 하이라이트","#ffc857"]],
+  say:["요금제 카드에 3D 틸트 넣어 주세요.","기울기는 최대 10도로요.","반사광도 같이 움직이게 해요."],
+  mistakes:["기울기가 커서 글자가 읽기 어려움","마우스가 나가도 기울어진 채 멈춰 있음","카드가 많은 목록 전체에 넣어 정신없음"],
+  related:["호버 이펙트","글래스모피즘","커스텀 커서"],
+  prompt:"요금제 카드에 마우스 위치에 따라 최대 10도까지 기울어지는 3D 틸트 효과를 넣고, 반사광도 같이 움직이게 해 줘.",
+  thumb:()=>`<div class="center"><div class="mt-tw"><div class="mt-tc">${ln('50%',6,'#9a9aaf')}${ln('70%',12,'#fff')}${ln('80%',5)}${ln('60%',5)}<div style="margin-top:auto;height:18px;border-radius:7px;background:#c6ff4d"></div></div></div></div>`,
+  demo(pg){let mx=10,gl=true;
+    pg.innerHTML=`<div class="bar">${rng('mx','최대 각도',0,30,10,'°')}${tgl('gl','반사광',true)}<span class="ctl">카드 위에서 마우스를 움직여 보세요</span></div><div class="stage"><div class="m-tiltw"><div class="m-tilt" id="tc"><h5>PRO</h5><b>₩19,000<small style="font-size:14px;color:var(--sub)"> /월</small></b><ul><li>✓ 무제한 프로젝트</li><li>✓ 팀원 10명</li><li>✓ 우선 지원</li></ul><button class="solid" style="width:100%">시작하기</button><div class="m-glare" id="gr"></div></div></div></div><div class="note" id="nt"></div>`;
+    const tc=pg.querySelector('#tc'),gr=pg.querySelector('#gr');
+    tc.onpointermove=e=>{const r=tc.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+      tc.style.transform=`rotateY(${(x-.5)*2*mx}deg) rotateX(${(.5-y)*2*mx}deg)`;gr.style.opacity=gl?1:0;gr.style.background=`radial-gradient(circle at ${x*100}% ${y*100}%,rgba(255,255,255,.35),transparent 55%)`;
+      pg.querySelector('#nt').innerHTML=mx>20?'<b>너무 많이 기울어서</b> 글자가 읽기 어려워요.':`가로 <b>${((x-.5)*2*mx).toFixed(0)}°</b>, 세로 <b>${((.5-y)*2*mx).toFixed(0)}°</b> 기울었어요.${gl?' 반사광이 마우스를 따라와요.':''}`};
+    tc.onpointerleave=()=>{tc.style.transform='none';gr.style.opacity=0};
+    wireRng(pg,'mx',v=>{mx=v},'°');pg.querySelector('#gl').onchange=e=>{gl=e.target.checked};pg.querySelector('#nt').innerHTML='카드 위에서 마우스를 움직이면 그 방향으로 <b>갸우뚱</b> 기울어요.'}});
+
+/* 24. 컨페티 */
+MV({id:"confetti",cat:"화면과 마우스",ko:"컨페티",en:"Confetti",sum:"축하 순간 색종이가 빵",
+  lead:"결제를 마치는 순간 색종이가 빵 터지는 효과. 정말 축하할 순간에만 아껴 써야 효과가 커요.",
+  video:"결제를 마치는 순간 색종이가 빵 터지죠. 컨페티 효과예요. 가입 완료나 첫 결제처럼 정말 축하할 순간에만 아껴야 효과가 커요. 매번 터지면 금방 시들해지거든요.",
+  tip:"첫 결제, 가입 완료처럼 특별한 순간에만. 모션 감소 설정 사용자에게는 생략하세요.",
+  parts:[["터지는 순간","첫 결제, 가입 완료","#ff6b9a"],["색종이 수와 시간","보통 2초 안팎","#c6ff4d"],["모션 감소","설정한 사용자는 생략","#ffc857"]],
+  say:["첫 결제에만 컨페티 터지게 해 주세요.","컨페티는 2초만요.","모션 감소 설정이면 생략해요."],
+  mistakes:["버튼 누를 때마다 터져서 금방 시들함","너무 오래 떨어져 화면을 가림","모션 감소 설정을 무시함"],
+  related:["마이크로 인터랙션","바운스","스케일 · 팝"],
+  prompt:"첫 결제가 끝나면 화면 위쪽에서 컨페티가 2초 동안 터지게 해 줘. 모션 감소 설정을 켠 사용자에게는 생략하고.",
+  thumb:()=>`<div class="center"><div class="mt-cf">${[[-60,-50,200],[50,-56,-160],[-30,-70,120],[70,-20,260],[-70,-10,-220],[20,-74,90],[-10,-40,300],[40,-40,-80]].map((v,i)=>`<i style="--x:${v[0]}px;--y:${v[1]}px;--r:${v[2]}deg;background:${C8[i]}"></i>`).join('')}</div></div>`,
+  demo(pg){let cnt=150,red=false,rid=0;
+    pg.innerHTML=`<div class="bar">${rng('ct','색종이 수',20,400,150,'개')}${tgl('rd','모션 감소 설정',false)}<button class="solid" id="pl">결제하기</button></div><div class="stage"><div class="mstage" id="st"><div class="m-pay" id="py"><span style="font-size:40px">💳</span><span class="ok" id="ok">결제를 눌러 보세요</span></div><canvas class="m-cv" id="cv"></canvas></div></div><div class="note" id="nt"></div>`;
+    const cv=pg.querySelector('#cv'),st=pg.querySelector('#st');
+    const play=()=>{cancelAnimationFrame(rid);pg.querySelector('#ok').textContent='첫 결제 완료! 🎉';pg.querySelector('#ok').animate([{transform:'scale(.6)',opacity:0},{transform:'scale(1)',opacity:1}],{duration:350,easing:EZ.out});
+      if(red){pg.querySelector('#nt').innerHTML='모션 감소 설정이 켜져 있어서 <b>컨페티는 생략</b>하고 완료 문구만 보여 줘요.';return}
+      const W=cv.width=st.clientWidth,H=cv.height=st.clientHeight,ctx=cv.getContext('2d');
+      const P=Array.from({length:cnt},()=>({x:W/2+(Math.random()-.5)*W*.3,y:-10-Math.random()*30,vx:(Math.random()-.5)*9,vy:Math.random()*4-2,r:Math.random()*6,vr:(Math.random()-.5)*.3,w:6+Math.random()*6,h:8+Math.random()*8,c:C8[Math.random()*8|0]}));const t0=performance.now();let lt=t0;
+      const f=t=>{if(!live(cv))return;ctx.clearRect(0,0,W,H);const e=t-t0,s=Math.min(3,Math.max(0,(t-lt)/16.7));lt=t;P.forEach(p=>{p.vy=Math.min(1.6,p.vy+.06*s);p.vx*=Math.pow(.98,s);p.x+=p.vx*s+Math.sin(e/300+p.r)*.4*s;p.y+=p.vy*s;p.r+=p.vr*s;ctx.save();ctx.globalAlpha=e>2000?Math.max(0,1-(e-2000)/600):1;ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h*Math.abs(Math.cos(p.r*2)));ctx.restore()});if(e<2600)rid=requestAnimationFrame(f);else ctx.clearRect(0,0,W,H)};rid=requestAnimationFrame(f);
+      pg.querySelector('#nt').innerHTML=`색종이 <b>${cnt}개</b>가 화면 위쪽에서 <b>2초</b> 동안 터져요. 매번 터지면 시들하니 <b>특별한 순간에만</b> 쓰세요.`};
+    wireRng(pg,'ct',v=>{cnt=v},'개');pg.querySelector('#rd').onchange=e=>{red=e.target.checked};pg.querySelector('#pl').onclick=play;pg.querySelector('#nt').innerHTML='결제하기를 누르면 <b>축하 색종이</b>가 터져요.'}});
+
 /* =====================================================
    화면 렌더링
    ===================================================== */
 let activeCat='전체',activeSet=(()=>{try{return localStorage.getItem('uiSet')||'real'}catch(e){return 'real'}})();
 const cur=s=>TERMS.filter(t=>(t.set||'real')===(s||activeSet));
-const HERO={real:['보면서 <span>이해하는</span> 실무 용어.','회의에서 쓰는 찐 실무 용어, 그림으로 먼저 익혀요.'],vibe:['이름을 알면 <span>AI에게</span> 정확히 말해요.','바이브코딩에서 쓰는 UI 용어 24개, 움직이는 화면과 요청 문장으로 익혀요.']};
+const HERO={real:['보면서 <span>이해하는</span> 실무 용어.','회의에서 쓰는 찐 실무 용어, 그림으로 먼저 익혀요.'],vibe:['이름을 알면 <span>AI에게</span> 정확히 말해요.','바이브코딩에서 쓰는 UI·모션 용어 48개, 움직이는 화면과 요청 문장으로 익혀요.']};
 function renderList(){
   const cats=['전체',...new Set(cur().map(t=>t.cat))];if(!cats.includes(activeCat))activeCat='전체';
-  $('#hh').innerHTML=HERO[activeSet][0];$('#hp').innerHTML=HERO[activeSet][1]+(activeSet==='vibe'?'<button class="cheatbtn" id="ch">치트시트 보기</button>':'');
+  $('#hh').innerHTML=HERO[activeSet][0];$('#hp').innerHTML=HERO[activeSet][1]+(activeSet!=='real'?'<button class="cheatbtn" id="ch">치트시트 보기</button>':'');
   document.querySelectorAll('#ptabs button').forEach(b=>b.classList.toggle('on',b.dataset.s===activeSet));$('#n1').textContent=cur('real').length;$('#n2').textContent=cur('vibe').length;
   const chb=$('#ch');if(chb)chb.onclick=()=>{location.hash='#/cheatsheet'};
   $('#filters').innerHTML=cats.map(c=>`<button class="${c===activeCat?'on':''}" data-c="${esc(c)}">${esc(c)}</button>`).join('');
@@ -1731,7 +2456,7 @@ function renderDetail(t){
     <div class="box s3 video"><h3>영상 핵심</h3><p>${esc(t.video)}</p><div class="tipl"><b>실무 TIP</b> ${esc(t.tip)}</div></div>
     <div class="box s3"><h3>실무에서 이렇게 말해요</h3>${t.say.map(s=>`<div class="q">${esc(s)}</div>`).join('')}</div>
     <div class="box s3"><h3>자주 하는 실수</h3>${t.mistakes.map(s=>`<div class="x">${esc(s)}</div>`).join('')}<h3 style="margin-top:22px">같이 보면 좋은 용어</h3><div class="tags">${t.related.map(r=>`<a>${esc(r)}</a>`).join('')}</div></div>
-    ${t.prompt?`<div class="box s6 promptbox"><h3>AI에게 요청하는 문장</h3><div class="pt" id="pt">${esc(t.prompt)}</div><button id="cp">복사</button><div class="formula"><b>공식</b> · UI 용어 + 원하는 동작 + 적용 조건</div></div>`:''}<div class="box s6"><h3>내 기록</h3>
+    ${t.prompt?`<div class="box s6 promptbox"><h3>AI에게 요청하는 문장</h3><div class="pt" id="pt">${esc(t.prompt)}</div><button id="cp">복사</button><div class="formula"><b>공식</b> · ${['움직임의 기본','글자와 그림','화면과 마우스'].includes(t.cat)?'효과 이름 + 속도 + 시작 조건':'UI 용어 + 원하는 동작 + 적용 조건'}</div></div>`:''}<div class="box s6"><h3>내 기록</h3>
       <textarea id="memo" placeholder="이해한 내용, 회사에서 들은 표현, 헷갈린 점을 적어두세요. 자동 저장돼요.">${esc(d.memo||'')}</textarea>
       <div class="foot"><label class="tg"><input type="checkbox" id="doneChk" ${d.done?'checked':''}><i></i>학습 완료</label><span id="saved">${d.updated?'저장됨 · '+esc(d.updated):''}</span><button class="ghost" id="addLog">+ 오늘 복습함</button></div>
       <ul class="log" id="log">${(d.log||[]).map(l=>`<li>${esc(l)}</li>`).join('')}</ul></div>
@@ -1747,7 +2472,7 @@ function renderDetail(t){
   t.demo($('#pg'));
   const cp=$('#cp');if(cp)cp.onclick=()=>{const txt=t.prompt;const done=()=>{cp.textContent='복사됨';setTimeout(()=>cp.textContent='복사',1200)};if(navigator.clipboard)navigator.clipboard.writeText(txt).then(done,done);else done()};
 }
-function renderCheat(){const groups=['레이아웃','UI 컴포넌트','효과'];let h='<div class="top" style="padding-bottom:0"><button class="back" id="back">← 목록</button><span class="pill">치트시트</span></div><div class="dhead"><h1>치트시트<small>한눈에 보는 24개</small></h1><div class="leadrow"><p>필요할 때 찾아서, 요청 문장을 바로 복사해 쓰세요.</p></div></div><table class="cheat">';for(const g of groups){h+=`<tr class="grp"><td colspan="3">${g}</td></tr>`;for(const t of cur('vibe').filter(x=>x.cat===g))h+=`<tr><td>${esc(t.ko)}<small>${esc(t.en)}</small></td><td>${esc(t.prompt)}</td><td><button data-id="${t.id}">복사</button></td></tr>`}h+='</table>';$('#detailView').innerHTML=h;$('#back').onclick=()=>{location.hash='#/'};$('#detailView').onclick=e=>{const b=e.target.closest('button[data-id]');if(!b)return;const t=TERMS.find(x=>x.id===b.dataset.id);const d=()=>{b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1200)};if(navigator.clipboard)navigator.clipboard.writeText(t.prompt).then(d,d);else d()}}
+function renderCheat(){const groups=[...new Set(cur().map(x=>x.cat))];let h='<div class="top" style="padding-bottom:0"><button class="back" id="back">← 목록</button><span class="pill">치트시트</span></div><div class="dhead"><h1>치트시트<small>한눈에 보는 '+cur().length+'개</small></h1><div class="leadrow"><p>필요할 때 찾아서, 요청 문장을 바로 복사해 쓰세요.</p></div></div><table class="cheat">';for(const g of groups){h+=`<tr class="grp"><td colspan="3">${g}</td></tr>`;for(const t of cur().filter(x=>x.cat===g))h+=`<tr><td>${esc(t.ko)}<small>${esc(t.en)}</small></td><td>${esc(t.prompt)}</td><td><button data-id="${t.id}">복사</button></td></tr>`}h+='</table>';$('#detailView').innerHTML=h;$('#back').onclick=()=>{location.hash='#/'};$('#detailView').onclick=e=>{const b=e.target.closest('button[data-id]');if(!b)return;const t=TERMS.find(x=>x.id===b.dataset.id);const d=()=>{b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1200)};if(navigator.clipboard)navigator.clipboard.writeText(t.prompt).then(d,d);else d()}}
 function route(){
   const id=location.hash.replace('#/','');
   if(id==='cheatsheet'){$('#listView').hidden=true;$('#detailView').hidden=false;renderCheat();scrollTo(0,0);return}
