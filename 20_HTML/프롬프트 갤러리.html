@@ -400,12 +400,6 @@ pre.box,.memo,.varbox{border-radius:12px}
     <input class="field" id="fTitle" placeholder="예: 번호 배지 + 흰 카드 리스트">
     <label class="fl">보조 설명 <small>(선택) 카드에도 함께 표시돼요</small></label>
     <input class="field" id="fDesc" placeholder="예: 모바일에서도 잘 보이는 버전">
-    <div class="row">
-      <div><label class="fl">사용한 AI <small>목록에 없으면 "+ 새 AI 추가"</small></label>
-        <select class="field" id="fAi"></select>
-        <input class="field" id="fAiNew" placeholder="새 AI 이름" hidden style="margin-top:8px"></div>
-      <div><label class="fl">구역</label><select class="field" id="fSec"></select></div>
-    </div>
     <label class="fl">별점 <small>결과가 마음에 든 정도</small></label><div class="starpick" id="fStars"></div>
     <label class="fl">태그 <small>입력 후 Enter 또는 쉼표 · 새 태그는 위쪽 탭에도 자동으로 생겨요</small></label>
     <div class="tagbox" id="tagBox"><input id="tagInput" list="tagList" placeholder="가이드, 표, 카드뉴스..."><datalist id="tagList"></datalist></div>
@@ -919,14 +913,7 @@ $('#dDup').onclick = async () => {
 };
 
 /* ---------- 편집 ---------- */
-let editId = null, eTags = [], eImage = '', eRating = 0;
-function fillAiSelect(selected) {
-  const list = [...aiList]; if (selected && !list.includes(selected)) list.push(selected);
-  $('#fAi').innerHTML = list.map(a => `<option value="${esc(a)}">${esc(a)}</option>`).join('') + '<option value="__new">+ 새 AI 추가...</option>';
-  $('#fAi').value = selected && list.includes(selected) ? selected : (list[0] || '__new');
-  $('#fAiNew').hidden = $('#fAi').value !== '__new'; $('#fAiNew').value = '';
-}
-$('#fAi').onchange = () => { const n = $('#fAi').value === '__new'; $('#fAiNew').hidden = !n; if (n) $('#fAiNew').focus(); };
+let editId = null, eTags = [], eImage = '', eRating = 0, eAi = '', eSec = '';
 function drawStars() { $('#fStars').innerHTML = [1,2,3,4,5].map(i => `<span data-n="${i}" class="${i <= eRating ? 'on' : ''}">★</span>`).join(''); }
 $('#fStars').onclick = e => { const s = e.target.closest('[data-n]'); if (s) { const n = +s.dataset.n; eRating = eRating === n ? 0 : n; drawStars(); } };
 function drawTags() {
@@ -978,9 +965,8 @@ function openEdit(id, secId) {
   $('#fTitle').value = c ? c.title : '';
   $('#fDesc').value = c ? (c.desc || '') : '';
   let last = ''; try { last = localStorage.getItem('pg-lastai') || ''; } catch {}
-  fillAiSelect(c ? c.ai : last);
-  $('#fSec').innerHTML = sections.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
-  $('#fSec').value = c ? c.sec : (secId || sections[0].id);
+  eAi = c ? c.ai : last;
+  eSec = c ? c.sec : (secId || sections[0].id);
   $('#fPrompt').value = c ? c.prompt : '';
   $('#fCode').value = c ? c.code : '';
   $('#fMemo').value = c ? c.memo : '';
@@ -994,14 +980,10 @@ $('#eSave').onclick = async () => {
   addTagFromInput();
   const title = $('#fTitle').value.trim();
   if (!title) { toast('제목을 입력해 주세요'); $('#fTitle').focus(); return; }
-  let ai = $('#fAi').value;
-  if (ai === '__new') {
-    ai = $('#fAiNew').value.trim();
-    if (ai && !aiList.includes(ai)) aiList.push(ai);
-  }
+  const ai = eAi;
   try { localStorage.setItem('pg-lastai', ai); } catch {}
   const now = Date.now(), old = editId ? cards.find(x => x.id === editId) : null;
-  const sec = $('#fSec').value;
+  const sec = eSec;
   let order;
   if (old && old.sec === sec) order = old.order;
   else order = Math.min(0, ...cards.filter(x => x.sec === sec).map(x => x.order)) - 1;   // 새 구역에서는 맨 앞에
