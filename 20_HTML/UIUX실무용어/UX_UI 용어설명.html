@@ -40,6 +40,11 @@ button{font:inherit;color:inherit}
 @media(max-width:620px){.cards{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:400px){.cards{grid-template-columns:1fr}}
 #detailView{max-width:1160px;margin:0 auto}
+@media(min-width:761px){
+ body.modal-open{overflow:hidden}
+ #detailView:not([hidden]){position:fixed;inset:0;max-width:none;z-index:80;background:rgba(8,8,14,.72);display:flex;justify-content:center;align-items:flex-start;padding:48px 24px;overflow-y:auto;margin:0}
+ #detailPanel{background:var(--panel);border:1px solid var(--line2);border-radius:20px;max-width:1160px;width:100%;box-shadow:0 40px 90px -20px rgba(0,0,0,.6)}
+}
 .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:0;overflow:hidden;cursor:pointer;text-align:left;display:block;width:100%;
  transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .35s}
 .card:hover,.card:focus-visible{transform:translateY(-6px);border-color:var(--line2);box-shadow:0 30px 60px -20px rgba(139,123,255,.35);outline:none}
@@ -1202,7 +1207,7 @@ textarea::placeholder{color:#6b6b80}
     <div class="cbody"><span class="tag">효과</span><h2>마이크로 인터랙션<small>Micro-interaction</small></h2><p>작은 행동에 돌아오는 작은 반응</p>
     <div class="cta"><span>만져보고 기록 남기기</span><span class="arrow">→</span></div></div></button></div>
   </section>
-  <section id="detailView" hidden=""></section>
+  <section id="detailView" hidden=""><div id="detailPanel"></div></section>
 </div>
 
 <script>
@@ -2486,7 +2491,7 @@ $('#cards').onclick=e=>{const c=e.target.closest('.card');if(c)location.hash='#/
 
 function renderDetail(t){
   const L=cur(t.set||'real'),d=load(t.id), idx=L.indexOf(t);
-  $('#detailView').innerHTML=`
+  $('#detailPanel').innerHTML=`
   <div class="top" style="padding-bottom:0"><button class="back" id="back">← 목록</button><span class="pill">${esc(t.cat)} · ${idx+1}/${L.length}</span></div>
   <div class="dhead"><h1 class="${t.ko.length>8||t.en.length>24?'long':''}">${esc(t.ko)}<small>${esc(t.en)}</small></h1><div class="leadrow"><p>${esc(t.lead)}</p><span class="pn top inl"><button id="pvT" ${idx===0?'disabled':''}>← 이전</button><button id="nxT" ${idx===L.length-1?'disabled':''}>다음 →</button></span></div></div>
   <div class="box playground" id="pg"></div>
@@ -2511,16 +2516,22 @@ function renderDetail(t){
   t.demo($('#pg'));
   const cp=$('#cp');if(cp)cp.onclick=()=>{const txt=t.prompt;const done=()=>{cp.textContent='복사됨';setTimeout(()=>cp.textContent='복사',1200)};if(navigator.clipboard)navigator.clipboard.writeText(txt).then(done,done);else done()};
 }
-function renderCheat(){const groups=[...new Set(TERMS.filter(x=>(x.set||'real')===activeSet).map(x=>x.cat))];let h='<div class="top" style="padding-bottom:0"><button class="back" id="back">← 목록</button><span class="pill">치트시트</span></div><div class="dhead"><h1>치트시트<small>한눈에 보는 '+cur().length+'개</small></h1><div class="leadrow"><p>필요할 때 찾아서, 요청 문장을 바로 복사해 쓰세요.</p></div></div><table class="cheat">';for(const g of groups){h+=`<tr class="grp"><td colspan="3">${g}</td></tr>`;for(const t of cur().filter(x=>x.cat===g))h+=`<tr><td>${esc(t.ko)}<small>${esc(t.en)}</small></td><td>${esc(t.prompt)}</td><td><button data-id="${t.id}">복사</button></td></tr>`}h+='</table>';$('#detailView').innerHTML=h;$('#back').onclick=()=>{location.hash='#/'};$('#detailView').onclick=e=>{const b=e.target.closest('button[data-id]');if(!b)return;const t=TERMS.find(x=>x.id===b.dataset.id);const d=()=>{b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1200)};if(navigator.clipboard)navigator.clipboard.writeText(t.prompt).then(d,d);else d()}}
+function renderCheat(){const groups=[...new Set(TERMS.filter(x=>(x.set||'real')===activeSet).map(x=>x.cat))];let h='<div class="top" style="padding-bottom:0"><button class="back" id="back">← 목록</button><span class="pill">치트시트</span></div><div class="dhead"><h1>치트시트<small>한눈에 보는 '+cur().length+'개</small></h1><div class="leadrow"><p>필요할 때 찾아서, 요청 문장을 바로 복사해 쓰세요.</p></div></div><table class="cheat">';for(const g of groups){h+=`<tr class="grp"><td colspan="3">${g}</td></tr>`;for(const t of cur().filter(x=>x.cat===g))h+=`<tr><td>${esc(t.ko)}<small>${esc(t.en)}</small></td><td>${esc(t.prompt)}</td><td><button data-id="${t.id}">복사</button></td></tr>`}h+='</table>';$('#detailPanel').innerHTML=h;$('#back').onclick=()=>{location.hash='#/'};$('#detailPanel').onclick=e=>{const b=e.target.closest('button[data-id]');if(!b)return;const t=TERMS.find(x=>x.id===b.dataset.id);const d=()=>{b.textContent='복사됨';setTimeout(()=>b.textContent='복사',1200)};if(navigator.clipboard)navigator.clipboard.writeText(t.prompt).then(d,d);else d()}}
 function route(){
   const id=location.hash.replace('#/','');
-  if(id==='cheatsheet'){$('#listView').hidden=true;$('#detailView').hidden=false;renderCheat();scrollTo(0,0);return}
-  const t=TERMS.find(x=>x.id===id);if(t){activeSet=t.set||'real'}
-  $('#listView').hidden=!!t;$('#detailView').hidden=!t;
-  if(t){renderDetail(t);scrollTo(0,0)}else renderList();
+  const isModal=matchMedia('(min-width:761px)').matches;
+  renderList();
+  if(id==='cheatsheet'){$('#listView').hidden=!isModal;$('#detailView').hidden=false;document.body.classList.toggle('modal-open',isModal);renderCheat();if(!isModal)scrollTo(0,0);return}
+  const t=TERMS.find(x=>x.id===id);
+  if(t){activeSet=t.set||'real';renderList()}
+  $('#listView').hidden=!!t&&!isModal;
+  $('#detailView').hidden=!t;
+  document.body.classList.toggle('modal-open',!!t&&isModal);
+  if(t){renderDetail(t);if(!isModal)scrollTo(0,0)}
 }
 addEventListener('hashchange',route);
-addEventListener('keydown',e=>{if($('#detailView').hidden||/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName))return;const id=location.hash.replace('#/','');const t=TERMS.find(x=>x.id===id);if(!t)return;const L=cur(t.set||'real'),i=L.indexOf(t);if(e.key==='ArrowLeft'&&i>0)location.hash='#/'+L[i-1].id;if(e.key==='ArrowRight'&&i<L.length-1)location.hash='#/'+L[i+1].id});
+$('#detailView').onclick=e=>{if(e.target===e.currentTarget&&matchMedia('(min-width:761px)').matches)location.hash='#/'};
+addEventListener('keydown',e=>{if($('#detailView').hidden||/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName))return;if(e.key==='Escape'&&matchMedia('(min-width:761px)').matches){location.hash='#/';return}const id=location.hash.replace('#/','');const t=TERMS.find(x=>x.id===id);if(!t)return;const L=cur(t.set||'real'),i=L.indexOf(t);if(e.key==='ArrowLeft'&&i>0)location.hash='#/'+L[i-1].id;if(e.key==='ArrowRight'&&i<L.length-1)location.hash='#/'+L[i+1].id});
 addEventListener('resize',()=>{const p=$('#pg');if(p&&p._redraw)p._redraw()});
 route();
 </script>
