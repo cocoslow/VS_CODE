@@ -174,6 +174,7 @@ main{padding:20px 24px 80px}
 .card:hover .quick{opacity:1}
 .info{padding:12px 13px 14px}
 .info h3{margin:0 0 5px;font-size:14.5px;font-weight:700;letter-spacing:-.01em;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.info .desc{margin:0 0 7px;color:var(--sub);font-size:12.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .meta{display:flex;align-items:center;flex-wrap:wrap;gap:2px 8px;color:var(--sub);font-size:12px;margin-bottom:7px}
 .stars{color:var(--star);letter-spacing:1px;font-size:13px}
 .stars .off{color:var(--staroff)}
@@ -397,6 +398,8 @@ pre.box,.memo,.varbox{border-radius:12px}
   <div class="mbody form" id="eBody">
     <label class="fl" style="margin-top:0">제목 <small>결과 모양 기준으로 지으면 나중에 찾기 쉬워요</small></label>
     <input class="field" id="fTitle" placeholder="예: 번호 배지 + 흰 카드 리스트">
+    <label class="fl">보조 설명 <small>(선택) 카드에도 함께 표시돼요</small></label>
+    <input class="field" id="fDesc" placeholder="예: 모바일에서도 잘 보이는 버전">
     <div class="row">
       <div><label class="fl">사용한 AI <small>목록에 없으면 "+ 새 AI 추가"</small></label>
         <select class="field" id="fAi"></select>
@@ -651,6 +654,7 @@ function cardHtml(c) {
       <div class="thumb">${c.image ? `<img src="${c.image}" alt="" draggable="false" loading="lazy">` : '<div class="noimg">이미지 없음</div>'}
         <div class="quick"><button class="btn sm" data-act="copy" title="프롬프트 복사">복사</button><button class="btn sm" data-act="edit">편집</button><button class="btn sm danger" data-act="del">삭제</button></div></div>
       <div class="info"><h3>${esc(c.title)}</h3>
+        ${c.desc ? `<p class="desc">${esc(c.desc)}</p>` : ''}
         <div class="meta">${stars(c.rating)}<span>${esc(c.ai)}</span><span>${fmtDate(c.created)}</span></div>
         <div class="tags">${c.tags.map(tagEl).join('')}</div></div>
     </article>`;
@@ -972,6 +976,7 @@ function openEdit(id, secId) {
   const c = id ? cards.find(x => x.id === id) : null;
   $('#eHead').textContent = c ? '카드 편집' : '새 카드';
   $('#fTitle').value = c ? c.title : '';
+  $('#fDesc').value = c ? (c.desc || '') : '';
   let last = ''; try { last = localStorage.getItem('pg-lastai') || ''; } catch {}
   fillAiSelect(c ? c.ai : last);
   $('#fSec').innerHTML = sections.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
@@ -1000,7 +1005,8 @@ $('#eSave').onclick = async () => {
   let order;
   if (old && old.sec === sec) order = old.order;
   else order = Math.min(0, ...cards.filter(x => x.sec === sec).map(x => x.order)) - 1;   // 새 구역에서는 맨 앞에
-  const c = {id: old ? old.id : uid(), title, ai, tags: [...eTags], rating: eRating, image: eImage, sec, order,
+  const desc = $('#fDesc').value.trim();
+  const c = {id: old ? old.id : uid(), title, desc, ai, tags: [...eTags], rating: eRating, image: eImage, sec, order,
     prompt: $('#fPrompt').value, code: $('#fCode').value, memo: $('#fMemo').value, created: old ? old.created : now, updated: now};
   try { await putCard(c); } catch (e) { alert('저장에 실패했어요: ' + e.message); return; }
   if (old) cards[cards.indexOf(old)] = c; else cards.push(c);
