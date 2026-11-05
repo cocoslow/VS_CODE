@@ -914,6 +914,21 @@ function card(o) {
   render()};
  const _r=render;render=function(){_r();upd()};
  render();
+ // 휠로 섹션(Save/Revision/...) 넘기기: 목록 끝/처음에서 한 번 더 휠을 돌리면 다음/이전 섹션으로 이동
+ const flatSubs=()=>{const out=[];for(const cat in TREE)for(const sub of TREE[cat])if(OPTIONS.some(o=>o.cat==cat&&o.sub==sub))out.push([cat,sub]);return out};
+ let wheelLock=false;
+ const gotoDelta=delta=>{
+  const list=flatSubs();const idx=list.findIndex(([c,s])=>c==curCat&&s==curSub);
+  if(idx<0)return;const next=idx+delta;if(next<0||next>=list.length)return;
+  curCat=list[next][0];curSub=list[next][1];curFav=false;G("q").value="";render();
+  requestAnimationFrame(()=>{const mn=document.querySelector("main");mn.scrollTop=delta>0?0:mn.scrollHeight});
+ };
+ document.querySelector("main").addEventListener("wheel",e=>{
+  if(curFav||G("q").value.trim())return;
+  const mn=e.currentTarget;const atBottom=mn.scrollTop+mn.clientHeight>=mn.scrollHeight-2;const atTop=mn.scrollTop<=2;
+  if(e.deltaY>0&&atBottom){e.preventDefault();if(!wheelLock){wheelLock=true;gotoDelta(1);setTimeout(()=>wheelLock=false,500)}}
+  else if(e.deltaY<0&&atTop){e.preventDefault();if(!wheelLock){wheelLock=true;gotoDelta(-1);setTimeout(()=>wheelLock=false,500)}}
+ },{passive:false});
 })();
 
 
