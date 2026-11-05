@@ -615,7 +615,6 @@
     <main>
       <div class="path" id="path"></div>
       <div class="bar">
-        <div class="filters" id="filters"></div>
         <button id="toggleAll" title="전체 펼치기" aria-label="전체 펼치기/접기"></button>
       </div>
       <div class="list" id="list"></div>
@@ -750,8 +749,6 @@ const LV = { 0: ["미분류", "b3"], 1: ["필수", "b1"], 2: ["추천", "b2"], 3
       else { G("path").innerHTML = '<a class="crumb" data-go="cat">' + curCat + '</a> &gt; <a class="crumb" data-go="sub">' + curSub + '</a>';
         G("path").querySelector('[data-go="cat"]').onclick = () => { const subs = TREE[curCat]; const first = subs.find(s => OPTIONS.some(o => o.cat == curCat && o.sub == s)) || subs[0]; catClosed.delete(curCat); curSub = first; curFav = false; render(); G("tree").querySelector(".sub.on") && G("tree").querySelector(".sub.on").scrollIntoView({ block: "nearest" }); };
         G("path").querySelector('[data-go="sub"]').onclick = () => { secClosed.clear(); render(); document.querySelector("main").scrollTo({ top: 0, behavior: "smooth" }) }; }
-      G("filters").innerHTML = [[0, "전체"], [1, "필수"], [2, "추천"], [3, "몰라도 됨"]].map(([v, t]) => '<button class="' + (curLv == v ? "on" : "") + '" data-v="' + v + '">' + t + '</button>').join("");
-      document.querySelectorAll(".filters button").forEach(b => b.onclick = () => { curLv = +b.dataset.v; render() });
       G("list").innerHTML = items.length ? (q ? items.map(card).join("") : (curFav ? favView(items) : sections(items))) : '<div class="empty-msg">이 항목은 아직 비어 있습니다.</div>';
       document.querySelectorAll("details.sec1,details.sec2").forEach(d => d.addEventListener("toggle", e => { if (e.target !== d) return; d.open ? secClosed.delete(d.dataset.k) : secClosed.add(d.dataset.k) }));
       document.querySelectorAll("details.card").forEach(d => d.addEventListener("toggle", () => { const id = +d.dataset.id; d.open ? openSet.add(id) : openSet.delete(id) }));
@@ -823,7 +820,7 @@ function card(o) {
       const m = mine[o.id] || {}; const def = m.def || effDef(o); const diff = m.val && m.val != def;
       return '<details class="card" data-id="' + o.id + '" ' + ((forceOpen || openSet.has(o.id)) ? "open" : "") + '><summary><span class="arrow">▶</span>' +
         '<div style="flex:1"><div class="ko">' + (o.en ? o.en + ' <span class="k2">(' + o.ko + ')</span>' : o.ko) + '</div>' +
-        '<div style="margin:4px 0"><span class="val">기본 ' + def + '</span>' +
+        '<div style="margin:4px 0"><span class="val" style="background:' + (def == "Yes" ? "#d8f0d8" : def == "No" ? "#fddede" : "#e3edff") + '">기본 ' + def + '</span>' +
         (m.val ? ' <span class="val" style="background:' + (diff ? "#ffd9a8" : "#d8f0d8") + '">내 설정 ' + m.val + '</span>' : '') + '</div>' +
         '<div class="sum">' + o.sum + '</div></div>' +
         '<div style="text-align:right"><button class="memo ' + (hasMemo(o) ? "on" : "") + '" data-id="' + o.id + '" title="메모/스샷" onclick="event.preventDefault();event.stopPropagation();openMemo(' + o.id + ')">' + MEMO_SVG + '</button><button class="star ' + (favs.has(favKey(o)) ? "on" : "") + '" title="즐겨찾기" onclick="event.preventDefault();event.stopPropagation();toggleFav(' + o.id + ')">' + (favs.has(favKey(o)) ? "★" : "☆") + '</button></div></summary>' +
