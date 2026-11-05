@@ -818,8 +818,9 @@ function favView(items){
  items.forEach(o=>{const g=o.cat+" > "+o.sub;if(g!=last){h+='<div class="favhead">'+g+'</div>';last=g}h+=card(o)});
  forceOpen=false;return h;
 }
+function effDef(o) { const vs = o.values.filter(v => v != "버튼"); return vs.includes(o.def) ? o.def : (vs[0] || o.def); }
 function card(o) {
-      const m = mine[o.id] || {}; const def = m.def || o.def; const diff = m.val && m.val != def;
+      const m = mine[o.id] || {}; const def = m.def || effDef(o); const diff = m.val && m.val != def;
       return '<details class="card" data-id="' + o.id + '" ' + ((forceOpen || openSet.has(o.id)) ? "open" : "") + '><summary><span class="arrow">▶</span>' +
         '<div style="flex:1"><div class="ko">' + (o.en ? o.en + ' <span class="k2">(' + o.ko + ')</span>' : o.ko) + '</div>' +
         '<div style="margin:4px 0"><span class="val">기본 ' + def + '</span>' +
@@ -829,11 +830,11 @@ function card(o) {
         '<div class="body">' + body(o, m) + '</div></details>';
     }
     function body(o, m) {
-      const def = m.def || o.def;
+      const def = m.def || effDef(o);
       return '<div class="en" style="margin-top:10px">' + (o.en ? '' : '영문 원문: 미입력 ') + '(' + o.group + ')</div>' +
         '<div class="row memo-row" data-id="' + o.id + '"><div class="k"><span>메모</span><span class="mbtns"><button class="mb tx no" title="NO 칸 넣기" onclick="insTpl(' + o.id + ',\'NO\')">NO</button><button class="mb tx yes" title="YES 칸 넣기" onclick="insTpl(' + o.id + ',\'YES\')">YES</button><button class="mb" title="크게 보기" onclick="openBig(' + o.id + ')">' + SVG_EXP + '</button><button class="mb" title="스샷 추가" onclick="pickImg(' + o.id + ')">' + SVG_IMG + '</button></span></div><div><div class="memoed" contenteditable="true" data-id="' + o.id + '" data-ph="메모를 적으세요. 스샷은 Ctrl+V로 붙여넣기 (글과 스샷을 순서대로 쓸 수 있어요)" oninput="saveMemo(' + o.id + ',this)" onpaste="pasteMemo(event,' + o.id + ')">' + memoHtml(o) + '</div></div></div>' +
         '<div class="row"><div class="k">기능</div><div>' + o.sum + '</div></div>' +
-        '<div class="row"><div class="k">선택값</div><div>' + (o.values.length ? o.values.join(" / ") : "화면에서 목록/숫자 확인") + ((o.onTxt || o.offTxt) ? '<div class="yn">' + (o.onTxt ? '<div class="yn-r on-box"><b>Yes</b> ' + o.onTxt + '</div>' : '') + (o.offTxt ? '<div class="yn-r off-box"><b>No</b> ' + o.offTxt + '</div>' : '') + '</div>' : '') + '</div></div>' +
+        '<div class="row"><div class="k">선택값</div><div>' + (o.values.length ? "" : "화면에서 목록/숫자 확인") + ((o.onTxt || o.offTxt) ? '<div class="yn">' + (o.onTxt ? '<div class="yn-r on-box"><b>Yes</b> ' + o.onTxt + '</div>' : '') + (o.offTxt ? '<div class="yn-r off-box"><b>No</b> ' + o.offTxt + '</div>' : '') + '</div>' : '') + '</div></div>' +
         (o.warn ? '<div class="row"><div class="k">주의</div><div class="warn">' + o.warn + '</div></div>' : '') +
 
         '<div class="row mine"><div class="k">설정</div><div style="display:flex;gap:18px">' +
