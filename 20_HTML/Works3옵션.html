@@ -823,7 +823,7 @@ function card(o) {
         '<div style="margin:4px 0"><span class="val" style="background:' + (def == "Yes" ? "#d8f0d8" : def == "No" ? "#fddede" : "#e3edff") + '">기본 ' + def + '</span>' +
         (m.val ? ' <span class="val" style="background:' + (diff ? "#ffd9a8" : "#d8f0d8") + '">내 설정 ' + m.val + '</span>' : '') + '</div>' +
         '<div class="sum">' + o.sum + '</div></div>' +
-        '<div style="text-align:right"><button class="memo ' + (hasMemo(o) ? "on" : "") + '" data-id="' + o.id + '" title="메모/스샷" onclick="event.preventDefault();event.stopPropagation();openMemo(' + o.id + ')">' + MEMO_SVG + '</button><button class="star ' + (favs.has(favKey(o)) ? "on" : "") + '" title="즐겨찾기" onclick="event.preventDefault();event.stopPropagation();toggleFav(' + o.id + ')">' + (favs.has(favKey(o)) ? "★" : "☆") + '</button></div></summary>' +
+        '<div style="text-align:right"><button class="star ' + (favs.has(favKey(o)) ? "on" : "") + '" title="즐겨찾기" onclick="event.preventDefault();event.stopPropagation();toggleFav(' + o.id + ')">' + (favs.has(favKey(o)) ? "★" : "☆") + '</button><button class="memo ' + (hasMemo(o) ? "on" : "") + '" data-id="' + o.id + '" title="메모/스샷" onclick="event.preventDefault();event.stopPropagation();openMemo(' + o.id + ')">' + MEMO_SVG + '</button></div></summary>' +
         '<div class="body">' + body(o, m) + '</div></details>';
     }
     function body(o, m) {
