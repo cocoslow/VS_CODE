@@ -819,28 +819,31 @@ function favView(items){
  forceOpen=false;return h;
 }
 function card(o) {
-      const m = mine[o.id] || {}; const diff = m.val && m.val != o.def;
+      const m = mine[o.id] || {}; const def = m.def || o.def; const diff = m.val && m.val != def;
       return '<details class="card" data-id="' + o.id + '" ' + ((forceOpen || openSet.has(o.id)) ? "open" : "") + '><summary><span class="arrow">▶</span>' +
         '<div style="flex:1"><div class="ko">' + (o.en ? o.en + ' <span class="k2">(' + o.ko + ')</span>' : o.ko) + '</div>' +
-        '<div style="margin:4px 0"><span class="val">기본 ' + o.def + '</span>' +
+        '<div style="margin:4px 0"><span class="val">기본 ' + def + '</span>' +
         (m.val ? ' <span class="val" style="background:' + (diff ? "#ffd9a8" : "#d8f0d8") + '">내 설정 ' + m.val + '</span>' : '') + '</div>' +
         '<div class="sum">' + o.sum + '</div></div>' +
         '<div style="text-align:right"><button class="memo ' + (hasMemo(o) ? "on" : "") + '" data-id="' + o.id + '" title="메모/스샷" onclick="event.preventDefault();event.stopPropagation();openMemo(' + o.id + ')">' + MEMO_SVG + '</button><button class="star ' + (favs.has(favKey(o)) ? "on" : "") + '" title="즐겨찾기" onclick="event.preventDefault();event.stopPropagation();toggleFav(' + o.id + ')">' + (favs.has(favKey(o)) ? "★" : "☆") + '</button></div></summary>' +
         '<div class="body">' + body(o, m) + '</div></details>';
     }
     function body(o, m) {
+      const def = m.def || o.def;
       return '<div class="en" style="margin-top:10px">' + (o.en ? '' : '영문 원문: 미입력 ') + '(' + o.group + ')</div>' +
         '<div class="row memo-row" data-id="' + o.id + '"><div class="k"><span>메모</span><span class="mbtns"><button class="mb tx no" title="NO 칸 넣기" onclick="insTpl(' + o.id + ',\'NO\')">NO</button><button class="mb tx yes" title="YES 칸 넣기" onclick="insTpl(' + o.id + ',\'YES\')">YES</button><button class="mb" title="크게 보기" onclick="openBig(' + o.id + ')">' + SVG_EXP + '</button><button class="mb" title="스샷 추가" onclick="pickImg(' + o.id + ')">' + SVG_IMG + '</button></span></div><div><div class="memoed" contenteditable="true" data-id="' + o.id + '" data-ph="메모를 적으세요. 스샷은 Ctrl+V로 붙여넣기 (글과 스샷을 순서대로 쓸 수 있어요)" oninput="saveMemo(' + o.id + ',this)" onpaste="pasteMemo(event,' + o.id + ')">' + memoHtml(o) + '</div></div></div>' +
         '<div class="row"><div class="k">기능</div><div>' + o.sum + '</div></div>' +
-        '<div class="row"><div class="k">선택값</div><div>' + (o.values.length ? o.values.join(" / ") : "화면에서 목록/숫자 확인") + ' (기본 ' + o.def + ', 추천 ' + o.rec + ')' + ((o.onTxt || o.offTxt) ? '<div class="yn">' + (o.onTxt ? '<div class="yn-r on-box"><b>Yes</b> ' + o.onTxt + '</div>' : '') + (o.offTxt ? '<div class="yn-r off-box"><b>No</b> ' + o.offTxt + '</div>' : '') + '</div>' : '') + '</div></div>' +
+        '<div class="row"><div class="k">선택값</div><div>' + (o.values.length ? o.values.join(" / ") : "화면에서 목록/숫자 확인") + ' (기본 ' + def + ', 추천 ' + o.rec + ')' + ((o.onTxt || o.offTxt) ? '<div class="yn">' + (o.onTxt ? '<div class="yn-r on-box"><b>Yes</b> ' + o.onTxt + '</div>' : '') + (o.offTxt ? '<div class="yn-r off-box"><b>No</b> ' + o.offTxt + '</div>' : '') + '</div>' : '') + '</div></div>' +
         (o.warn ? '<div class="row"><div class="k">주의</div><div class="warn">' + o.warn + '</div></div>' : '') +
-        
+
+        '<div class="row mine"><div class="k">기본값</div><div><select onchange="sv(' + o.id + ',\'def\',this.value)">' +
+        o.values.filter(v => v != "버튼").map(v => '<option ' + (def == v ? "selected" : "") + '>' + v + '</option>').join("") + '</select></div></div>' +
         '<div class="row mine"><div class="k">내 설정</div><div><select onchange="sv(' + o.id + ',\'val\',this.value)"><option value="">미선택</option>' +
         o.values.filter(v => v != "버튼").map(v => '<option ' + (m.val == v ? "selected" : "") + '>' + v + '</option>').join("") + '</select></div></div>';
     }
     function sv(id, k, v) {
       mine[id] = mine[id] || {}; mine[id][k] = v; try { __ls.setItem("gxmine", JSON.stringify(mine)) } catch (e) { }
-      if (k == "val") render();
+      if (k == "val" || k == "def") render();
     }
     G("q").oninput = render;
 
